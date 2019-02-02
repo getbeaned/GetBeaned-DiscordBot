@@ -1,0 +1,74 @@
+import discord
+from discord.ext import commands
+
+from cogs.helpers.helpful_classes import LikeUser, FakeMember
+
+
+class NotStrongEnough(Exception):
+    pass
+
+
+class HierarchyError(Exception):
+    pass
+
+
+## Converters
+# Stolen from R.Danny source code, as should do any discord bot anyway
+# https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/mod.py#L63
+class InferiorMember(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            m = await commands.MemberConverter().convert(ctx, argument)
+            can_execute = ctx.author == ctx.guild.owner or \
+                          ctx.author.top_role > m.top_role
+        except commands.BadArgument:
+            raise commands.BadArgument(f"{argument} is not a valid member or member ID.") from None
+        else:
+            if can_execute:
+                if m.top_role > ctx.guild.me.top_role:
+                    raise NotStrongEnough(f'You cannot do this action on this user due to role hierarchy between the bot and {m.name}.')
+                return m  # We return a Member
+            else:
+                raise HierarchyError('You cannot do this action on this user due to role hierarchy.')
+
+
+class ForcedMember(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            m = await InferiorMember().convert(ctx, argument)
+            return m
+        except commands.BadArgument:
+            try:
+                did = int(argument, base=10)
+                try:
+                    u = ctx.bot.get_user(did)
+                    if u:
+                        return FakeMember(u, ctx.guild)
+
+                    else:
+                        u = await ctx.bot.get_user_info(did)
+                        return FakeMember(u, ctx.guild)
+                except:
+                    ctx.bot.logger.exception("An error happened trying to convert a discord ID to a User instance. "
+                                             "Relying on a LikeUser")
+                    return LikeUser(did=int(argument, base=10), name="Unknown member", guild=ctx.guild)
+            except ValueError:
+                raise commands.BadArgument(f"{argument} is not a valid member or member ID.") from None
+        except Exception as e:
+            raise
+
+
+class BannedMember(commands.Converter):
+    async def convert(self, ctx, argument):
+        ban_list = await ctx.guild.bans()
+        try:
+            member_id = int(argument, base=10)
+
+            entity = discord.utils.find(lambda u: u.user.id == member_id, ban_list)
+        except ValueError:
+            entity = discord.utils.find(lambda u: str(u.user) == argument, ban_list)
+
+        if entity is None:
+            raise commands.BadArgument("Not a valid previously-banned member.")
+
+        return entity

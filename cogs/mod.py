@@ -67,7 +67,7 @@ class Mod:
             on_member = FakeMember(guild=ctx.guild, user=on)
 
             act = await full_process(ctx.bot, unban, on_member, ctx.author, reason, attachement_url=attachments_url)
-            await ctx.send(f":ok_hand: - See {act['url']} for details, user_informed={act['user_informed']}")
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
 
     @commands.command()
     @commands.guild_only()
@@ -114,7 +114,7 @@ class Mod:
                 attachments_url = None
 
             act = await full_process(ctx.bot, note, on, ctx.author, reason, attachement_url=attachments_url)
-            await ctx.send(f":ok_hand: - See {act['url']} for details, user_informed={act['user_informed']}")
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
 
     @commands.command()
     @commands.guild_only()
@@ -160,7 +160,7 @@ class Mod:
                 attachments_url = None
 
             act = await full_process(ctx.bot, warn, on, ctx.author, reason, attachement_url=attachments_url)
-            await ctx.send(f":ok_hand: - See {act['url']} for details, user_informed={act['user_informed']}")
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
 
     @commands.command()
     @commands.guild_only()
@@ -206,7 +206,7 @@ class Mod:
                 attachments_url = None
 
             act = await full_process(ctx.bot, kick, on, ctx.author, reason, attachement_url=attachments_url)
-            await ctx.send(f":ok_hand: - See {act['url']} for details, user_informed={act['user_informed']}")
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
 
     @commands.command()
     @commands.guild_only()
@@ -255,7 +255,7 @@ class Mod:
                 attachments_url = None
 
             act = await full_process(ctx.bot, softban, on, ctx.author, reason, attachement_url=attachments_url)
-            await ctx.send(f":ok_hand: - See {act['url']} for details, user_informed={act['user_informed']}")
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
 
     @commands.command()
     @commands.guild_only()
@@ -302,7 +302,7 @@ class Mod:
 
             act = await full_process(ctx.bot, ban, on, ctx.author, reason, attachement_url=attachments_url)
 
-            await ctx.send(f":ok_hand: - See {act['url']} for details, user_informed={act['user_informed']}")
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
 
 
 

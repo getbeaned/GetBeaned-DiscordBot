@@ -22,7 +22,7 @@ class Mod:
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def unban(self, ctx, banned_users: commands.Greedy[BannedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+    async def unban(self, ctx, banned_users: commands.Greedy[BannedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Unban a member from the server. The member must be currently banned for this command to work.
 
@@ -120,7 +120,7 @@ class Mod:
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
-    async def warn(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+    async def warn(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Warn a member on the server. If thresholds are enabled, warning a user can lead to worse actions, like bans and kicks.
 
@@ -166,7 +166,7 @@ class Mod:
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
-    async def kick(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+    async def kick(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Kick a member from the server. If thresholds are enabled, kicking a user can lead to bans.
 
@@ -212,7 +212,7 @@ class Mod:
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def softban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+    async def softban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Softban a member on the server. A softban is when you ban a user to remove every message sent by him,
         before unbanning him/her so that he/she can join again.
@@ -261,7 +261,7 @@ class Mod:
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def ban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+    async def ban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Banning a user is the ultimate punishment, where is is kicked from the server and can't return
 
@@ -303,8 +303,6 @@ class Mod:
             act = await full_process(ctx.bot, ban, on, ctx.author, reason, attachement_url=attachments_url)
 
             await ctx.send(f":ok_hand: - See {act['url']} for details")
-
-
 
 
 def setup(bot):

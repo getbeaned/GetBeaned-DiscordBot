@@ -74,6 +74,14 @@ class Mod:
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
     async def note(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)):
+        """
+        Note a member on the server. A note does nothing but store information of a specific user.
+
+        Use like +note [member(s)] [reason].
+
+        [member] can be an ID, a username#discrim or a mention.
+        [reason] is your note reason.
+        """
         # Nothing to do here.
 
         if len(users) >= 2:
@@ -113,6 +121,14 @@ class Mod:
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
     async def warn(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+        """
+        Warn a member on the server. If thresholds are enabled, warning a user can lead to worse actions, like bans and kicks.
+
+        Use like +warn [member(s)] <reason>.
+
+        [member] can be an ID, a username#discrim or a mention.
+        <reason> is your warn reason.
+        """
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
@@ -151,6 +167,14 @@ class Mod:
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
     async def kick(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+        """
+        Kick a member from the server. If thresholds are enabled, kicking a user can lead to bans.
+
+        Use like +kick [member(s)] <reason>.
+
+        [member] can be an ID, a username#discrim or a mention.
+        <reason> is your kick reason.
+        """
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
@@ -189,6 +213,17 @@ class Mod:
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
     async def softban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+        """
+        Softban a member on the server. A softban is when you ban a user to remove every message sent by him,
+        before unbanning him/her so that he/she can join again.
+
+        If thresholds are enabled, softbanning a user can lead to bans.
+
+        Use like +softban [member(s)] <reason>.
+
+        [member] can be an ID, a username#discrim or a mention.
+        <reason> is your softban reason.
+        """
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
@@ -227,6 +262,14 @@ class Mod:
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
     async def ban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+        """
+        Banning a user is the ultimate punishment, where is is kicked from the server and can't return
+
+        Use like +ban [member(s)] <reason>.
+
+        [member] can be an ID, a username#discrim or a mention.
+        <reason> is your ban reason.
+        """
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(

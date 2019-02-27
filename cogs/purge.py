@@ -24,7 +24,7 @@ class Arguments(argparse.ArgumentParser):
     def error(self, message):
         raise RuntimeError(message)
 
-class ModPurge:
+class ModPurge(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api = bot.api

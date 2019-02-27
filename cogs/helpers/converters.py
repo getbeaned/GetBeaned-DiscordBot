@@ -33,6 +33,10 @@ class InferiorMember(commands.Converter):
 
 
 class ForcedMember(commands.Converter):
+    def __init__(self, may_be_banned=True):
+        super().__init__()
+        self.may_be_banned = may_be_banned
+
     async def convert(self, ctx, argument):
         try:
             m = await InferiorMember().convert(ctx, argument)
@@ -40,6 +44,13 @@ class ForcedMember(commands.Converter):
         except commands.BadArgument:
             try:
                 did = int(argument, base=10)
+                if did < 10 * 15:  # Minimum 21154535154122752 (17 digites, but we are never too safe)
+                    raise commands.BadArgument(f"The discord ID {argument} provided is too small to be a real discord user-ID. Please check your input and try again.")
+
+                if not self.may_be_banned:
+                    if discord.utils.find(lambda u: u.user.id == did, await ctx.guild.bans()):
+                        raise commands.BadArgument(f"The member {argument} is already banned.")
+
                 try:
                     u = ctx.bot.get_user(did)
                     if u:

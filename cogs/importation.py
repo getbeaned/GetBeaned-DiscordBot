@@ -4,7 +4,7 @@ from cogs.helpers import checks
 from cogs.helpers.helpful_classes import LikeUser
 
 
-class Importation:
+class Importation(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

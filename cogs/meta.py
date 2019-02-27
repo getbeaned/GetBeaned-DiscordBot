@@ -21,7 +21,7 @@ import datetime
 from collections import Counter
 
 
-class Meta:
+class Meta(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -318,7 +318,11 @@ class Meta:
             await self.bot.api.add_user(who)
             await ctx.send_to(f"{who.name}: https://getbeaned.api-d.com/users/{who.id}")
 
-
+    @commands.command()
+    @checks.have_required_level(1)
+    async def channel_id(self, ctx):
+        """Show the current channel ID."""
+        await ctx.send_to(f"{ctx.channel.mention} ID is {ctx.channel.id}")
 
 def setup(bot):
     bot.add_cog(Meta(bot))

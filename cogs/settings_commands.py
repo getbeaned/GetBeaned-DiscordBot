@@ -4,7 +4,7 @@ from discord.ext import commands
 from cogs.helpers import checks
 
 
-class Importation:
+class Importation(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -93,6 +93,7 @@ class Importation:
         await ctx.send_to(
             "https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=201714887&scope=bot")
 
+    @commands.Cog.listener
     async def on_guild_join(self, guild: discord.guild):
         self.bot.logger.info(f"New server joined! {guild.id} - {guild.name} ({guild.member_count} members)")
         await self.api.add_guild(guild)

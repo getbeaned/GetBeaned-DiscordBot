@@ -7,7 +7,7 @@ from cogs.helpers.converters import ForcedMember, BannedMember, InferiorMember
 from cogs.helpers.helpful_classes import FakeMember
 
 
-class Mod:
+class Mod(commands.Cog):
     """
     Moderation commands for the bot.
 

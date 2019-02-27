@@ -75,7 +75,7 @@ class CheckMessage:
         self.old_multiplicator = self.multiplicator
 
 
-class AutoMod:
+class AutoMod(commands.Cog):
     """
     Custom on_message parser to detect and prevent things like spam, AThere/everyone mentions...
     """
@@ -360,6 +360,7 @@ class AutoMod:
         ctx.logger.info("\n".join(check_message.logs))
         return check_message
 
+    @commands.Cog.listener
     async def on_message(self, message):
         await self.bot.wait_until_ready()
         if not message.guild:
@@ -375,6 +376,7 @@ class AutoMod:
         self.automod_cache[message.id] = (logs, int(time.time()))
         self.cleanup_cache()
 
+    @commands.Cog.listener
     async def on_message_edit(self, _, message):
         await self.bot.wait_until_ready()
         if not len(message.content): return

@@ -39,17 +39,17 @@ class Carbonitex(commands.Cog):
         async with self.session.post(url, data=payload, headers=headers) as resp:
             self.bot.logger.info('discordbots.org statistics returned {0.status} for {1}'.format(resp, payload))
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_guild_join(self, server):
         self.bot.logger.info("## New server {name} + {members} members ##".format(name=server.name, members=server.member_count))
         await self.update()
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_guild_remove(self, server):
         self.bot.logger.info("## Server removed {name} - {members} members ##".format(name=server.name, members=server.member_count))
         await self.update()
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_ready(self):
         await asyncio.sleep(60*2)  # To be sure we see everyone
         await self.update()

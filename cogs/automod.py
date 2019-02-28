@@ -197,7 +197,7 @@ class AutoMod(commands.Cog):
         automod_ignore_level = await self.bot.settings.get(message.guild, 'automod_ignore_level')
 
         if author_level >= automod_ignore_level and act:
-            return "Level too low"
+            return "Author level is too high, I'm not going further"
 
         if author.status is discord.Status.offline:
             check_message.multiplicator += await self.bot.settings.get(message.guild, 'automod_multiplictor_offline')
@@ -360,7 +360,7 @@ class AutoMod(commands.Cog):
         ctx.logger.info("\n".join(check_message.logs))
         return check_message
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_message(self, message):
         await self.bot.wait_until_ready()
         if not message.guild:
@@ -376,7 +376,7 @@ class AutoMod(commands.Cog):
         self.automod_cache[message.id] = (logs, int(time.time()))
         self.cleanup_cache()
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_message_edit(self, _, message):
         await self.bot.wait_until_ready()
         if not len(message.content): return

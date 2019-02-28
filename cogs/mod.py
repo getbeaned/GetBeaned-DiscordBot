@@ -261,7 +261,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def ban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
+    async def ban(self, ctx, users: commands.Greedy[ForcedMember(may_be_banned=False)], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Banning a user is the ultimate punishment, where is is kicked from the server and can't return
 

@@ -48,7 +48,7 @@ class Logging(commands.Cog):
         else:
             return channel
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_message_delete(self, message):
         """
         Handle message deletions. However, older deleted messages that aren't in discord internal cache will not fire
@@ -95,7 +95,7 @@ class Logging(commands.Cog):
 
             await channel.send(textual_log)
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_message_edit(self, old, new):
         """
         Handle message edits. However, older messages that aren't in discord internal cache will not fire
@@ -142,7 +142,7 @@ class Logging(commands.Cog):
 
             await channel.send(textual_log)
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_member_join(self, member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
 
@@ -172,7 +172,7 @@ class Logging(commands.Cog):
 
             await channel.send(textual_log)
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_member_remove(self, member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
 
@@ -201,7 +201,7 @@ class Logging(commands.Cog):
 
             await channel.send(textual_log)
 
-    @commands.Cog.listener
+    @commands.Cog.listener()
     async def on_member_update(self, old, new):
 
         if old.nick != new.nick:

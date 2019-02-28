@@ -20,9 +20,11 @@ import re
 import shlex
 import logging
 
+
 class Arguments(argparse.ArgumentParser):
     def error(self, message):
         raise RuntimeError(message)
+
 
 class ModPurge(commands.Cog):
     def __init__(self, bot):

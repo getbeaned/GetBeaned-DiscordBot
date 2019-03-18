@@ -81,6 +81,8 @@ class Logging(commands.Cog):
 
             embed.title = f"Message deleted | By {message.author.name}({message.author.id})"
             embed.description = message.content
+            embed.add_field(name="Channel", value=message.channel.mention, inline=False)
+
 
             embed.set_author(name=self.bot.user.name)
 
@@ -91,6 +93,7 @@ class Logging(commands.Cog):
         else:
             textual_log = f"Message deleted | " \
                 f"By {message.author.name}#{message.author.discriminator}({message.author.id})\n" \
+                f"In {message.channel.mention}"\
                 f"**Content**:{message.content}"
 
             await channel.send(textual_log)

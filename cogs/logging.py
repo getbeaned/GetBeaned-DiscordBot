@@ -57,6 +57,9 @@ class Logging(commands.Cog):
         This dosen't logs other bots
         """
 
+        if message.guild is None:
+            return
+
         if message.author.bot:
             return
 
@@ -106,6 +109,9 @@ class Logging(commands.Cog):
 
         This dosen't logs other bots
         """
+        
+        if old.guild is None:
+            return
 
         if old.author.bot:
             return

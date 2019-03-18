@@ -1,9 +1,10 @@
+import collections
 import datetime
 
 import discord
 from discord.ext import commands
 
-from cogs.helpers import context
+from cogs.helpers import context, checks
 
 
 class Logging(commands.Cog):
@@ -17,6 +18,7 @@ class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api = bot.api
+        self.snipes = collections.defaultdict(lambda: collections.deque(maxlen=5)) # channel: [message, message]
 
     async def get_logging_channel(self, guild, pref):
         # Beware to see if the channel id is actually in the same server (to compare, we will see if the current server
@@ -65,6 +67,8 @@ class Logging(commands.Cog):
 
         if not message.type == discord.MessageType.default:
             return
+
+        self.snipes[message.channel].append(message)
 
         channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
 
@@ -185,6 +189,7 @@ class Logging(commands.Cog):
     async def on_member_remove(self, member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
 
+
         if not channel:
             return
 
@@ -244,6 +249,23 @@ class Logging(commands.Cog):
                     f"**New**: {new.nick}"
 
                 await channel.send(textual_log)
+
+    @commands.command()
+    @commands.guild_only()
+    @checks.bot_have_permissions()
+    @checks.have_required_level(2)
+    async def snipe(self, ctx):
+        message = self.snipes[ctx.channel].pop()
+        if not message:
+            await ctx.send("❌ Nothing to snipe")
+            return
+
+        embed = discord.Embed()
+        embed.title = f"Sniped message | {message.id}"
+        embed.add_field(name="By", value=message.author.mention)
+        embed.add_field(name="In", value=message.channel.mention)
+        embed.description = message.content
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

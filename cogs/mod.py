@@ -126,7 +126,6 @@ class Mod(commands.Cog):
             act = await full_process(ctx.bot, unmute, on, ctx.author, reason, attachement_url=attachments_url)
             await ctx.send(f":ok_hand: - See {act['url']} for details")
 
-
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_permissions()

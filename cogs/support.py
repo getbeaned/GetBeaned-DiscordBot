@@ -1,5 +1,6 @@
 from discord.ext import commands
 
+
 class Support(commands.Cog):
     """Cog for various support commands."""
 
@@ -17,6 +18,7 @@ class Support(commands.Cog):
         pm_channel = self.bot.get_channel(557294214417874945)
 
         await pm_channel.send(f"{message.author.mention} ({message.author.name}#{message.author.discriminator})\n```{message.content[:1900]}```")
+
 
 def setup(bot):
     bot.add_cog(Support(bot))

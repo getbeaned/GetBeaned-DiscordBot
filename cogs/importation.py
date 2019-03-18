@@ -101,6 +101,15 @@ class Importation(commands.Cog):
 
         logs_content.append("Adding a PermissionOverwrite into the server channels :")
         for channel in ctx.guild.channels:
+            current_channel_permissions = ctx.message.guild.me.permissions_in(channel)
+            if not isinstance(channel, discord.TextChannel) and not isinstance(channel, discord.VoiceChannel):
+                logs_content.append(f"\tS #{channel.name} (not a text or voicechannel)")
+                continue
+
+            if not current_channel_permissions.manage_roles or not current_channel_permissions.manage_channels:
+                logs_content.append(f"\tS #{channel.name} (no permissions there)")
+                continue
+
             if isinstance(channel, discord.TextChannel):
                 await channel.set_permissions(muted_role, overwrite=None, reason=REASON)
                 await channel.set_permissions(muted_role, overwrite=text_overwrite, reason=REASON)

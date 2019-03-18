@@ -131,8 +131,13 @@ class GetBeaned(commands.AutoShardedBot):
 
 
 async def get_prefix(bot, message):
-    prefix_set = await bot.settings.get(message.guild, "bot_prefix")
+
     forced_prefixes = ["m!", "m+", "g+", "g!", "gb"]
+
+    if not message.server:
+        return commands.when_mentioned_or(*forced_prefixes)
+    
+    prefix_set = await bot.settings.get(message.guild, "bot_prefix")
     extras = [prefix_set] + forced_prefixes
 
     return commands.when_mentioned_or(*extras)(bot, message)
@@ -149,7 +154,7 @@ logger.debug("Loading cogs : ")
 #                 V  #
 # ###############   ##
 
-cogs = ['cogs.mod', 'cogs.purge', 'cogs.importation', 'cogs.settings_commands', 'cogs.stats', 'cogs.automod', 'cogs.meta', 'cogs.logging', 'cogs.help']
+cogs = ['cogs.mod', 'cogs.purge', 'cogs.importation', 'cogs.settings_commands', 'cogs.stats', 'cogs.automod', 'cogs.meta', 'cogs.logging', 'cogs.help', 'cogs.support']
 
 for extension in cogs:
     try:

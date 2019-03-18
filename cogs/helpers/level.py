@@ -98,4 +98,3 @@ async def get_level(ctx, user: discord.Member):
     return 1
 
     # Level 0 was checked before, so no need to do that again
-

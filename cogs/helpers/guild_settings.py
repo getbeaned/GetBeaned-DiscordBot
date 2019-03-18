@@ -59,5 +59,3 @@ class Settings:
         del self.settings_cache[guild]
 
         await self.bot.api.set_settings(guild, setting, value)
-
-

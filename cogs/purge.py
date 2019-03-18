@@ -46,7 +46,7 @@ class ModPurge(commands.Cog):
             #await ctx.invoke(help_cmd, command='remove')
             await ctx.send_to(textwrap.dedent(f"""
             This is a purge command on steroids. Some quick examples include:
-            
+
             **Purge the latest 50 messages**:
             ```
             {ctx.prefix}purge all 50

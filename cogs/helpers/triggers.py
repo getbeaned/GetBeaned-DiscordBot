@@ -92,4 +92,3 @@ async def message_contains_any(message: discord.Message, texts: List[str]) -> bo
         if await message_contains(message, text):
             return True
     return False
-

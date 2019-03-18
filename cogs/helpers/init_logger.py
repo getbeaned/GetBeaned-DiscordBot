@@ -148,5 +148,3 @@ def init_logger():
 
 
     return base_logger, logger
-
-

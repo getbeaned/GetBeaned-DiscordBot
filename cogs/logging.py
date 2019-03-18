@@ -12,7 +12,7 @@ class Logging(commands.Cog):
     Logging events.
 
     Here you'll find events that listen to message edition and deletion,
-    and post the approriate embeds in the appripriate channels if asked to by the guild settings
+    and post the appropriate embeds in the appropriate channels if asked to by the guild settings
     """
 
     def __init__(self, bot):

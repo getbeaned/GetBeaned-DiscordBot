@@ -47,7 +47,32 @@ def bot_have_permissions():
             attach_files=True,
             read_message_history=True,
             external_emojis=True,
-            change_nickname=True
+            change_nickname=True,
+            add_reactions=True
+        )
+
+        cond = current_permissions >= wanted_permissions
+
+        ctx.logger.debug(f"Check for permissions required returned {cond}")
+
+        if cond:
+            return True
+        else:
+            raise NoPermissionsError()
+
+    return commands.check(predicate)
+
+def bot_have_minimal_permissions():
+    async def predicate(ctx):
+        await ctx.bot.wait_until_ready()
+        current_permissions = ctx.message.guild.me.permissions_in(ctx.channel)
+        wanted_permissions = discord.permissions.Permissions.none()
+        wanted_permissions.update(
+            read_messages=True,
+            send_messages=True,
+            embed_links=True,
+            attach_files=True,
+            add_reactions=True
         )
 
         cond = current_permissions >= wanted_permissions

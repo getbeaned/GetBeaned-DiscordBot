@@ -252,7 +252,7 @@ class Logging(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @checks.bot_have_permissions()
+    @checks.bot_have_minimal_permissions()
     @checks.have_required_level(2)
     async def snipe(self, ctx):
         message = self.snipes[ctx.channel].pop()

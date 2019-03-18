@@ -14,7 +14,7 @@ class Importation(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @checks.have_required_level(4)
-    @checks.bot_have_permissions()
+    @checks.bot_have_minimal_permissions()
     async def import_bans(self, ctx):
         """
         Import bans from the server banlist. If possible and available, also include the reason from the audit logs.

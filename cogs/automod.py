@@ -139,7 +139,7 @@ class AutoMod(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @checks.bot_have_permissions()
+    @checks.bot_have_minimal_permissions()
     # @checks.have_required_level(8)
     async def automod_debug(self, ctx, *, message_str):
         ctx.message.content = message_str

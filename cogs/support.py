@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from cogs.helpers import checks
+from cogs.helpers.level import get_level
 
 
 class Support(commands.Cog):
@@ -80,7 +81,7 @@ class Support(commands.Cog):
         perms_check = []
 
         for permission in ["kick_members", "ban_members", "read_messages", "send_messages", "manage_messages", "embed_links", "attach_files",
-            "read_message_history", "external_emojis", "change_nickname", "view_audit_log"]:
+            "read_message_history", "external_emojis", "change_nickname", "view_audit_log", "add_reactions"]:
             have_perm = current_permissions.__getattribute__(permission)
             emoji = emojis[have_perm]
             perms_check.append(

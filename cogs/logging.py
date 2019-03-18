@@ -109,7 +109,7 @@ class Logging(commands.Cog):
 
         This dosen't logs other bots
         """
-        
+
         if old.guild is None:
             return
 

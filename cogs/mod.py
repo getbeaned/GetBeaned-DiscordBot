@@ -1,8 +1,9 @@
 import asyncio
 
+import discord
 from discord.ext import commands
 from cogs.helpers import checks
-from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban
+from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban, mute
 from cogs.helpers.converters import ForcedMember, BannedMember, InferiorMember
 from cogs.helpers.helpful_classes import FakeMember
 
@@ -256,6 +257,64 @@ class Mod(commands.Cog):
 
             act = await full_process(ctx.bot, softban, on, ctx.author, reason, attachement_url=attachments_url)
             await ctx.send(f":ok_hand: - See {act['url']} for details")
+
+    @commands.command()
+    @commands.guild_only()
+    @checks.bot_have_permissions()
+    @checks.have_required_level(3)
+    async def mute(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+        """
+        Mute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
+        Using this command require a specific role, that you can create using the +create_muted_role command
+
+        If thresholds are enabled, muting a user can lead to kicks.
+
+        Use like +mute [member(s)] <reason>.
+
+        [member] can be an ID, a username#discrim or a mention.
+        <reason> is your mute reason.
+        """
+        ROLE_NAME = "GetBeaned_muted"
+        muted_role = discord.utils.get(ctx.guild.roles, name=ROLE_NAME)
+
+        if muted_role is None:
+            await ctx.send_to(f"❌ The muted role does NOT exist yet. Please create it using the {ctx.prefix}create_muted_role.")
+            return False
+
+        if len(users) >= 2:
+            bans_list_names = ", ".join([b.name for b in users])
+            await ctx.send_to(
+                f":warning: You are gonna softban multiple people at once, are you sure you want to do that ?\n"
+                f"**To be softbanned:** {bans_list_names}")
+
+            await ctx.send_to("To confirm, say `ok` within the next 10 seconds")
+
+            def check(m):
+                return m.content == 'ok' and m.channel == ctx.channel and m.author == ctx.author
+
+            try:
+                await self.bot.wait_for('message', check=check, timeout=10.0)
+            except asyncio.TimeoutError:
+                await ctx.send_to("Not doing anything")
+                return None
+
+        for on in users:
+            if on.id == ctx.author.id:
+                await ctx.send_to("You wouldn't do that to yourself ?")
+                continue
+            elif on.id == self.bot.user.id:
+                await ctx.send_to("I'm innocent, I won't allow you to do that on me")
+                continue
+
+            if ctx.message.attachments:
+                attachments_url = ctx.message.attachments[0].url
+            else:
+                attachments_url = None
+
+            act = await full_process(ctx.bot, mute, on, ctx.author, reason, attachement_url=attachments_url)
+            await ctx.send(f":ok_hand: - See {act['url']} for details")
+
+
 
     @commands.command()
     @commands.guild_only()

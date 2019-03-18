@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 from cogs.helpers import checks
@@ -34,7 +35,6 @@ class Importation(commands.Cog):
 
         bans = await ctx.guild.bans()
 
-
         i = 0
         t = len(bans)
         for ban in bans:
@@ -51,6 +51,67 @@ class Importation(commands.Cog):
 
         await ctx.send(f"{i}/{t} bans imported from the server ban list.")
 
+    @commands.command()
+    @commands.guild_only()
+    @checks.have_required_level(4)
+    @checks.bot_have_permissions()
+    @commands.cooldown(rate=2, per=300, type=commands.BucketType.guild)
+    async def create_muted_role(self, ctx):
+        """
+        Create or update the muted role to disallow anyone with it to talk in any channel.
+
+        :param ctx:
+        :return:
+        """
+
+        ROLE_NAME = "GetBeaned_muted"
+        REASON = f"create_muted_role command invoked by {ctx.message.author.name}"
+
+        ctx.guild: discord.Guild
+
+        current_permissions = ctx.message.guild.me.permissions_in(ctx.channel)
+
+        if not current_permissions.manage_roles:
+            await ctx.send(f"To run this, I additionally need the `manage_roles` permission, because I'll create/update the {ROLE_NAME} role.")
+            return False
+
+        if not current_permissions.manage_channels:
+            await ctx.send(f"To run this, I additionally need the `manage_channels` permission, because I'll create/update the {ROLE_NAME} role.")
+            return False
+
+        logs_content = ["Creating the muted role, please wait", "Permissions check passed"]
+
+        logs_message = await ctx.send("Creating the muted role, please wait")
+
+        muted_role = discord.utils.get(ctx.guild.roles, name=ROLE_NAME)
+
+        if not muted_role:
+            logs_content.append("Couldn't find the muted role, creating it...")
+            muted_role = await ctx.guild.create_role(name=ROLE_NAME, reason=REASON)
+
+        logs_content.append(f"The muted role ID is {muted_role.id}")
+
+        await logs_message.edit(content="```" + '\n'.join(logs_content) + "```")
+
+        text_overwrite = discord.PermissionOverwrite()
+        text_overwrite.update(send_messages=False, add_reactions=False, create_instant_invite=False)
+
+        voice_overwrite = discord.PermissionOverwrite()
+        voice_overwrite.update(speak=False, create_instant_invite=False)
+
+        logs_content.append("Adding a PermissionOverwrite into the server channels :")
+        for channel in ctx.guild.channels:
+            if isinstance(channel, discord.TextChannel):
+                await channel.set_permissions(muted_role, overwrite=None, reason=REASON)
+                await channel.set_permissions(muted_role, overwrite=text_overwrite, reason=REASON)
+                logs_content.append(f"\tT #{channel.name}")
+            elif isinstance(channel, discord.VoiceChannel):
+                await channel.set_permissions(muted_role, overwrite=None, reason=REASON)
+                await channel.set_permissions(muted_role, overwrite=voice_overwrite, reason=REASON)
+                logs_content.append(f"\tV #{channel.name}")
+
+        await logs_message.edit(content="```" + '\n'.join(logs_content) + "```", delete_after=60)
+        await ctx.send("The muted role has been successfully created/updated.")
 
 
 def setup(bot):

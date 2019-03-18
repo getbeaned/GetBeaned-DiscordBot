@@ -7,8 +7,10 @@ from discord import Color
 from cogs.helpers.helpful_classes import LikeUser
 
 colours = {'unban': Color.green(),
+           'unmute': Color.dark_green(),
            'note': Color.light_grey(),
            'warn': Color.orange(),
+           'mute': Color.dark_purple(),
            'kick': Color.dark_orange(),
            'softban': Color.red(),
            'ban': Color.dark_red()
@@ -30,6 +32,11 @@ async def thresholds_enforcer(bot, victim, action_type):
     elif action_type == 'warn':
         thresholds_warns_to_kick = await bot.settings.get(victim.guild, 'thresholds_warns_to_kick')
         if thresholds_warns_to_kick and counters['warn'] % thresholds_warns_to_kick == 0:
+            await full_process(bot, kick, victim, mod_user, reason=reason)
+
+    elif action_type == 'mute':
+        thresholds_mutes_to_kick = await bot.settings.get(victim.guild, 'thresholds_mutes_to_kick')
+        if thresholds_mutes_to_kick and counters['warn'] % thresholds_mutes_to_kick == 0:
             await full_process(bot, kick, victim, mod_user, reason=reason)
 
     elif action_type == 'kick':
@@ -58,6 +65,15 @@ async def softban(victim, reason=None):
 
 async def kick(victim, reason=None):
     await victim.guild.kick(victim, reason=reason)
+
+
+async def mute(victim, reason=None):
+    muted_role = discord.utils.get(victim.guild.roles, name="GetBeaned_muted")
+    await victim.add_roles(muted_role, reason=reason)
+
+async def unmute(victim, reason=None):
+    muted_role = discord.utils.get(victim.guild.roles, name="GetBeaned_muted")
+    await victim.remove_roles(muted_role, reason=reason)
 
 
 async def warn(victim, reason=None):

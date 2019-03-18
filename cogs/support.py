@@ -12,7 +12,7 @@ class Support(commands.Cog):
         if not message.guild is None:
             return
 
-        if message.author is self.bot:
+        if message.author is self.bot.user:
             return
 
         pm_channel = self.bot.get_channel(557294214417874945)

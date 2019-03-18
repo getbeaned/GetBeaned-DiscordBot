@@ -265,6 +265,7 @@ class Logging(commands.Cog):
         embed.add_field(name="By", value=message.author.mention)
         embed.add_field(name="In", value=message.channel.mention)
         embed.description = message.content
+        embed.set_footer(text=f"You can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}")
         await ctx.send(embed=embed)
 
 

@@ -44,7 +44,7 @@ class ForcedMember(commands.Converter):
         except commands.BadArgument:
             try:
                 did = int(argument, base=10)
-                if did < 10 * 15:  # Minimum 21154535154122752 (17 digites, but we are never too safe)
+                if did < 10 * 15:  # Minimum 21154535154122752 (17 digits, but we are never too safe)
                     raise commands.BadArgument(f"The discord ID {argument} provided is too small to be a real discord user-ID. Please check your input and try again.")
 
                 if not self.may_be_banned:

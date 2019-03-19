@@ -255,8 +255,9 @@ class Logging(commands.Cog):
     @checks.bot_have_minimal_permissions()
     @checks.have_required_level(2)
     async def snipe(self, ctx):
-        message = self.snipes[ctx.channel].pop()
-        if not message:
+        try:
+            message = self.snipes[ctx.channel].pop()
+        except IndexError: #  Nothing in deque
             await ctx.send("❌ Nothing to snipe")
             return
 

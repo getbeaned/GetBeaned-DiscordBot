@@ -57,7 +57,7 @@ class ForcedMember(commands.Converter):
                         return FakeMember(u, ctx.guild)
 
                     else:
-                        u = await ctx.bot.get_user_info(did)
+                        u = await ctx.bot.fetch_user(did)
                         return FakeMember(u, ctx.guild)
                 except:
                     ctx.bot.logger.exception("An error happened trying to convert a discord ID to a User instance. "

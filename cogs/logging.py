@@ -257,7 +257,7 @@ class Logging(commands.Cog):
     async def snipe(self, ctx):
         try:
             message = self.snipes[ctx.channel].pop()
-        except IndexError: #  Nothing in deque
+        except IndexError:  # Nothing in deque
             await ctx.send("❌ Nothing to snipe")
             return
 

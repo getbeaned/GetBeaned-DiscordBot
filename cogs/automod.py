@@ -108,7 +108,7 @@ class AutoMod(commands.Cog):
                 check_message.debug(f"Checking invite code : {invite}")
 
                 try:
-                    invite_obj = await self.bot.get_invite(invite)
+                    invite_obj = await self.bot.fetch_invite(invite)
                     if invite_obj.guild.id not in [195260081036591104, 449663867841413120, 512328935304855555] + [check_message.message.guild.id]:
                         minimal_membercount = await self.bot.settings.get(check_message.message.guild, 'automod_minimal_membercount_trust_server')
 

@@ -18,7 +18,7 @@ class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api = bot.api
-        self.snipes = collections.defaultdict(lambda: collections.deque(maxlen=5)) # channel: [message, message]
+        self.snipes = collections.defaultdict(lambda: collections.deque(maxlen=5))  # channel: [message, message]
 
     async def get_logging_channel(self, guild, pref):
         # Beware to see if the channel id is actually in the same server (to compare, we will see if the current server
@@ -90,7 +90,6 @@ class Logging(commands.Cog):
             embed.description = message.content
             embed.add_field(name="Channel", value=message.channel.mention, inline=False)
 
-
             embed.set_author(name=self.bot.user.name)
 
             embed.timestamp = message.created_at
@@ -100,7 +99,7 @@ class Logging(commands.Cog):
         else:
             textual_log = f"Message deleted | " \
                 f"By {message.author.name}#{message.author.discriminator}({message.author.id})\n" \
-                f"In {message.channel.mention}"\
+                f"In {message.channel.mention}" \
                 f"**Content**:{message.content}"
 
             await channel.send(textual_log)
@@ -188,7 +187,6 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
-
 
         if not channel:
             return

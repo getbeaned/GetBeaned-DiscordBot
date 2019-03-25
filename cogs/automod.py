@@ -256,7 +256,7 @@ class AutoMod(commands.Cog):
             m_list = [a.name + '#' + a.discriminator for a in mentions]
             check_message.debug(f"Message mentions more than 3 people ({m_list})")
 
-        if await self.get_invites_count(check_message) >= 1 and not message.channel.id == await self.bot.settings.get(message.guild, 'automod_ignore_invites_in'):
+        if await self.get_invites_count(check_message) >= 1 and str(message.channel.id) not in str(await self.bot.settings.get(message.guild, 'automod_ignore_invites_in')): # They can add multiple channels separated by a " "
             check_message.score += await self.bot.settings.get(message.guild, 'automod_score_contain_invites')
             check_message.debug(f"Message contains invite(s) ({check_message.invites_code})")
 

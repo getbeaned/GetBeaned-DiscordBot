@@ -32,6 +32,10 @@ class Mod(commands.Cog):
         [member] can be an ID or a username.
         <reason> is your unban reason.
         """
+        if len(banned_users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}unban <list of users> [reason]`")
+            return
 
         if len(banned_users) >= 2:
             bans_list_names = ", ".join([b.user.name for b in banned_users])
@@ -76,12 +80,12 @@ class Mod(commands.Cog):
     @checks.have_required_level(3)
     async def unmute(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
-        Mute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
+        UnMute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
         Using this command require a specific role, that you can create using the +create_muted_role command
 
         If thresholds are enabled, muting a user can lead to kicks.
 
-        Use like +mute [member(s)] <reason>.
+        Use like +unmute [member(s)] <reason>.
 
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your mute reason.
@@ -93,11 +97,16 @@ class Mod(commands.Cog):
             await ctx.send_to(f"❌ The muted role does NOT exist yet. Please create it using the {ctx.prefix}create_muted_role.")
             return False
 
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}unmute <list of users> [reason]`")
+            return
+
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
                 f":warning: You are gonna unmute multiple people at once, are you sure you want to do that ?\n"
-                f"**To be softbanned:** {bans_list_names}")
+                f"**To be unmuted:** {bans_list_names}")
 
             await ctx.send_to("To confirm, say `ok` within the next 10 seconds")
 
@@ -140,6 +149,10 @@ class Mod(commands.Cog):
         [reason] is your note reason.
         """
         # Nothing to do here.
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}warn <list of users> [reason]`")
+            return
 
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
@@ -186,6 +199,11 @@ class Mod(commands.Cog):
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your warn reason.
         """
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}warn <list of users> [reason]`")
+            return
+
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
@@ -242,11 +260,16 @@ class Mod(commands.Cog):
             await ctx.send_to(f"❌ The muted role does NOT exist yet. Please create it using the {ctx.prefix}create_muted_role.")
             return False
 
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}mute <list of users> [reason]`")
+            return
+
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
                 f":warning: You are gonna mute multiple people at once, are you sure you want to do that ?\n"
-                f"**To be softbanned:** {bans_list_names}")
+                f"**To be muted:** {bans_list_names}")
 
             await ctx.send_to("To confirm, say `ok` within the next 10 seconds")
 
@@ -289,6 +312,12 @@ class Mod(commands.Cog):
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your kick reason.
         """
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}kick <list of users> [reason]`")
+            return
+
+
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
@@ -338,6 +367,11 @@ class Mod(commands.Cog):
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your softban reason.
         """
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}softban <list of users> [reason]`")
+            return
+
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(
@@ -384,6 +418,11 @@ class Mod(commands.Cog):
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your ban reason.
         """
+        if len(users) == 0:
+            await ctx.send_to(
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}ban <list of users> [reason]`")
+            return
+
         if len(users) >= 2:
             bans_list_names = ", ".join([b.name for b in users])
             await ctx.send_to(

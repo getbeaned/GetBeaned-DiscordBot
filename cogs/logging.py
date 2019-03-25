@@ -128,7 +128,7 @@ class Logging(commands.Cog):
             return
 
         ctx = await self.bot.get_context(new, cls=context.CustomContext)
-        ctx.logger.info(f"Logging message edition")
+        ctx.logger.info(f"Logging message edition {old}->{new}")
 
         if await self.bot.settings.get(old.guild, 'logs_as_embed'):
             embed = discord.Embed()
@@ -161,7 +161,7 @@ class Logging(commands.Cog):
         if not channel:
             return
 
-        self.bot.logger.info(f"Logging user join for guild:{member.guild.id}")
+        self.bot.logger.info(f"Logging user join {member}")
 
         if await self.bot.settings.get(member.guild, 'logs_as_embed'):
             embed = discord.Embed()
@@ -191,7 +191,7 @@ class Logging(commands.Cog):
         if not channel:
             return
 
-        self.bot.logger.info(f"Logging user leave for guild:{member.guild.id}")
+        self.bot.logger.info(f"Logging user leave {member}")
 
         if await self.bot.settings.get(member.guild, 'logs_as_embed'):
             embed = discord.Embed()
@@ -223,7 +223,7 @@ class Logging(commands.Cog):
             if not channel:
                 return
 
-            self.bot.logger.info(f"Logging user edit for guild:{old.guild.id}")
+            self.bot.logger.info(f"Logging user edit {old}->{new}")
 
             if await self.bot.settings.get(old.guild, 'logs_as_embed'):
                 embed = discord.Embed()

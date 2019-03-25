@@ -85,7 +85,10 @@ class GetBeaned(commands.AutoShardedBot):
     async def on_command_error(self, context, exception):
         if isinstance(exception, discord.ext.commands.errors.CommandNotFound):
             return
-        elif isinstance(exception, discord.ext.commands.errors.MissingRequiredArgument):
+
+        context.logger.debug(f"Error during processing: {exception} ({repr(exception)})")
+
+        if isinstance(exception, discord.ext.commands.errors.MissingRequiredArgument):
             await context.send_to(f":x: A required argument is missing.\nUse it like : `{context.prefix}{context.command.signature}`")
             return
         elif isinstance(exception, checks.NoPermissionsError):
@@ -116,6 +119,10 @@ class GetBeaned(commands.AutoShardedBot):
             await context.send_to(f":x: An argument provided is incorrect: \n"
                                   f"**{exception}**")
             return
+        elif isinstance(exception, discord.ext.commands.errors.ArgumentParsingError):
+            await context.send_to(f":x: There was a problem parsing your command, please ensure all quotes are correct: \n"
+                                  f"**{exception}**")
+            return
         elif isinstance(exception, discord.ext.commands.errors.CommandOnCooldown):
             if context.message.author.id in [138751484517941259]:
                 await context.reinvoke()
@@ -125,6 +132,11 @@ class GetBeaned(commands.AutoShardedBot):
                 await context.send_to("You are on cooldown :(, try again in {seconds} seconds".format(
                     seconds=round(exception.retry_after, 1)))
                 return
+        elif isinstance(exception, discord.ext.commands.errors.TooManyArguments):
+            await context.send_to(f":x: You gave me to many arguments. You may want to use quotes.\nUse the command like : `{context.prefix}{context.command.signature}`")
+            return
+        elif isinstance(exception, discord.ext.commands.NoPrivateMessage):
+            await context.send_to('This command cannot be used in private messages.')
         else:
             logger.error('Ignoring exception in command {}:'.format(context.command))
             logger.error("".join(traceback.format_exception(type(exception), exception, exception.__traceback__)))

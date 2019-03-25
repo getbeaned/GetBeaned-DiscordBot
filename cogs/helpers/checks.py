@@ -62,6 +62,7 @@ def bot_have_permissions():
 
     return commands.check(predicate)
 
+
 def bot_have_minimal_permissions():
     async def predicate(ctx):
         await ctx.bot.wait_until_ready()

@@ -1,7 +1,10 @@
+import typing
+
 import discord
 from discord.ext import commands
 
 from cogs.helpers import checks
+from cogs.helpers.helpful_classes import LikeUser
 
 
 class Importation(commands.Cog):
@@ -14,12 +17,16 @@ class Importation(commands.Cog):
     @commands.command(aliases=["addadmin"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_admin(self, ctx, user: discord.Member):
+    async def add_admin(self, ctx, user: typing.Union[discord.Member, discord.Role]):
         """
         Add some server admins. They can moderate the server but also edit other moderator reasons on the webinterface.
 
         You can manage the members you gave some access to in your server settings in the webinterface. See `m+urls`
         """
+
+        if isinstance(user, discord.Role):
+            user = LikeUser(did=user.id, name=f"[ROLE] {user.name}", guild=ctx.guild, discriminator='0000',
+                            do_not_update=False)
 
         await self.api.add_to_staff(ctx.guild, user, 'admins')
         await ctx.send_to(':ok_hand: Done. You can edit staff on the web interface.')
@@ -27,12 +34,16 @@ class Importation(commands.Cog):
     @commands.command(aliases=["addmoderator"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_moderator(self, ctx, user: discord.Member):
+    async def add_moderator(self, ctx, user: typing.Union[discord.Member, discord.Role]):
         """
         Add a moderator on this server. Moderators can do things such as banning, kicking, warning, softbanning...
 
         You can manage the members you gave some access to in your server settings in the webinterface. See `m+urls`
         """
+
+        if isinstance(user, discord.Role):
+            user = LikeUser(did=user.id, name=f"[ROLE] {user.name}", guild=ctx.guild, discriminator='0000',
+                            do_not_update=False)
 
         await self.api.add_to_staff(ctx.guild, user, 'moderators')
         await ctx.send_to(':ok_hand: Done. You can edit staff on the web interface.')
@@ -40,7 +51,7 @@ class Importation(commands.Cog):
     @commands.command(aliases=["addtrusted", "addtrustedmember", "add_trusted"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_trusted_member(self, ctx, user: discord.Member):
+    async def add_trusted_member(self, ctx, user: typing.Union[discord.Member, discord.Role]):
         """
         Add a trusted member on this server. Trusted members can do basic moderation actions as kicking, warning or
         noting people.
@@ -48,13 +59,17 @@ class Importation(commands.Cog):
         You can manage the members you gave some access to in your server settings in the webinterface. See `m+urls`
         """
 
+        if isinstance(user, discord.Role):
+            user = LikeUser(did=user.id, name=f"[ROLE] {user.name}", guild=ctx.guild, discriminator='0000',
+                            do_not_update=False)
+
         await self.api.add_to_staff(ctx.guild, user, 'trusted')
         await ctx.send_to(':ok_hand: Done. You can edit staff on the web interface.')
 
     @commands.command(aliases=["add_banned", "addbanned", "addbannedmember"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_banned_member(self, ctx, user: discord.Member):
+    async def add_banned_member(self, ctx, user: typing.Union[discord.Member, discord.Role]):
         """
         Ban a member from the bot on this server. They will get a malus on the automod, and won't be able to use most
         of the commands there
@@ -82,7 +97,6 @@ class Importation(commands.Cog):
                           f"- **Server webpage**: https://getbeaned.api-d.com/guilds/{ctx.guild.id} \n"
                           f"- **Your server profile**: https://getbeaned.api-d.com/users/{ctx.guild.id}/{user_id}\n"
                           f"- **Your global profile**: https://getbeaned.api-d.com/users/{user_id}")
-
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.guild):

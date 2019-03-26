@@ -123,6 +123,10 @@ class GetBeaned(commands.AutoShardedBot):
             await context.send_to(f":x: There was a problem parsing your command, please ensure all quotes are correct: \n"
                                   f"**{exception}**")
             return
+        elif isinstance(exception, discord.ext.commands.errors.BadUnionArgument):
+            await context.send_to(f":x: There was a problem parsing your arguments, please ensure the are the correct type: \n"
+                                  f"**{exception}**")
+            return
         elif isinstance(exception, discord.ext.commands.errors.CommandOnCooldown):
             if context.message.author.id in [138751484517941259]:
                 await context.reinvoke()

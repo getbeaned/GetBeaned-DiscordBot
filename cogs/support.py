@@ -99,7 +99,7 @@ class Support(commands.Cog):
     @checks.have_required_level(1)
     async def doctor(self, ctx):
         waiting_message = await ctx.send("<a:loading:393852367751086090> Please wait, running `doctor` checks")  # <a:loading:393852367751086090> is a loading emoji
-
+        del self.bot.settings.settings_cache[ctx.guild]
         messages = {}
         message = []
         # Permissions
@@ -226,7 +226,11 @@ class Support(commands.Cog):
                 if admin:
                     message.append(f"+ {admin.name}#{admin.discriminator} ({admin_id})")
                 else:
-                    message.append(f"- User left the server ({admin_id})")
+                    role = discord.utils.get(guild.roles, id=admin_id)
+                    if role:
+                        message.append(f"+ (Role) {role.name} ({admin_id})")
+                    else:
+                        message.append(f"- User left the server ({admin_id})")
             message.append("```")
 
             embed.add_field(name="Server administrators", value="\n".join(message))
@@ -240,7 +244,11 @@ class Support(commands.Cog):
                 if mod:
                     message.append(f"+ {mod.name}#{mod.discriminator} ({mod_id})")
                 else:
-                    message.append(f"- User left the server ({mod_id})")
+                    role = discord.utils.get(guild.roles, id=mod_id)
+                    if role:
+                        message.append(f"+ (Role) {role.name} ({mod_id})")
+                    else:
+                        message.append(f"- User left the server ({mod_id})")
             message.append("```")
 
             embed.add_field(name="Server moderators", value="\n".join(message))

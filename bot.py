@@ -137,6 +137,10 @@ class GetBeaned(commands.AutoShardedBot):
             return
         elif isinstance(exception, discord.ext.commands.NoPrivateMessage):
             await context.send_to('This command cannot be used in private messages.')
+            return
+        elif isinstance(exception, discord.ext.commands.errors.CommandInvokeError):
+            await context.author.send("Sorry, an error happened processing your command. Please review the bot permissions and try again.")
+            return
         else:
             logger.error('Ignoring exception in command {}:'.format(context.command))
             logger.error("".join(traceback.format_exception(type(exception), exception, exception.__traceback__)))

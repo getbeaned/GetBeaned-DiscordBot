@@ -83,15 +83,6 @@ class Importation(commands.Cog):
                           f"- **Your server profile**: https://getbeaned.api-d.com/users/{ctx.guild.id}/{user_id}\n"
                           f"- **Your global profile**: https://getbeaned.api-d.com/users/{user_id}")
 
-    @commands.command(aliases=["info", "join"])
-    @commands.guild_only()
-    @checks.have_required_level(1)
-    async def invite(self, ctx):
-        """
-        Get this bot invite link
-        """
-        await ctx.send_to(
-            "https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=201714887&scope=bot")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.guild):

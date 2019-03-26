@@ -7,6 +7,8 @@ import random
 import discord
 from discord.ext import commands
 
+from cogs.helpers import checks
+
 
 class CannotPaginate(Exception):
     pass
@@ -401,7 +403,7 @@ class HelpPaginator(Pages):
         # ...
 
         for cog, commands in itertools.groupby(entries, key=key):
-            #plausible = [cmd for cmd in commands if (await _can_run(cmd, ctx)) and not cmd.hidden]
+            # plausible = [cmd for cmd in commands if (await _can_run(cmd, ctx)) and not cmd.hidden]
             plausible = [cmd for cmd in commands if not cmd.hidden]
             if len(plausible) == 0:
                 continue
@@ -526,7 +528,6 @@ class HelpPaginator(Pages):
         self.bot.loop.create_task(go_back_to_current_page())
 
 
-
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -552,6 +553,24 @@ class Help(commands.Cog):
             await p.paginate()
         except Exception as e:
             await ctx.send(e)
+
+    @commands.command(aliases=["join"])
+    @checks.have_required_level(1)
+    async def invite(self, ctx):
+        """
+        Get this bot invite link
+        """
+        await ctx.send_to(
+            "https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=201714887&scope=bot")
+
+    @commands.command(name='info')
+    @checks.have_required_level(1)
+    async def _info(self, ctx):
+        """Shows bot info"""
+
+        await ctx.send_to(f"This bot was made by Eyesofcreeper#0001. For help, type {ctx.prefix}help, for support go to https://discord.gg/cPbhK53. "
+                          f"To invite the bot, find the link using {ctx.prefix}invite. This bot universal prefix is g+")
+
 #
 #     @commands.command()
 #     @checks.have_required_level(1)

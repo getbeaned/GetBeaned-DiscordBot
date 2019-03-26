@@ -69,6 +69,9 @@ async def get_level(ctx, user: discord.Member):
     if user_id in BANNED_MEMBERS_IDS:
         return 0
 
+    if not ctx.guild:  # Private messages
+        return 1
+
     # Level 5
     if user.guild.owner == user:
         return 5

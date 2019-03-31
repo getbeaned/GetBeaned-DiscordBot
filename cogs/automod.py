@@ -88,6 +88,8 @@ class AutoMod(commands.Cog):
         self.message_history = collections.defaultdict(
             lambda: collections.deque(maxlen=7))  # Member -> collections.deque(maxlen=7)
 
+        self.invites_codes_cache = {}
+
         self.automod_cache = {}
 
     async def get_invites(self, message: str):
@@ -106,23 +108,25 @@ class AutoMod(commands.Cog):
             total = 0
             for invite in invites:
                 check_message.debug(f"Checking invite code : {invite}")
-
+                invite_obj = self.invites_codes_cache.get(invite, None)
                 try:
-                    invite_obj = await self.bot.fetch_invite(invite)
+                    if not invite_obj:
+                        await self.bot.fetch_invite(invite, with_counts=True)
+                    self.invites_codes_cache[invite] = invite_obj
                     if invite_obj.guild.id not in [195260081036591104, 449663867841413120, 512328935304855555] + [check_message.message.guild.id]:
                         minimal_membercount = await self.bot.settings.get(check_message.message.guild, 'automod_minimal_membercount_trust_server')
 
                         try:
-                            member_count = invite_obj.guild.member_count
+                            member_count = invite_obj.approximate_member_count
                         except AttributeError:
                             member_count = 0
                         if 0 < minimal_membercount < member_count:
                             check_message.debug(
-                                f">> Detected invite code for untrusted server but known enough not to act on it: "
+                                f">> Detected invite code for untrusted server but known enough not to act on it (approx. members count: {member_count}): "
                                 f"{invite_obj.code} (server : {invite_obj.guild.name} - {invite_obj.guild.id})")
                         else:
                             check_message.debug(
-                                f">> Detected invite code for untrusted server: "
+                                f">> Detected invite code for untrusted server (approx. members count: {member_count}): "
                                 f"{invite_obj.code} (server : {invite_obj.guild.name} - {invite_obj.guild.id})")
 
                             check_message.invites.append(invite_obj)
@@ -131,6 +135,7 @@ class AutoMod(commands.Cog):
                         check_message.debug(f">> Detected invite code for trusted server:"
                                             f"{invite_obj.code}")
                 except discord.errors.NotFound:
+                    self.invites_codes_cache[invite] = None
                     check_message.debug(f">> Invalid invite code")
 
                     continue

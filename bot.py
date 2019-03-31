@@ -7,14 +7,25 @@
 # You also have to use python 3.7 to run this
 # Have fun !
 # The doc for d.py rewrite is here : http://discordpy.readthedocs.io/en/rewrite/index.html
+print("Loading...")
+
+# Importing the discord API warpper
+import discord
+import discord.ext.commands as commands
+
+# Load some essentials modules
+import traceback
+import collections
+import json
+import datetime
+
 from cogs.helpers.converters import NotStrongEnough, HierarchyError
 from cogs.helpers.guild_settings import Settings
-
-print("Loading...")
 
 from cogs.helpers.init_logger import init_logger
 
 base_logger, logger = init_logger()
+
 
 # Setting up asyncio to use uvloop if possible, a faster implementation on the event loop
 import asyncio
@@ -29,15 +40,6 @@ else:
     logger.info("Using the fast uvloop asyncio event loop")
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-# Importing the discord API warpper
-import discord
-import discord.ext.commands as commands
-
-# Load some essentials modules
-import traceback
-import collections
-import json
-import datetime
 
 logger.debug("Creating a bot instance of commands.AutoShardedBot")
 

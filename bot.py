@@ -147,6 +147,8 @@ class GetBeaned(commands.AutoShardedBot):
         elif isinstance(exception, discord.ext.commands.errors.CommandInvokeError):
             await context.author.send("Sorry, an error happened processing your command. Please review the bot permissions and try again.")
             return
+        elif isinstance(exception, discord.ext.commands.errors.NotOwner):
+            return  # Jsk uses this
         else:
             logger.error('Ignoring exception in command {}:'.format(context.command))
             logger.error("".join(traceback.format_exception(type(exception), exception, exception.__traceback__)))

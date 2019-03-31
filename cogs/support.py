@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 import discord
 from discord import Color
@@ -99,6 +100,10 @@ class Support(commands.Cog):
     @checks.have_required_level(1)
     async def doctor(self, ctx):
         waiting_message = await ctx.send("<a:loading:393852367751086090> Please wait, running `doctor` checks")  # <a:loading:393852367751086090> is a loading emoji
+        t_1 = time.perf_counter()
+        await ctx.trigger_typing()  # tell Discord that the bot is "typing", which is a very simple request
+        t_2 = time.perf_counter()
+        time_delta = round((t_2 - t_1) * 1000)  # calculate the time needed to trigger typing
         del self.bot.settings.settings_cache[ctx.guild]
         messages = {}
         message = []
@@ -255,12 +260,23 @@ class Support(commands.Cog):
 
         messages["Staff"] = embed
 
-        # Send everything
+        embed = discord.Embed(description="This is stuff you can't do much about it, but just wait for the problems to go away if there are some. \n"
+                                          "You might want to check https://status.discordapp.com for more information",
+                              color=Color.green() if time_delta < 200 else Color.red())
 
+        embed.add_field(name="Bot ping", value=f"{time_delta}ms")
+        embed.add_field(name="Bot latency", value=f"{round(self.bot.latency * 1000)}ms")
+
+        messages["Connexion"] = embed
+
+        # Send everything
         for message_title, embed in messages.items():
             embed.title = message_title
             await ctx.send(embed=embed)
+            # await ctx.trigger_typing()
             await asyncio.sleep(.8)
+
+
 
         await waiting_message.delete()
 

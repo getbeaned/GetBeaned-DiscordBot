@@ -71,10 +71,10 @@ class Support(commands.Cog):
 
         await ctx.send(f"Current level: {l} ({levels_names[l]})")
 
-    @commands.command(aliases=["permissions_check", "permission_check"])
+    @commands.command(aliases=["permissions_checks", "permission_check"])
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def bot_permissions_check(self, ctx):
+    async def permissions_check(self, ctx):
         current_permissions: discord.Permissions = ctx.message.guild.me.permissions_in(ctx.channel)
 
         emojis = {
@@ -128,7 +128,7 @@ class Support(commands.Cog):
         errored_in = []
         for channel in ctx.guild.channels:
             my_permissions = ctx.message.guild.me.permissions_in(channel)
-            if my_permissions <= wanted_permissions:
+            if not my_permissions.is_strict_superset(wanted_permissions):
                 errored_in.append(channel)
 
         if len(errored_in) == 0:

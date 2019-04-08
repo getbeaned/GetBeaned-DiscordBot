@@ -49,8 +49,8 @@ class Api:
                 'discord_id': user.id,
                 'discord_name': user.name,
                 'discord_discriminator': user.discriminator,
-                'discord_avatar_url': user.avatar_url_as(static_format='png', size=1024),
-                'discord_default_avatar_url': user.default_avatar_url,
+                'discord_avatar_url': str(user.avatar_url_as(static_format='png', size=1024)),
+                'discord_default_avatar_url': str(user.default_avatar_url),
                 }
         # self.logger.debug(f"(add_user) -> {data}")
         async with aiohttp.ClientSession() as cs:
@@ -64,7 +64,7 @@ class Api:
 
         data = {'discord_id': guild.id,
                 'discord_name': guild.name,
-                'discord_icon_url': guild.icon_url if guild.icon_url else f'https://cdn.discordapp.com/icons/{guild.id}.png',
+                'discord_icon_url': str(guild.icon_url) if guild.icon_url else f'https://cdn.discordapp.com/icons/{guild.id}.png',
                 # Probably doesn't work
                 'discord_created_at': str(guild.created_at),
                 'discord_user_count': guild.member_count,

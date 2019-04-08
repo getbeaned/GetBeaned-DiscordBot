@@ -79,7 +79,11 @@ async def get_level(ctx, user: discord.Member):
     # Level 4
     admins_ids = await ctx.bot.settings.get(user.guild, 'permissions_admins')
 
-    if user.guild_permissions.administrator or user.id in admins_ids or set(admins_ids).intersection(set([r.id for r in user.roles])):
+    if user.guild_permissions.administrator:
+        return 4
+    elif user.id in admins_ids:
+        return 4
+    elif set(admins_ids).intersection(set([r.id for r in user.roles])):
         return 4
 
     # Level 3
@@ -87,13 +91,23 @@ async def get_level(ctx, user: discord.Member):
     # We are checking permissions here (give a ban permission : members can use
     # the ban, softban commands, a kick permission for the kick, warns and note commands)
     moderators_ids = await ctx.bot.settings.get(user.guild, 'permissions_moderators')
-    if user.guild_permissions.ban_members or user.id in moderators_ids or set(moderators_ids).intersection(set([r.id for r in user.roles])):
+
+    if user.guild_permissions.ban_members:
+        return 3
+    elif user.id in moderators_ids:
+        return 3
+    elif set(moderators_ids).intersection(set([r.id for r in user.roles])):
         return 3
 
     # Level 2
     # This will basically be half-mods, that can user kick-permission commands, but can't ban or do much damage
     trusted_ids = await ctx.bot.settings.get(user.guild, 'permissions_trusted')
-    if user.guild_permissions.kick_members or user.id in trusted_ids or set(trusted_ids).intersection(set([r.id for r in user.roles])):
+
+    if user.guild_permissions.kick_members:
+        return 2
+    elif user.id in trusted_ids:
+        return 2
+    elif set(trusted_ids).intersection(set([r.id for r in user.roles])):
         return 2
 
     banned_ids = await ctx.bot.settings.get(user.guild, 'permissions_banned')

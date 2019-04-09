@@ -113,6 +113,10 @@ class AutoMod(commands.Cog):
                     if not invite_obj:
                         await self.bot.fetch_invite(invite, with_counts=True)
                     self.invites_codes_cache[invite] = invite_obj
+                    if not invite_obj:
+                        # Not an invite
+                        continue
+
                     if invite_obj.guild.id not in [195260081036591104, 449663867841413120, 512328935304855555] + [check_message.message.guild.id]:
                         minimal_membercount = await self.bot.settings.get(check_message.message.guild, 'automod_minimal_membercount_trust_server')
 

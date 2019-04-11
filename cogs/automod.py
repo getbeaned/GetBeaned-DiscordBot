@@ -314,8 +314,10 @@ class AutoMod(commands.Cog):
             try:
                 if act:
                     await message.delete()
-                    await full_process(ctx.bot, note, message.author, automod_user, reason="Automod deleted a message from this user.",
-                                       automod_logs="\n".join(check_message.logs))
+                    if await self.bot.settings.get(message.guild, 'automod_note_message_deletions'):
+                        await full_process(ctx.bot, note, message.author, automod_user, reason="Automod deleted a message from this user.",
+                                           automod_logs="\n".join(check_message.logs))
+
             except discord.errors.NotFound:
                 check_message.debug(f"Message already deleted!")
 
@@ -410,8 +412,6 @@ class AutoMod(commands.Cog):
                     i += 1
 
             self.bot.logger.debug(f"Cleaned {i} logs")
-
-
 
 def setup(bot):
     bot.add_cog(AutoMod(bot))

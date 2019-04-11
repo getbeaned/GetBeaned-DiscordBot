@@ -20,6 +20,18 @@ class Logging(commands.Cog):
         self.api = bot.api
         self.snipes = collections.defaultdict(lambda: collections.deque(maxlen=5))  # channel: [message, message]
 
+    async def perms_okay(self, channel):
+        wanted_permissions = discord.permissions.Permissions.none()
+        wanted_permissions.update(
+            send_messages=True,
+            embed_links=True,
+            attach_files=True,
+        )
+
+        my_permissions = channel.guild.me.permissions_in(channel)
+
+        return my_permissions.is_strict_superset(wanted_permissions)
+
     async def get_logging_channel(self, guild, pref):
         # Beware to see if the channel id is actually in the same server (to compare, we will see if the current server
         # owner is the same as the one in the target channel). If yes, even if it's not the same server, we will allow
@@ -78,7 +90,7 @@ class Logging(commands.Cog):
         ctx = await self.bot.get_context(message, cls=context.CustomContext)
         ctx.logger.info(f"Logging message deletion")
 
-        if await self.bot.settings.get(message.guild, 'logs_as_embed'):
+        if await self.bot.settings.get(message.guild, 'logs_as_embed') and await self.perms_okay(channel):
 
             embed = discord.Embed()
             if message.attachments:
@@ -86,7 +98,7 @@ class Logging(commands.Cog):
 
             embed.colour = discord.colour.Color.red()
 
-            embed.title = f"Message deleted | By {message.author.name}({message.author.id})"
+            embed.title = f"Message deleted | By {message.author.name} ({message.author.id})"
             embed.description = message.content
             embed.add_field(name="Channel", value=message.channel.mention, inline=False)
 
@@ -102,7 +114,10 @@ class Logging(commands.Cog):
                 f"In {message.channel.mention}" \
                 f"**Content**:{message.content}"
 
-            await channel.send(textual_log)
+            try:
+                await channel.send(textual_log)
+            except discord.errors.Forbidden:
+                ctx.logger.info(f"Couldn't log message deletion {message} (No perms)")
 
     @commands.Cog.listener()
     async def on_message_edit(self, old, new):
@@ -130,7 +145,7 @@ class Logging(commands.Cog):
         ctx = await self.bot.get_context(new, cls=context.CustomContext)
         ctx.logger.info(f"Logging message edition {old}->{new}")
 
-        if await self.bot.settings.get(old.guild, 'logs_as_embed'):
+        if await self.bot.settings.get(old.guild, 'logs_as_embed') and await self.perms_okay(channel):
             embed = discord.Embed()
 
             embed.colour = discord.colour.Color.orange()
@@ -152,7 +167,11 @@ class Logging(commands.Cog):
                 f"**Old**:{old.content}\n" \
                 f"**New**:{new.content}"
 
-            await channel.send(textual_log)
+            try:
+                await channel.send(textual_log)
+            except discord.errors.Forbidden:
+                ctx.logger.info(f"Couldn't log message edition {old}->{new} (No perms)")
+
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -163,12 +182,12 @@ class Logging(commands.Cog):
 
         self.bot.logger.info(f"Logging user join {member}")
 
-        if await self.bot.settings.get(member.guild, 'logs_as_embed'):
+        if await self.bot.settings.get(member.guild, 'logs_as_embed') and await self.perms_okay(channel):
             embed = discord.Embed()
 
             embed.colour = discord.colour.Color.green()
 
-            embed.title = f"New Member | {member.name}({member.id})"
+            embed.title = f"New Member | {member.name} ({member.id})"
 
             embed.add_field(name="Current member count", value=str(member.guild.member_count))
 
@@ -182,23 +201,25 @@ class Logging(commands.Cog):
             textual_log = f"Member Joined | {member.name}#{member.discriminator} (`{member.id}`)\n" \
                 f"**Current member count**: {member.guild.member_count}"
 
-            await channel.send(textual_log)
+            try:
+                await channel.send(textual_log)
+            except discord.errors.Forbidden:
+                self.bot.logger.info(f"Couldn't log user leave {member} (No perms)")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
-
         if not channel:
             return
 
         self.bot.logger.info(f"Logging user leave {member}")
 
-        if await self.bot.settings.get(member.guild, 'logs_as_embed'):
+        if await self.bot.settings.get(member.guild, 'logs_as_embed') and await self.perms_okay(channel):
             embed = discord.Embed()
 
             embed.colour = discord.colour.Color.red()
 
-            embed.title = f"Member Left | {member.name}({member.id})"
+            embed.title = f"Member Left | {member.name} ({member.id})"
 
             embed.add_field(name="Current member count", value=str(member.guild.member_count))
 
@@ -208,10 +229,13 @@ class Logging(commands.Cog):
 
             await channel.send(embed=embed)
         else:
+
             textual_log = f"Member Left | {member.name}#{member.discriminator} (`{member.id}`)\n" \
                 f"**Current member count**: {member.guild.member_count}"
-
-            await channel.send(textual_log)
+            try:
+                await channel.send(textual_log)
+            except discord.errors.Forbidden:
+                self.bot.logger.info(f"Couldn't log user leave {member} (No perms)")
 
     @commands.Cog.listener()
     async def on_member_update(self, old, new):
@@ -225,12 +249,12 @@ class Logging(commands.Cog):
 
             self.bot.logger.info(f"Logging user edit {old}->{new}")
 
-            if await self.bot.settings.get(old.guild, 'logs_as_embed'):
+            if await self.bot.settings.get(old.guild, 'logs_as_embed') and await self.perms_okay(channel):
                 embed = discord.Embed()
 
                 embed.colour = discord.colour.Color.red()
 
-                embed.title = f"Member Nickname Change | {old.name}({old.id})"
+                embed.title = f"Member Nickname Change | {old.name} ({old.id})"
 
                 embed.add_field(name="Old nickname", value=old.nick)
                 embed.add_field(name="New nickname", value=new.nick)
@@ -246,7 +270,10 @@ class Logging(commands.Cog):
                     f"**Old**: {old.nick}\n" \
                     f"**New**: {new.nick}"
 
-                await channel.send(textual_log)
+                try:
+                    await channel.send(textual_log)
+                except discord.errors.Forbidden:
+                    self.bot.logger.info(f"Couldn't log member uppdate {old}->{new} (No perms)")
 
     @commands.command()
     @commands.guild_only()

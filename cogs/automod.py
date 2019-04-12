@@ -6,6 +6,7 @@ import time
 from typing import Union
 
 import discord
+import numpy
 from discord.ext import commands
 
 from cogs.helpers import checks, context
@@ -14,7 +15,10 @@ from cogs.helpers.actions import full_process, unban, note, warn, kick, softban,
 
 from cogs.helpers.level import get_level
 from cogs.helpers.triggers import SexDatingDiscordBots
+import unicodedata
+import codecs
 
+ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
 DEBUG = False
 BAD_WORDS = ['nigga', 'fuck', 'cunt', 'dick', 'cock', 'sex',
              'nigger']
@@ -91,6 +95,18 @@ class AutoMod(commands.Cog):
         self.invites_codes_cache = {}
 
         self.automod_cache = {}
+
+    async def contains_zalgo(self, message):
+        THRESHOLD = 0.5
+        if len(message) == 0:
+            return False
+        word_scores = []
+        for word in message.split():
+            cats = [unicodedata.category(c) for c in word]
+            score = sum([cats.count(banned) for banned in ZALGO_CHAR_CATEGORIES]) / len(word)
+            word_scores.append(score)
+        total_score = numpy.percentile(word_scores, 75)
+        return total_score > THRESHOLD, total_score
 
     async def get_invites(self, message: str):
 
@@ -291,6 +307,12 @@ class AutoMod(commands.Cog):
             # Not a command or something
             self.message_history[check_message.message.author].append(
                 check_message.message.content)  # Add content for repeat-check later.
+
+        contains_zalgo, zalgo_score = await self.contains_zalgo(message.content)
+
+        if contains_zalgo:
+            check_message.score += await self.bot.settings.get(message.guild, 'automod_score_zalgo')
+            check_message.debug(f"Message contains zalgo (zalgo_score={zalgo_score})")
 
         if await self.bot.settings.get(message.guild, 'autotrigger_enable'):
             check_message.debug("Running AutoTrigger checks")

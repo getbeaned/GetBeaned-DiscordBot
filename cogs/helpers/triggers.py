@@ -69,6 +69,22 @@ class SexDatingDiscordBots(AutoTrigger):
         return True
 
 
+# http://write-me-tender.ml/ - Instant Essay Writing Service! Best Prices - Best Writers !
+class InstantEssayDiscordBots(AutoTrigger):
+    def __init__(self, message):
+        super().__init__(message)
+        self.autotrigger_name = "Instant Essay Discord Bots"
+        self.autotrigger_dbname = "instantessaydiscordbots"
+
+    async def check(self):
+        assert await message_contains_any(self.message, ["write-me-tender.ml", "Instant Essay Writing Service!", "Instant Essay Writing Service! Best Prices - Best Writers !"])
+        assert await member_joined_x_days_ago(self.message.author, x=1)
+        assert await user_created_x_days_ago(self.message.author, x=3)
+        assert not await user_have_nitro(self.message.author)
+
+        return True
+
+
 async def user_dont_have_a_profile_picture(user: discord.User) -> bool:
     return user.avatar_url == user.default_avatar_url
 
@@ -79,6 +95,10 @@ async def user_have_nitro(user: discord.User) -> bool:
 
 async def member_joined_x_days_ago(member: discord.Member, x=1) -> bool:
     return member.joined_at > datetime.datetime.now() - datetime.timedelta(days=x)
+
+
+async def user_created_x_days_ago(member: discord.Member, x=1) -> bool:
+    return member.created_at > datetime.datetime.now() - datetime.timedelta(days=x)
 
 
 async def message_contains(message: discord.Message, text: str) -> bool:

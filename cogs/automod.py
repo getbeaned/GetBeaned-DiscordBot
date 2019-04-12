@@ -14,7 +14,7 @@ from cogs.helpers.helpful_classes import LikeUser
 from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban
 
 from cogs.helpers.level import get_level
-from cogs.helpers.triggers import SexDatingDiscordBots
+from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots
 import unicodedata
 import codecs
 
@@ -23,7 +23,7 @@ DEBUG = False
 BAD_WORDS = ['nigga', 'fuck', 'cunt', 'dick', 'cock', 'sex',
              'nigger']
 
-TRIGGERS_ENABLED = [SexDatingDiscordBots]
+TRIGGERS_ENABLED = [SexDatingDiscordBots, InstantEssayDiscordBots]
 
 
 class CheckMessage:

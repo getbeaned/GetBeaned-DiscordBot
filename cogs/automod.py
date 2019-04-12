@@ -98,7 +98,7 @@ class AutoMod(commands.Cog):
     async def contains_zalgo(self, message):
         THRESHOLD = 0.5
         if len(message) == 0:
-            return False
+            return False, 0
         word_scores = []
         for word in message.split():
             cats = [unicodedata.category(c) for c in word]
@@ -125,13 +125,9 @@ class AutoMod(commands.Cog):
                 check_message.debug(f"Checking invite code : {invite}")
                 invite_obj = self.invites_codes_cache.get(invite, None)
                 try:
-                    if not invite_obj:
-                        await self.bot.fetch_invite(invite, with_counts=True)
+                    if invite_obj is None:
+                        invite_obj = await self.bot.fetch_invite(invite, with_counts=True)
                     self.invites_codes_cache[invite] = invite_obj
-                    if not invite_obj:
-                        # Not an invite
-                        continue
-
                     if invite_obj.guild.id not in [195260081036591104, 449663867841413120, 512328935304855555] + [check_message.message.guild.id]:
                         minimal_membercount = await self.bot.settings.get(check_message.message.guild, 'automod_minimal_membercount_trust_server')
 

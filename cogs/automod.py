@@ -16,7 +16,6 @@ from cogs.helpers.actions import full_process, unban, note, warn, kick, softban,
 from cogs.helpers.level import get_level
 from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots
 import unicodedata
-import codecs
 
 ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
 DEBUG = False

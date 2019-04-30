@@ -71,6 +71,7 @@ class SexDatingDiscordBots(AutoTrigger):
 
 # http://write-me-tender.ml/ - Instant Essay Writing Service! Best Prices - Best Writers !
 # http://cool-essay.ga - Order essay writing online! Smarter and faster than your profs!
+# http://write-some.ga/ - From admission essays to graduate dissertations - rely on a trusted service to do it for you!
 class InstantEssayDiscordBots(AutoTrigger):
     def __init__(self, message):
         super().__init__(message)
@@ -79,7 +80,8 @@ class InstantEssayDiscordBots(AutoTrigger):
 
     async def check(self):
         assert await message_contains_x_of(self.message, 4, ["write-me-tender.ml", "cool-essay.ga", "essay", "writers", "profs", "order essay", "instant essay",
-                                                             "Instant Essay Writing Service!", "Order essay writing online!", "Best Prices - Best Writers !"])
+                                                             "Instant Essay Writing Service!", "Order essay writing online!", "Best Prices - Best Writers !", "write-some.ga",
+                                                             "admission essays", "graduate dissertations"])
 
         assert await member_joined_x_days_ago(self.message.author, x=1)
         assert await user_created_x_days_ago(self.message.author, x=3)

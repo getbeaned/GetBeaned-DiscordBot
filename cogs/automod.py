@@ -105,7 +105,8 @@ class AutoMod(commands.Cog):
             score = sum([cats.count(banned) for banned in ZALGO_CHAR_CATEGORIES]) / len(word)
             word_scores.append(score)
         total_score = numpy.percentile(word_scores, 75)
-        return total_score > THRESHOLD, total_score
+        contain = total_score > THRESHOLD
+        return contain, total_score
 
     async def get_invites(self, message: str):
 
@@ -175,7 +176,6 @@ class AutoMod(commands.Cog):
         log = self.automod_cache.get(message_id, ("No logs found for this message ID, maybe it was purged ?", 0))
 
         await ctx.send_to(log[0])
-
 
     async def check_message(self, message, act=True) -> Union[CheckMessage, str]:
         await self.bot.wait_until_ready()
@@ -293,7 +293,7 @@ class AutoMod(commands.Cog):
             check_message.score += await self.bot.settings.get(message.guild, 'automod_score_bad_words') * bad_words_count
             check_message.debug(f"Message contains {bad_words_count} bad words ({', '.join(bad_words_in_message)})")
 
-        if not check_message.message.content.lower().startswith(("dh", "!", "?", "§", "t!", ">", "<", "-")) or len(
+        if not check_message.message.content.lower().startswith(("dh", "!", "?", "§", "t!", ">", "<", "-", "+")) or len(
                 check_message.message.content) > 30 \
                 and check_message.message.content.lower() not in ['yes', 'no', 'maybe', 'hey', 'hi', 'hello', 'oui',
                                                                   'non', 'bonjour', '\o', 'o/', ':)', ':D', ':(', 'ok',

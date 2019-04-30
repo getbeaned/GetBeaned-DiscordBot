@@ -8,6 +8,7 @@ from discord.ext import commands
 from cogs.helpers import checks
 from cogs.helpers.level import get_level
 
+PM_VIEWING_CHANNEL_ID = 557294214417874945
 
 class Support(commands.Cog):
     """Cog for various support commands."""
@@ -23,9 +24,32 @@ class Support(commands.Cog):
         if message.author.id == self.bot.user.id:
             return
 
-        pm_channel = self.bot.get_channel(557294214417874945)
+        pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
 
-        await pm_channel.send(f"{message.author.mention} ({message.author.name}#{message.author.discriminator})\n```{message.content[:1900]}```")
+        attachments_list = [e.url for e in message.attachments]
+
+        message_transcribed = f"{message.author.mention} ({message.author.name}#{message.author.discriminator})\n"
+
+        if len(message.content) > 0:
+            message_transcribed += f"```{message.content[:1700]}```\n"
+
+        if len(attachments_list) > 0:
+            message_transcribed += f"Attachments : {attachments_list}"
+
+        await pm_channel.send(message_transcribed)
+
+    @commands.command(aliases=["answer", "send_pm", "sendpm"])
+    @checks.have_required_level(8)
+    async def pm(self, ctx, user: discord.User, *, message_content:str):
+        try:
+            await user.send(f"🐦 {ctx.author.name}#{ctx.author.discriminator}, a bot moderator, sent you the following message:\n{message_content}")
+        except Exception as e:
+            await ctx.send(f"Error sending message : {e}")
+            return
+
+        pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
+
+        await pm_channel.send(f"**{ctx.author.name}#{ctx.author.discriminator}** answered {user.mention} ({user.name}#{user.discriminator})\n```{message_content[:1900]}```")
 
     @commands.command()
     @commands.guild_only()

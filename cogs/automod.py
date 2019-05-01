@@ -190,6 +190,9 @@ class AutoMod(commands.Cog):
         if not await self.bot.settings.get(message.guild, 'automod_enable'):
             return "Automod disabled here"
 
+        if "[getbeaned:disable_automod]" in message.channel.topic:
+            return "`[getbeaned:disable_automod]` in topic, Automod Disabled here"
+
         current_permissions = message.guild.me.permissions_in(message.channel)
         wanted_permissions = discord.permissions.Permissions.none()
         wanted_permissions.update(

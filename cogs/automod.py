@@ -187,10 +187,10 @@ class AutoMod(commands.Cog):
         if message.guild is None:
             return "Not in a guild"  # ignore messages from PMs
 
-        if not await self.bot.settings.get(message.guild, 'automod_enable') and not "[getbeaned:enable_automod]" in message.channel.topic:
+        if not await self.bot.settings.get(message.guild, 'automod_enable') and not "[getbeaned:enable_automod]" in str(message.channel.topic):
             return "Automod disabled here"
 
-        if "[getbeaned:disable_automod]" in message.channel.topic:
+        if "[getbeaned:disable_automod]" in str(message.channel.topic):
             return "`[getbeaned:disable_automod]` in topic, Automod Disabled here"
 
         current_permissions = message.guild.me.permissions_in(message.channel)

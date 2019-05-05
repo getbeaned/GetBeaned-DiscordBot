@@ -81,7 +81,7 @@ class GetBeaned(commands.AutoShardedBot):
         game = discord.Game(name=f"g+help | g+urls")
         await bot.change_presence(status=discord.Status.online, activity=game)
         logger.info("We are all set, on_ready was fired! Yeah!")
-        total_members = sum([guild.member_count for guild in self.guilds])
+        total_members = len(self.users)
         logger.info(f"I see {len(self.guilds)} guilds, and {total_members} members")
 
     async def on_command_error(self, context, exception):
@@ -155,7 +155,6 @@ class GetBeaned(commands.AutoShardedBot):
 
 
 async def get_prefix(bot, message):
-
     forced_prefixes = ["g+", "g!", "gb", "gb!", "gb+"]
 
     if not message.guild:

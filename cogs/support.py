@@ -118,6 +118,23 @@ class Support(commands.Cog):
 
         await ctx.send("\n".join(perms_check))
 
+    @commands.command(aliases=["hierarchy", "check_hierarchy"])
+    @commands.guild_only()
+    @checks.have_required_level(1)
+    async def hierarchy_check(self, ctx, m:discord.Member):
+        can_execute = ctx.author == ctx.guild.owner or \
+                      ctx.author.top_role > m.top_role
+
+        if can_execute:
+            if m.top_role > ctx.guild.me.top_role:
+                await ctx.send(f'You cannot do this action on this user due to role hierarchy between the bot and {m.name}.')
+                return False
+            await ctx.send("Everything checks out!")
+            return True
+        else:
+            await ctx.send('You cannot do this action on this user due to role hierarchy.')
+            return False
+
     @commands.command(aliases=["bot_doctor", "support_check"])
     @commands.guild_only()
     @commands.cooldown(2, 60, commands.BucketType.guild)

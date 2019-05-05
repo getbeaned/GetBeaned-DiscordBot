@@ -99,7 +99,8 @@ class Mod(commands.Cog):
 
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}unmute <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}unmute <list of users> [reason]`. "
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
         if len(users) >= 2:
@@ -151,7 +152,8 @@ class Mod(commands.Cog):
         # Nothing to do here.
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}warn <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}warn <list of users> [reason]`. "
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
         if len(users) >= 2:
@@ -201,7 +203,8 @@ class Mod(commands.Cog):
         """
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}warn <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}warn <list of users> [reason]`. "
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
         if len(users) >= 2:
@@ -241,7 +244,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def mute(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
+    async def mute(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)=None):
         """
         Mute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
         Using this command require a specific role, that you can create using the +create_muted_role command
@@ -262,7 +265,8 @@ class Mod(commands.Cog):
 
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}mute <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}mute <list of users> [reason]`."
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
         if len(users) >= 2:
@@ -314,7 +318,8 @@ class Mod(commands.Cog):
         """
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}kick <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}kick <list of users> [reason]`. "
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
 
@@ -369,7 +374,8 @@ class Mod(commands.Cog):
         """
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}softban <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}softban <list of users> [reason]`. "
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
         if len(users) >= 2:
@@ -420,7 +426,8 @@ class Mod(commands.Cog):
         """
         if len(users) == 0:
             await ctx.send_to(
-                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}ban <list of users> [reason]`")
+                f":warning: Command syntax error, nothing was done. Use the command like `{ctx.prefix}ban <list of users> [reason]`. "
+                f"If you did the command correctly, this error is due to a hierarchy problem. To fix, use `{ctx.prefix}hierarchy @user`")
             return
 
         if len(users) >= 2:

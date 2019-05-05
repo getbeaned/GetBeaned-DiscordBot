@@ -156,7 +156,7 @@ class GetBeaned(commands.AutoShardedBot):
 
 async def get_prefix(bot, message):
 
-    forced_prefixes = ["m!", "m+", "g+", "g!", "gb"]
+    forced_prefixes = ["g+", "g!", "gb", "gb!", "gb+"]
 
     if not message.guild:
         return commands.when_mentioned_or(*forced_prefixes)(bot, message)

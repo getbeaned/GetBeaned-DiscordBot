@@ -37,6 +37,7 @@ class Support(commands.Cog):
             message_transcribed += f"Attachments : {attachments_list}"
 
         await pm_channel.send(message_transcribed)
+        await pm_channel.send(f"To answer, use `+answer {message.author.id} MESSAGE`")
 
     @commands.command(aliases=["answer", "send_pm", "sendpm"])
     @checks.have_required_level(8)

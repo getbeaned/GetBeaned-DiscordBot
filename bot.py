@@ -177,7 +177,18 @@ logger.debug("Loading cogs : ")
 #                 V  #
 # ###############   ##
 
-cogs = ['cogs.mod', 'cogs.purge', 'cogs.importation', 'cogs.settings_commands', 'cogs.stats', 'cogs.automod', 'cogs.meta', 'cogs.logging', 'cogs.help', 'cogs.support', 'jishaku']
+cogs = ['cogs.mod',
+        'cogs.purge',
+        'cogs.importation',
+        'cogs.settings_commands',
+        'cogs.stats',
+        'cogs.automod',
+        'cogs.meta',
+        'cogs.logging',
+        'cogs.help',
+        'cogs.support',
+        'cogs.dehoister',
+        'jishaku']
 
 for extension in cogs:
     try:

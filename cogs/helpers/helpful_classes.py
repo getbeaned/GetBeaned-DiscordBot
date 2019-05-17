@@ -7,6 +7,7 @@ class LikeUser:
         # 0 : Ban list import
         # 1 : Automod
         # 2 : Thresholds
+        # 3 : Dehoister
 
         self.id = did
         self.name = name

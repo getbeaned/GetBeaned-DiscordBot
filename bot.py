@@ -188,6 +188,7 @@ cogs = ['cogs.mod',
         'cogs.help',
         'cogs.support',
         'cogs.dehoister',
+        'cogs.autoinspect',
         'jishaku']
 
 for extension in cogs:

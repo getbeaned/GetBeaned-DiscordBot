@@ -8,6 +8,7 @@ class LikeUser:
         # 1 : Automod
         # 2 : Thresholds
         # 3 : Dehoister
+        # 4 : AutoInspect
 
         self.id = did
         self.name = name

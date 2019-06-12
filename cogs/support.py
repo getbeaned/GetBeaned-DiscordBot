@@ -198,7 +198,8 @@ class Support(commands.Cog):
         settings_to_check = {"automod_enable": "Automod",
                              "autotrigger_enable": "AutoTriggers (special automod rules to fight a specific kind of spam message — Require automod to be enabled too)",
                              "thresholds_enable": "Thresholds (automatic action when a users received X strikes)",
-                             "logs_enable": "Logs"
+                             "logs_enable": "Logs",
+                             "autoinspect_enable": "AutoInspect (Verification of new members that join your server)",
                              }
 
         for setting, display_name in settings_to_check.items():
@@ -220,7 +221,8 @@ class Support(commands.Cog):
                     "logs_joins_channel_id": "Users joining/leaving",
                     "logs_member_edits_channel_id": "Users edits",
                     "logs_edits_channel_id": "Message edits",
-                    "logs_delete_channel_id": "Message deletions"}
+                    "logs_delete_channel_id": "Message deletions",
+                    "logs_autoinspect_channel_id": "AutoInspect logs"}
             everything_good = True
             message = ["Logs are globally enabled on this server. The following specific logs are activated and configured: \n```diff"]
             for setting, display_name in logs.items():

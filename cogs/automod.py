@@ -14,7 +14,7 @@ from cogs.helpers.helpful_classes import LikeUser
 from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban
 
 from cogs.helpers.level import get_level
-from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots
+from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots, SexBots
 import unicodedata
 
 ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
@@ -22,7 +22,7 @@ DEBUG = False
 BAD_WORDS = ['nigga', 'fuck', 'cunt', 'dick', 'cock', 'sex',
              'nigger']
 
-TRIGGERS_ENABLED = [SexDatingDiscordBots, InstantEssayDiscordBots]
+TRIGGERS_ENABLED = [SexDatingDiscordBots, InstantEssayDiscordBots, SexBots]
 
 
 class CheckMessage:
@@ -172,7 +172,7 @@ class AutoMod(commands.Cog):
 
     @commands.command()
     # @checks.have_required_level(8)
-    async def automod_logs(self, ctx, message_id:int):
+    async def automod_logs(self, ctx, message_id: int):
         log = self.automod_cache.get(message_id, ("No logs found for this message ID, maybe it was purged ?", 0))
 
         await ctx.send_to(log[0])
@@ -279,11 +279,13 @@ class AutoMod(commands.Cog):
             m_list = [a.name + '#' + a.discriminator for a in mentions]
             check_message.debug(f"Message mentions more than 3 people ({m_list})")
 
-        if await self.get_invites_count(check_message) >= 1 and str(message.channel.id) not in str(await self.bot.settings.get(message.guild, 'automod_ignore_invites_in')): # They can add multiple channels separated by a " "
+        if await self.get_invites_count(check_message) >= 1 and str(message.channel.id) not in str(
+                await self.bot.settings.get(message.guild, 'automod_ignore_invites_in')):  # They can add multiple channels separated by a " "
             check_message.score += await self.bot.settings.get(message.guild, 'automod_score_contain_invites')
             check_message.debug(f"Message contains invite(s) ({check_message.invites_code})")
 
-        if message.content:  # TODO: Check images repeat
+        if message.content and "[getbeaned:disable_spam_detection]" not in str(message.channel.topic):
+            # TODO: Check images repeat
             repeat = self.message_history[check_message.message.author].count(check_message.message.content)
             if repeat >= 3:
                 check_message.score += await self.bot.settings.get(message.guild, 'automod_score_repeated') * repeat
@@ -432,6 +434,7 @@ class AutoMod(commands.Cog):
                     i += 1
 
             self.bot.logger.debug(f"Cleaned {i} logs")
+
 
 def setup(bot):
     bot.add_cog(AutoMod(bot))

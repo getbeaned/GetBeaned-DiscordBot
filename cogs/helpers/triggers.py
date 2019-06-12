@@ -90,6 +90,23 @@ class InstantEssayDiscordBots(AutoTrigger):
         return True
 
 
+class SexBots(AutoTrigger):
+    def __init__(self, message):
+        super().__init__(message)
+        self.autotrigger_name = "Sex Bots"
+        self.autotrigger_dbname = "sexbots"
+
+    async def check(self):
+        assert await message_contains_x_of(self.message, 1, ["privatepage.vip"])
+
+        assert await member_joined_x_days_ago(self.message.author, x=2)
+        assert await user_created_x_days_ago(self.message.author, x=3)
+        assert not await user_have_nitro(self.message.author)
+
+        return True
+
+
+
 async def user_dont_have_a_profile_picture(user: discord.User) -> bool:
     return user.avatar_url == user.default_avatar_url
 

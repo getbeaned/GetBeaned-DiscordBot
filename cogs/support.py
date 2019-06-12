@@ -10,6 +10,7 @@ from cogs.helpers.level import get_level
 
 PM_VIEWING_CHANNEL_ID = 557294214417874945
 
+
 class Support(commands.Cog):
     """Cog for various support commands."""
 
@@ -96,7 +97,7 @@ class Support(commands.Cog):
 
         await ctx.send(f"Current level: {l} ({levels_names[l]})")
 
-    @commands.command(aliases=["permissions_checks", "permission_check"])
+    @commands.command(aliases=["permissions_checks", "permission_check", "bot_permissions_check"])
     @commands.guild_only()
     @checks.have_required_level(1)
     async def permissions_check(self, ctx):

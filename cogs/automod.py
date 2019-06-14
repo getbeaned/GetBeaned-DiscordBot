@@ -91,9 +91,9 @@ class AutoMod(commands.Cog):
         self.message_history = collections.defaultdict(
             lambda: collections.deque(maxlen=7))  # Member -> collections.deque(maxlen=7)
 
-        self.invites_codes_cache = {}
+        self.invites_codes_cache = bot.cache.get_cache("automod_invites_codes", expire_after=3600)
 
-        self.automod_cache = {}
+        self.automod_cache = bot.cache.get_cache("automod_logs", expire_after=3600)
 
     async def contains_zalgo(self, message):
         THRESHOLD = 0.5
@@ -407,7 +407,6 @@ class AutoMod(commands.Cog):
             logs = str(ret)
 
         self.automod_cache[message.id] = (logs, int(time.time()))
-        self.cleanup_cache()
 
     @commands.Cog.listener()
     async def on_message_edit(self, _, message):
@@ -424,16 +423,6 @@ class AutoMod(commands.Cog):
 
         self.automod_cache[message.id] = (logs, int(time.time()))
 
-    def cleanup_cache(self):
-        if len(self.automod_cache) > 100000:
-            self.bot.logger.debug("Cleaning up the cache of automod logs")
-            i = 0
-            for key, cached_log in self.automod_cache.copy().items():
-                if cached_log[1] < time.time() + 60 * 60:
-                    del self.automod_cache[key]
-                    i += 1
-
-            self.bot.logger.debug(f"Cleaned {i} logs")
 
 
 def setup(bot):

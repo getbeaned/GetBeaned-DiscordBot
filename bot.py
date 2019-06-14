@@ -7,6 +7,8 @@
 # You also have to use python 3.7 to run this
 # Have fun !
 # The doc for d.py rewrite is here : http://discordpy.readthedocs.io/en/rewrite/index.html
+from cogs.helpers.cache import Cache
+
 print("Loading...")
 
 # Importing the discord API warpper
@@ -49,7 +51,7 @@ from cogs.helpers import context, api, checks
 class GetBeaned(commands.AutoShardedBot):
     def __init__(self, command_prefix, **options):
         super().__init__(command_prefix, **options)
-
+        self.cache = Cache(self)
         self.commands_used = collections.Counter()
         self.admins = [138751484517941259]
         self.base_logger, self.logger = base_logger, logger
@@ -177,7 +179,8 @@ logger.debug("Loading cogs : ")
 #                 V  #
 # ###############   ##
 
-cogs = ['cogs.mod',
+cogs = ['cogs.cache',
+        'cogs.mod',
         'cogs.purge',
         'cogs.importation',
         'cogs.settings_commands',

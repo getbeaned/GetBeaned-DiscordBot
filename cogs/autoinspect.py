@@ -56,7 +56,10 @@ class AutoInspect(commands.Cog):
             await context["logging_channel"].send(embed=embed)
 
             if action == 3:
-                await full_process(self.bot, kick, context["member"], autoinspect_user, reason=f"Automatic kick by AutoInspect {name}")
+                await full_process(self.bot, softban, context["member"], autoinspect_user, reason=f"Automatic softban by AutoInspect {name}")
+                return False
+            elif action == 4:
+                await full_process(self.bot, ban, context["member"], autoinspect_user, reason=f"Automatic ban by AutoInspect {name}")
                 return False
 
         return True

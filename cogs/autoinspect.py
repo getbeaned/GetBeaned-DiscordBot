@@ -40,7 +40,7 @@ class AutoInspect(commands.Cog):
 
         if check_result:
             autoinspect_user = LikeUser(did=4, name="AutoInspector", guild=context["guild"])
-            await full_process(self.bot, note, context["member"], autoinspect_user, reason=f"Automatic note by AutoInspect {name}, following a positive check.")
+            # await full_process(self.bot, note, context["member"], autoinspect_user, reason=f"Automatic note by AutoInspect {name}, following a positive check.")
 
             embed = discord.Embed()
 
@@ -82,6 +82,7 @@ class AutoInspect(commands.Cog):
         for check_name, check_callable in self.checks.items():
             if not await self.check_and_act(check_callable, check_name, context):
                 return True
+
 
 def setup(bot):
     bot.add_cog(AutoInspect(bot))

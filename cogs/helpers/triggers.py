@@ -90,6 +90,7 @@ class InstantEssayDiscordBots(AutoTrigger):
         return True
 
 
+# :heart_eyes: 🥰 My 18+ photos :stuck_out_tongue_winking_eye: - https://www.nakedphotos.club/
 class SexBots(AutoTrigger):
     def __init__(self, message):
         super().__init__(message)
@@ -97,7 +98,7 @@ class SexBots(AutoTrigger):
         self.autotrigger_dbname = "sexbots"
 
     async def check(self):
-        assert await message_contains_x_of(self.message, 1, ["privatepage.vip"])
+        assert await message_contains_x_of(self.message, 1, ["privatepage.vip", "nakedphotos.club"])
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
         assert await user_created_x_days_ago(self.message.author, x=3)

@@ -23,7 +23,7 @@ class Dehoister(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def dehoist_user_in_guild(self, user, guild):
+    async def dehoist_user_in_guild(self, user, guild) -> bool:
         if await self.bot.settings.get(guild, "dehoist_enable"):
             member = guild.get_member(user.id)
 
@@ -87,6 +87,8 @@ class Dehoister(commands.Cog):
                         pass
 
                 return True
+            else:
+                return False
         else:
             return False
 
@@ -94,6 +96,22 @@ class Dehoister(commands.Cog):
         for guild in self.bot.guilds:
             if user in guild.members:
                 await self.dehoist_user_in_guild(user, guild)
+
+    @commands.command()
+    @commands.guild_only()
+    @checks.have_required_level(4)
+    @checks.bot_have_permissions()
+    @commands.cooldown(rate=1, per=300, type=commands.BucketType.guild)
+    async def dehoist_users(self, ctx):
+        guild = ctx.guild
+        dehoisted_users_count = 0
+
+        await ctx.send(f"Processing, please wait.")
+
+        for member in guild.members:
+            dehoisted_users_count += int(await self.dehoist_user_in_guild(member, guild))
+
+        await ctx.send(f"{dehoisted_users_count} users were dehoisted.")
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):

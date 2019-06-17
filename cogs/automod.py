@@ -173,9 +173,9 @@ class AutoMod(commands.Cog):
     @commands.command()
     # @checks.have_required_level(8)
     async def automod_logs(self, ctx, message_id: int):
-        log = self.automod_cache.get(message_id, ("No logs found for this message ID, maybe it was purged ?", 0))
+        log = self.automod_cache.get(message_id, "No logs found for this message ID, maybe it was purged ?")
 
-        await ctx.send_to(log[0])
+        await ctx.send_to(log)
 
     async def check_message(self, message, act=True) -> Union[CheckMessage, str]:
         await self.bot.wait_until_ready()
@@ -406,7 +406,7 @@ class AutoMod(commands.Cog):
         except AttributeError:
             logs = str(ret)
 
-        self.automod_cache[message.id] = (logs, int(time.time()))
+        self.automod_cache[message.id] = logs
 
     @commands.Cog.listener()
     async def on_message_edit(self, _, message):
@@ -419,10 +419,9 @@ class AutoMod(commands.Cog):
         except AttributeError:
             logs = str(ret)
 
-        logs = self.automod_cache.get(message.id, ("(No logs stored before the edit)", 0))[0] + "\n==AN EDIT WAS MADE==\n" + logs
+        logs = self.automod_cache.get(message.id, "(No logs stored before the edit)") + "\n==AN EDIT WAS MADE==\n" + logs
 
-        self.automod_cache[message.id] = (logs, int(time.time()))
-
+        self.automod_cache[message.id] = logs
 
 
 def setup(bot):

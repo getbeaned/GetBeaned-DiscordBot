@@ -94,9 +94,9 @@ class Importation(commands.Cog):
 
         user_id = user.id if user else ctx.message.author.id
         await ctx.send_to(f"**Useful urls**:\n"
-                          f"- **Server webpage**: https://getbeaned.api-d.com/guilds/{ctx.guild.id} \n"
-                          f"- **Your server profile**: https://getbeaned.api-d.com/users/{ctx.guild.id}/{user_id}\n"
-                          f"- **Your global profile**: https://getbeaned.api-d.com/users/{user_id}")
+                          f"- **Server webpage**: https://getbeaned.me/guilds/{ctx.guild.id} \n"
+                          f"- **Your server profile**: https://getbeaned.me/users/{ctx.guild.id}/{user_id}\n"
+                          f"- **Your global profile**: https://getbeaned.me/users/{user_id}")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.guild):

@@ -12,7 +12,7 @@ with open("credentials.json", "r") as f:
 
 
 
-API_URL = "https://getbeaned.api-d.com/api"
+API_URL = "https://getbeaned.me/api"
 
 API_TOKEN = credentials["web_token"]
 

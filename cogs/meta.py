@@ -62,7 +62,7 @@ class Meta(commands.Cog):
 
         for who in whos:
             await self.bot.api.add_user(who)
-            await ctx.send_to(f"{who.name}: https://getbeaned.api-d.com/users/{who.id}")
+            await ctx.send_to(f"{who.name}: https://getbeaned.me/users/{who.id}")
 
     @commands.command()
     @checks.have_required_level(1)

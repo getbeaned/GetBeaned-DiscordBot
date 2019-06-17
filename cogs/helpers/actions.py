@@ -136,7 +136,7 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
                                    automod_logs=automod_logs,
                                    )
 
-    url = "https://getbeaned.api-d.com" + res['result_url']
+    url = "https://getbeaned.me" + res['result_url']
 
     try:
 

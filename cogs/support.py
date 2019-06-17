@@ -129,12 +129,12 @@ class Support(commands.Cog):
 
         if can_execute:
             if m.top_role > ctx.guild.me.top_role:
-                await ctx.send(f'You cannot do this action on this user due to role hierarchy between the bot and {m.name}.')
+                await ctx.send(f'❌ In the Discord Permissions system, the bot top role is lower or equal to the top role of the target.')
                 return False
-            await ctx.send("Everything checks out!")
+            await ctx.send("✅ Everything checks out!")
             return True
         else:
-            await ctx.send('You cannot do this action on this user due to role hierarchy.')
+            await ctx.send('❌ In the Discord Permissions system, your top role is lower or equal to the top role of the target.')
             return False
 
     @commands.command(aliases=["bot_doctor", "support_check"])

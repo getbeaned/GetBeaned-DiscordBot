@@ -46,7 +46,6 @@ class Cache(commands.Cog):
                               f"{global_stored_expired_keys_count} stored and expired ({percent_stored_and_expired} %)\n"
                               f"{global_expired_keys_count} expired")
 
-
         stored_messages = len(self.bot._connection._messages)
         max_messages = self.bot._connection.max_messages
         pct_max_messages = round(stored_messages/max_messages * 100, 2)

@@ -16,6 +16,16 @@ class CacheStorageDict(collections.MutableMapping):
         self.update(dict(*args, **kwargs))  # use the free update to set keys
         self._expired_keys = 0
 
+    def get(self, key, default=None):
+        try:
+            r = self[key]
+            if r is None:
+                return default
+            else:
+                return r
+        except KeyError:
+            return default
+
     def cleanup(self):
         i = 0
         for key, expire in list(self.times.items()):

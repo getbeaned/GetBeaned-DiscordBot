@@ -97,6 +97,39 @@ class Support(commands.Cog):
 
         await ctx.send(f"Current level: {l} ({levels_names[l]})")
 
+    @commands.command(aliases=["message_info", "report_message", "message_report", "minfo"])
+    @commands.guild_only()
+    @checks.have_required_level(2)
+    async def info_message(self, ctx, message_id:int):
+        target_message:discord.Message = await ctx.channel.fetch_message(message_id)
+
+        if target_message is None:
+            await ctx.send("❌ Message not found in the channel.")
+            return False
+
+        automod_cache = self.bot.cache.get_cache("automod_logs", expire_after=3600)
+
+        embed = discord.Embed(timestamp=target_message.created_at,
+                              title=f"Message report by {ctx.author.name}#{ctx.author.discriminator}")
+
+        embed.set_author(name=f"{target_message.author.name}#{target_message.author.discriminator}", icon_url=target_message.author.avatar_url)
+        embed.add_field(name="Content", value=target_message.content, inline=False)
+
+        if len(target_message.attachments) > 0:
+            attachments = ", ".join(target_message.attachments)
+            embed.add_field(name="Attachement(s)", value=attachments, inline=False)
+
+        embed.add_field(name="Author ID", value=target_message.author.id, inline=True)
+        embed.add_field(name="Channel ID", value=target_message.channel.id, inline=True)
+        embed.add_field(name="Message ID", value=target_message.id, inline=True)
+
+        embed.add_field(name="Author created at", value=target_message.author.created_at, inline=True)
+
+        embed.add_field(name="Automod Logs", value="```\n" + automod_cache.get(message_id, "None stored :(") + "\n```", inline=False)
+
+        await ctx.send(embed=embed)
+
+
     @commands.command(aliases=["permissions_checks", "permission_check", "bot_permissions_check"])
     @commands.guild_only()
     @checks.have_required_level(1)
@@ -320,8 +353,6 @@ class Support(commands.Cog):
             await ctx.send(embed=embed)
             # await ctx.trigger_typing()
             await asyncio.sleep(.8)
-
-
 
         await waiting_message.delete()
 

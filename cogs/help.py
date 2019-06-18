@@ -442,10 +442,11 @@ class HelpPaginator(Pages):
         self.embed.title = self.title
 
         if hasattr(self, '_is_bot'):
-            value = 'For more help, join the official bot support server: https://discord.gg/cPbhK53'
+            value = 'For more help, join the official bot support server: https://discord.gg/cPbhK53\n' \
+                    'There is a way better list of commands there: https://docs.getbeaned.me/bot-documentation/list-of-commands'
             self.embed.add_field(name='Support', value=value, inline=False)
 
-        messages = [f'Use "{self.prefix}help command" for more info on a command.',
+        messages = [f'Use "+help command" for more info on a command.',
                     "Remember that GetBeaned features include the automod, which dosen't have any commands, but that can be configured on the webinterface.",
                     "Most of the commands shown here require the bot permissions to be correctly setup. "
                     "Please give the bot the following permissions if you encounter problems: "
@@ -535,6 +536,9 @@ class Help(commands.Cog):
     @commands.command(name='help')
     async def _help(self, ctx, *, command: str = None):
         """Shows help about a command or the bot"""
+
+        await ctx.send("This help viewer is now deprecated for the new and beautiful docs available here: https://docs.getbeaned.me/bot-documentation/list-of-commands\n"
+                       "This command navigator will soon get removed.")
 
         try:
             if command is None:

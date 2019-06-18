@@ -101,9 +101,9 @@ class Support(commands.Cog):
     @commands.guild_only()
     @checks.have_required_level(2)
     async def info_message(self, ctx, message_id:int):
-        target_message:discord.Message = await ctx.channel.fetch_message(message_id)
-
-        if target_message is None:
+        try:
+            target_message:discord.Message = await ctx.channel.fetch_message(message_id)
+        except discord.NotFound:
             await ctx.send("❌ Message not found in the channel.")
             return False
 

@@ -55,7 +55,11 @@ class Api:
         # self.logger.debug(f"(add_user) -> {data}")
         async with aiohttp.ClientSession() as cs:
             async with cs.post(API_URL + "/users/", data=data, headers=new_headers) as r:
-                res = await r.json()
+                try:
+                    res = await r.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    print(await r.text())
+                    raise
                 # self.logger.debug(f"(add_user) <- {res}")
                 return res
 

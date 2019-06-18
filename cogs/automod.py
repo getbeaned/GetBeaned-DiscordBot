@@ -173,6 +173,7 @@ class AutoMod(commands.Cog):
     @commands.command()
     # @checks.have_required_level(8)
     async def automod_logs(self, ctx, message_id: int):
+        await ctx.send_to("This command is deprecated. Please use the new `message_info` command. :)")
         log = self.automod_cache.get(message_id, "No logs found for this message ID, maybe it was purged ?")
 
         await ctx.send_to(log)

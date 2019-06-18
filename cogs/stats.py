@@ -5,6 +5,8 @@ import aiohttp
 import json
 from discord.ext import commands
 
+from cogs.helpers import checks
+
 with open("credentials.json", "r") as f:
     credentials = json.load(f)
 
@@ -70,6 +72,7 @@ class Carbonitex(commands.Cog):
         await self.update()
 
     @commands.command()
+    @checks.have_required_level(8)
     async def update_analytics(self, ctx):
         await self.update()
         await ctx.send(":ok_hand:")

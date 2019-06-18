@@ -3,6 +3,7 @@ This file is meant to keep code for AutoTriggers, so that the automod file isn't
 Everything here should be imported by automod if enabled
 """
 import datetime
+import re
 import sys
 import traceback
 from typing import List
@@ -101,7 +102,11 @@ class SexBots(AutoTrigger):
         assert await message_contains_x_of(self.message, 1, ["privatepage.vip", "nakedphotos.club", "viewc.site", "My naked photos", "My 18+ photos", "Awesome Gift of the Day"])
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
-        assert await user_created_x_days_ago(self.message.author, x=7)
+
+        # If the account is not that old or if it's matching the name pattern.
+        assert (await user_created_x_days_ago(self.message.author, x=14) or
+                bool(re.match(r"([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))", self.message.author.name)))
+
         assert not await user_have_nitro(self.message.author)
 
         return True

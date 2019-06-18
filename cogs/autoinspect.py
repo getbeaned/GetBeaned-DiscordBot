@@ -23,7 +23,7 @@ class AutoInspect(commands.Cog):
     async def pornspam_bots_check(self, member) -> bool:
         # https://regex101.com/r/IeIqbl/1
         result = bool(re.match(r"([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))", member.name))
-        result = result and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=7))
+        result = result and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=14))
 
         return result
 

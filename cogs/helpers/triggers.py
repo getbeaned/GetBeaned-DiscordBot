@@ -98,10 +98,10 @@ class SexBots(AutoTrigger):
         self.autotrigger_dbname = "sexbots"
 
     async def check(self):
-        assert await message_contains_x_of(self.message, 1, ["privatepage.vip", "nakedphotos.club", "viewc.site", "My naked photos", "My 18+ photos"])
+        assert await message_contains_x_of(self.message, 1, ["privatepage.vip", "nakedphotos.club", "viewc.site", "My naked photos", "My 18+ photos", "Awesome Gift of the Day"])
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
-        assert await user_created_x_days_ago(self.message.author, x=3)
+        assert await user_created_x_days_ago(self.message.author, x=7)
         assert not await user_have_nitro(self.message.author)
 
         return True

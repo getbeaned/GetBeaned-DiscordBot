@@ -6,6 +6,7 @@ from discord import Color
 from discord.ext import commands
 
 from cogs.helpers import checks
+from cogs.helpers.hastebins import upload_text
 from cogs.helpers.level import get_level
 
 PM_VIEWING_CHANNEL_ID = 557294214417874945
@@ -97,6 +98,11 @@ class Support(commands.Cog):
 
         await ctx.send(f"Current level: {l} ({levels_names[l]})")
 
+    async def safe_add_field(self, embed, *, name, value, inline=None):
+        if len(value) > 1000:
+            value = await upload_text(value)
+        embed.add_field(name=name, value=value, inline=inline)
+
     @commands.command(aliases=["message_info", "report_message", "message_report", "minfo"])
     @commands.guild_only()
     @checks.have_required_level(2)
@@ -113,7 +119,7 @@ class Support(commands.Cog):
                               title=f"Message report by {ctx.author.name}#{ctx.author.discriminator}")
 
         embed.set_author(name=f"{target_message.author.name}#{target_message.author.discriminator}", icon_url=target_message.author.avatar_url)
-        embed.add_field(name="Content", value=target_message.content, inline=False)
+        await self.safe_add_field(embed, name="Content", value=target_message.content, inline=False)
 
         if len(target_message.attachments) > 0:
             attachments = ", ".join(target_message.attachments)
@@ -125,7 +131,7 @@ class Support(commands.Cog):
 
         embed.add_field(name="Author created at", value=target_message.author.created_at, inline=True)
 
-        embed.add_field(name="Automod Logs", value="```\n" + automod_cache.get(message_id, "None stored :(") + "\n```", inline=False)
+        await self.safe_add_field(embed, name="Automod Logs", value="```\n" + automod_cache.get(message_id, "None stored :(") + "\n```", inline=False)
 
         await ctx.send(embed=embed)
 

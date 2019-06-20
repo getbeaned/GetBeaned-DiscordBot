@@ -9,5 +9,4 @@ async def upload_text(text: str):
     async with aiohttp.ClientSession() as cs:
         async with cs.post(server + "/documents", data=text) as r:
             res = await r.json()
-            # self.logger.debug(f"(add_guild) <- {res}")
-            return res["key"]
+            return server + res["key"]

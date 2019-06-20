@@ -98,8 +98,11 @@ class Support(commands.Cog):
 
         await ctx.send(f"Current level: {l} ({levels_names[l]})")
 
-    async def safe_add_field(self, embed, *, name, value, inline=None):
+    async def safe_add_field(self, embed, *, name, value, inline=None, strip=True):
         if len(value) > 1000:
+            if strip:
+                value = value.strip("`")
+
             value = await upload_text(value)
         embed.add_field(name=name, value=value, inline=inline)
 
@@ -119,7 +122,7 @@ class Support(commands.Cog):
                               title=f"Message report by {ctx.author.name}#{ctx.author.discriminator}")
 
         embed.set_author(name=f"{target_message.author.name}#{target_message.author.discriminator}", icon_url=target_message.author.avatar_url)
-        await self.safe_add_field(embed, name="Content", value=target_message.content, inline=False)
+        await self.safe_add_field(embed, name="Content", value=target_message.content, inline=False, strip=False)
 
         if len(target_message.attachments) > 0:
             attachments = ", ".join(target_message.attachments)
@@ -134,7 +137,6 @@ class Support(commands.Cog):
         await self.safe_add_field(embed, name="Automod Logs", value="```\n" + automod_cache.get(message_id, "None stored :(") + "\n```", inline=False)
 
         await ctx.send(embed=embed)
-
 
     @commands.command(aliases=["permissions_checks", "permission_check", "bot_permissions_check"])
     @commands.guild_only()

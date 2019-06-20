@@ -112,7 +112,6 @@ class SexBots(AutoTrigger):
         return True
 
 
-
 async def user_dont_have_a_profile_picture(user: discord.User) -> bool:
     return user.avatar_url == user.default_avatar_url
 

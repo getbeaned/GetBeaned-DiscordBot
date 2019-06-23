@@ -32,22 +32,26 @@ async def thresholds_enforcer(bot, victim, action_type):
     elif action_type == 'warn':
         thresholds_warns_to_kick = await bot.settings.get(victim.guild, 'thresholds_warns_to_kick')
         if thresholds_warns_to_kick and counters['warn'] % thresholds_warns_to_kick == 0:
-            await full_process(bot, kick, victim, mod_user, reason=reason)
+            logs = f"Total of {counters['warn']}, we want {counters['warn']}%{thresholds_warns_to_kick} = {counters['warn'] % thresholds_warns_to_kick} = 0"
+            await full_process(bot, kick, victim, mod_user, reason=reason, automod_logs=logs)
 
     elif action_type == 'mute':
         thresholds_mutes_to_kick = await bot.settings.get(victim.guild, 'thresholds_mutes_to_kick')
-        if thresholds_mutes_to_kick and counters['warn'] % thresholds_mutes_to_kick == 0:
-            await full_process(bot, kick, victim, mod_user, reason=reason)
+        if thresholds_mutes_to_kick and counters['mute'] % thresholds_mutes_to_kick == 0:
+            logs = f"Total of {counters['mute']}, we want {counters['mute']}%{thresholds_mutes_to_kick} = {counters['mute'] % thresholds_mutes_to_kick} = 0"
+            await full_process(bot, kick, victim, mod_user, reason=reason, automod_logs=logs)
 
     elif action_type == 'kick':
         thresholds_kicks_to_bans = await bot.settings.get(victim.guild, 'thresholds_kicks_to_bans')
         if thresholds_kicks_to_bans and counters['kick'] % thresholds_kicks_to_bans == 0:
-            await full_process(bot, ban, victim, mod_user, reason=reason)
+            logs = f"Total of {counters['kick']}, we want {counters['kick']}%{thresholds_kicks_to_bans} = {counters['kick'] % thresholds_kicks_to_bans} = 0"
+            await full_process(bot, ban, victim, mod_user, reason=reason, automod_logs=logs)
 
     elif action_type == 'softban':
         thresholds_softbans_to_bans = await bot.settings.get(victim.guild, 'thresholds_softbans_to_bans')
         if thresholds_softbans_to_bans and counters['softban'] % thresholds_softbans_to_bans == 0:
-            await full_process(bot, ban, victim, mod_user, reason=reason)
+            logs = f"Total of {counters['softban']}, we want {counters['softban']}%{thresholds_softbans_to_bans} = {counters['softban'] % thresholds_softbans_to_bans} = 0"
+            await full_process(bot, ban, victim, mod_user, reason=reason, automod_logs=logs)
     else:
         return False
 

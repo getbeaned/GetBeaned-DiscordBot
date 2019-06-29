@@ -2,6 +2,9 @@ import logging
 
 from discord.ext import commands
 
+from cogs.helpers.hastebins import upload_text
+
+
 class CustomContext(commands.Context):
 
     def __init__(self, **attrs):
@@ -22,6 +25,9 @@ class CustomContext(commands.Context):
     async def send_to(self, message, user=None, **kwargs):
         if user is None:
             user = self.author
+
+        if len(message) > 1900 and kwargs.get("embed", None) is None:
+            message = await upload_text(message.strip("`"))
 
         message = f"{user.mention} > {message}"
 

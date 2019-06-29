@@ -105,7 +105,7 @@ class SexBots(AutoTrigger):
 
         # If the account is not that old or if it's matching the name pattern.
         assert (await user_created_x_days_ago(self.message.author, x=14) or
-                bool(re.match(r"([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))", self.message.author.name)))
+                bool(re.match(r"([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))$", self.message.author.name)))
 
         assert not await user_have_nitro(self.message.author)
 

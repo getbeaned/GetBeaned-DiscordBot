@@ -158,6 +158,7 @@ class AutoMod(commands.Cog):
 
             return total
 
+
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_minimal_permissions()

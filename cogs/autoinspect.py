@@ -23,10 +23,18 @@ class AutoInspect(commands.Cog):
 
     async def pornspam_bots_check(self, member) -> bool:
         # https://regex101.com/r/IeIqbl/1
-        result = bool(re.match(r"([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))$", member.name))
-        result = result and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=14))
 
-        return result
+        first_version_result = bool(re.match(r"^([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))$", member.name))
+        first_version_result = first_version_result \
+                               and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=14))
+
+        # https://regex101.com/r/IeIqbl/1
+        second_version_result = bool(re.match(r"^[A-Z][a-z]+[0-9]{1,2}[a-z]{1,2}[a-z0-9]{1,2}$", member.name))
+        second_version_result = second_version_result \
+                                and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=7)) \
+                                and member.avatar_url == member.default_avatar_url
+
+        return first_version_result or second_version_result
 
     async def check_and_act(self, check, name, context) -> bool:
         """

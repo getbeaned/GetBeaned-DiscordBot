@@ -1,5 +1,5 @@
 """
-Since purge is a more complex command, I've thrown it in a séparate file
+Since purge is a more complex command, I've thrown it in a separate file
 
 Stolen from R.Danny, will probably need a rewrite to be more user-friendly
 """

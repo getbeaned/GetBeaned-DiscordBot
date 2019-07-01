@@ -5,8 +5,6 @@ from typing import Dict
 
 
 class CacheStorageDict(collections.MutableMapping):
-    """A dictionary that applies an arbitrary key-altering
-       function before accessing the keys"""
 
     def __init__(self, expire_after=60, strict=False, *args, **kwargs):
         self.store = dict()

@@ -19,6 +19,7 @@ class AutoInspect(commands.Cog):
         self.bot = bot
         self.api = bot.api
         self.checks = {'autoinspect_pornspam_bots': self.pornspam_bots_check}
+        self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
 
     async def pornspam_bots_check(self, member) -> bool:
         # https://regex101.com/r/IeIqbl/1
@@ -39,6 +40,10 @@ class AutoInspect(commands.Cog):
         check_result = await check(context["member"])
 
         if check_result:
+            logs = f"To prevent False Positives, AutoInspect added a mark on this account for 600 seconds. " \
+                f"If the user {context['member'].name}#{context['member'].discriminator} tries to rejoin the server in the " \
+                f"next 10 minutes, AutoInspect rules will not apply on him."
+
             autoinspect_user = LikeUser(did=4, name="AutoInspector", guild=context["guild"])
             # await full_process(self.bot, note, context["member"], autoinspect_user, reason=f"Automatic note by AutoInspect {name}, following a positive check.")
 
@@ -52,14 +57,15 @@ class AutoInspect(commands.Cog):
             embed.set_author(name=self.bot.user.name)
             embed.add_field(name="Member ID", value=context['member'].id)
             embed.add_field(name="Check name", value=name)
+            embed.add_field(name="Info", value=logs)
 
             await context["logging_channel"].send(embed=embed)
 
             if action == 3:
-                await full_process(self.bot, softban, context["member"], autoinspect_user, reason=f"Automatic softban by AutoInspect {name}")
+                await full_process(self.bot, softban, context["member"], autoinspect_user, reason=f"Automatic softban by AutoInspect {name}", automod_logs=logs)
                 return False
             elif action == 4:
-                await full_process(self.bot, ban, context["member"], autoinspect_user, reason=f"Automatic ban by AutoInspect {name}")
+                await full_process(self.bot, ban, context["member"], autoinspect_user, reason=f"Automatic ban by AutoInspect {name}", automod_logs=logs)
                 return False
 
         return True
@@ -75,6 +81,11 @@ class AutoInspect(commands.Cog):
 
         if not logging_channel:
             return 'No logging channel configured for AutoInspect.'
+
+        if member in self.bypass_cache.get(member.guild, []):
+            return "User was already AutoInspected previously, don't do that again."
+
+        self.bypass_cache[member.guild] = self.bypass_cache.get(member.guild, []) + [member]
 
         context = {
             'logging_channel': logging_channel,

@@ -40,9 +40,13 @@ class AutoInspect(commands.Cog):
         check_result = await check(context["member"])
 
         if check_result:
-            logs = f"To prevent False Positives, AutoInspect added a mark on this account for 600 seconds. " \
-                f"If the user {context['member'].name}#{context['member'].discriminator} tries to rejoin the server in the " \
-                f"next 10 minutes, AutoInspect rules will not apply on him."
+
+            if await self.bot.settings.get(context['guild'], 'autoinspect_bypass_enable'):
+                logs = f"To prevent False Positives, AutoInspect added a mark on this account for 600 seconds. " \
+                    f"If the user {context['member'].name}#{context['member'].discriminator} tries to rejoin the server in the " \
+                    f"next 10 minutes, AutoInspect rules will not apply on him."
+            else:
+                logs = "As requested by the server settings, no exceptions are allowed on AutoInspect."
 
             autoinspect_user = LikeUser(did=4, name="AutoInspector", guild=context["guild"])
             # await full_process(self.bot, note, context["member"], autoinspect_user, reason=f"Automatic note by AutoInspect {name}, following a positive check.")
@@ -82,7 +86,7 @@ class AutoInspect(commands.Cog):
         if not logging_channel:
             return 'No logging channel configured for AutoInspect.'
 
-        if member in self.bypass_cache.get(member.guild, []):
+        if member in self.bypass_cache.get(member.guild, []) and await self.bot.settings.get(member.guild, 'autoinspect_bypass_enable'):
             return "User was already AutoInspected previously, don't do that again."
 
         self.bypass_cache[member.guild] = self.bypass_cache.get(member.guild, []) + [member]

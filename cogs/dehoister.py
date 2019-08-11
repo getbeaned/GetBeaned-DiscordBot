@@ -27,7 +27,7 @@ class Dehoister(commands.Cog):
         if await self.bot.settings.get(guild, "dehoist_enable"):
             member = guild.get_member(user.id)
 
-            if await get_level(FakeCtx(guild, self.bot), member) > int(await self.bot.settings.get(guild, "dehoist_ignore_level")):
+            if await get_level(FakeCtx(guild, self.bot), member) >= int(await self.bot.settings.get(guild, "dehoist_ignore_level")):
                 return False
 
             intensity = int(await self.bot.settings.get(guild, "dehoist_intensity"))

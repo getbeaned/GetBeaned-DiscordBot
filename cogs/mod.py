@@ -306,7 +306,7 @@ class Mod(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_permissions()
-    @checks.have_required_level(2)
+    @checks.have_required_level(3)
     async def kick(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
         """
         Kick a member from the server. If thresholds are enabled, kicking a user can lead to bans.

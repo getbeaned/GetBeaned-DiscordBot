@@ -88,8 +88,11 @@ class AutoMod(commands.Cog):
         self.api = bot.api
         self.invites_regex = re.compile(
             r'discord(?:app\.com|\.gg)[\/invite\/]?(?:(?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32})')
-        self.message_history = collections.defaultdict(
-            lambda: collections.deque(maxlen=7))  # Member -> collections.deque(maxlen=7)
+
+        #self.message_history = collections.defaultdict(
+        #    lambda: collections.deque(maxlen=7))  # Member -> collections.deque(maxlen=7)
+
+        self.message_history = bot.cache.get_cache("automod_previous_messages", expire_after=600, default=lambda: collections.deque(maxlen=7))
 
         self.invites_codes_cache = bot.cache.get_cache("automod_invites_codes", expire_after=3600)
 
@@ -307,8 +310,8 @@ class AutoMod(commands.Cog):
                                                                   'this', 'that', 'yup'] \
                 and act:
             # Not a command or something
-            self.message_history[check_message.message.author].append(
-                check_message.message.content)  # Add content for repeat-check later.
+            self.message_history[check_message.message.author].append(check_message.message.content)  # Add content for repeat-check later.
+            self.message_history.reset_expiry(check_message.message.author)
 
         contains_zalgo, zalgo_score = await self.contains_zalgo(message.content)
 

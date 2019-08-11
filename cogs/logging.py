@@ -18,7 +18,7 @@ class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api = bot.api
-        self.snipes = collections.defaultdict(lambda: collections.deque(maxlen=5))  # channel: [message, message]
+        self.snipes = bot.cache.get_cache("logging_deleted_messages", expire_after=7200, default=lambda: collections.deque(maxlen=15))  # channel: [message, message]
 
     async def perms_okay(self, channel):
         wanted_permissions = discord.permissions.Permissions.none()
@@ -81,6 +81,7 @@ class Logging(commands.Cog):
             return
 
         self.snipes[message.channel].append(message)
+        self.snipes.reset_expiry(message.channel)
 
         channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
 

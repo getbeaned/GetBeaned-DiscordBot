@@ -1,16 +1,16 @@
 import collections
 import time
 
-from typing import Dict
-
+from typing import Dict, Callable
 
 class CacheStorageDict(collections.MutableMapping):
 
-    def __init__(self, expire_after=60, strict=False, *args, **kwargs):
+    def __init__(self, expire_after=60, strict=False, default:Callable = None, *args, **kwargs):
         self.store = dict()
         self.times = dict()
         self.expire_after = expire_after
         self.strict = strict
+        self.default_func = default
         self.update(dict(*args, **kwargs))  # use the free update to set keys
         self._expired_keys = 0
 
@@ -23,6 +23,12 @@ class CacheStorageDict(collections.MutableMapping):
                 return r
         except KeyError:
             return default
+
+    def reset_expiry(self, key, seconds=None):
+        if seconds is None:
+            self.times[key] = time.time() + self.expire_after
+        else:
+            self.times[key] = time.time() + seconds
 
     def cleanup(self):
         i = 0
@@ -54,12 +60,21 @@ class CacheStorageDict(collections.MutableMapping):
 
     def __getitem__(self, key):
         if key not in self.store:
-            return None
+            if self.default_func is not None:
+                self[key] = self.default_func()
+                return self[key]
+            else:
+                return None
 
         if self.strict and time.time() > self.times.get(key, 0):
             self._expired_keys += 1
             del self[key]
-            return None
+            if self.default_func is not None:
+                self[key] = self.default_func()
+                return self[key]
+            else:
+                return None
+
             # raise KeyError("The key expired and strict mode is set")
 
         return self.store[key]

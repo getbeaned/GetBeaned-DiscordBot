@@ -28,8 +28,8 @@ class AutoInspect(commands.Cog):
         first_version_result = first_version_result \
                                and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=14))
 
-        # https://regex101.com/r/IeIqbl/1
-        second_version_result = bool(re.match(r"^[A-Z][a-z]+[0-9]{1,2}[a-z]{1,2}[a-z0-9]{1,2}$", member.name))
+        # https://regex101.com/r/ns1L0E/2
+        second_version_result = bool(re.match(r"^[A-Z][a-z]{2,10}[0-9]{1,3}[a-z0-9]{1,3}$", member.name))
         second_version_result = second_version_result \
                                 and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=7)) \
                                 and member.avatar_url == member.default_avatar_url

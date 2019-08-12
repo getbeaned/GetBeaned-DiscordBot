@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 
 from cogs.helpers import context, checks
+from cogs.helpers.hastebins import upload_text
 
 
 class Logging(commands.Cog):
@@ -63,6 +64,142 @@ class Logging(commands.Cog):
             return channel
 
     @commands.Cog.listener()
+    async def on_bulk_message_delete(self, messages):
+        """
+        Handle bulk message deletions. However, older deleted messages that aren't in discord internal cache will not fire
+        this event so we kinda "hope" that the messages weren't too old when they were deleted, and that they were in the cache
+
+        This may log other bots
+        """
+
+        first_message = messages[0]
+
+        if first_message.guild is None:
+            return
+
+        logging_channel = await self.get_logging_channel(first_message.guild, 'logs_delete_channel_id')
+
+        if not logging_channel:
+            return
+
+        guild = first_message.guild
+
+        channel = first_message.channel
+        channel_id = channel.id
+
+        bulky_messages_list = [f"Messages bulk-deleted on #{channel.name} (https://discordapp.com/channels/{guild.id}/{channel_id})\n",
+                               f"Creation date :: Message ID :: [ID] Author - Content"]
+
+        authors = set()
+
+        for message in messages:
+            author = message.author
+
+            authors.add(author)
+
+            bulky_messages_list.append(f"{message.created_at} :: {message.id} :: `[{author.id}]` {author.name}#{author.discriminator} \t - {message.content}")
+
+        if await self.perms_okay(logging_channel):
+            embed = discord.Embed(title=f"#{channel.name}",
+                                  colour=discord.Colour.dark_red(),
+                                  description=f"\nChannel: \t`[{channel_id}]` [#{channel.name}](https://discordapp.com/channels/{guild.id}/{channel_id}) \n"
+                                              f"Authors: \t `{len(authors)}` \n"
+                                              f"Messages: \t `{len(messages)}`"
+                                  )
+
+            embed.set_author(name="Messages deleted (in bulk)", url="https://getbeaned.me")  # , icon_url="ICON_URL_DELETE")
+
+            embed.timestamp = first_message.created_at
+
+            embed.set_footer(text="First message was created at",
+                             icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
+
+            embed.add_field(name="Deleted messages list",
+                            value=await upload_text("\n".join(bulky_messages_list)))
+
+            await logging_channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_raw_message_edit(self, raw_message_update):
+        """
+        Handle **raw** message edits. ~~However, older messages that aren't in discord internal cache will not fire
+        this event so we kinda "hope" that the message wasn't too old when it was edited, and that it was in the cache~~
+
+        This doesn't logs other bots
+        """
+
+        message_id = raw_message_update.message_id
+        channel_id = int(raw_message_update.data["channel_id"])  # TODO: In d.py 1.3.0, make that raw_message_update.channel_id
+
+        new_content = raw_message_update.data.get("content", None)  # Embed may be partial, see doc.
+
+        if not new_content:
+            return
+
+        if raw_message_update.cached_message:
+            cached_message = True
+            old_message = raw_message_update.cached_message
+            channel = old_message.channel
+            author = old_message.author
+
+            old_content = old_message.content
+
+        else:
+            cached_message = False
+            channel = self.bot.get_channel(channel_id)
+
+            author = self.bot.get_user(int(raw_message_update.data["author"]["id"]))
+
+            if author is None:
+                return
+
+        if channel is None or isinstance(channel, discord.abc.PrivateChannel):
+            return
+
+        guild = channel.guild
+
+        if author.bot:
+            return
+
+        logging_channel = await self.get_logging_channel(guild, 'logs_edits_channel_id')
+
+        if not logging_channel:
+            return
+
+        embed = discord.Embed(title=f"{author.name}#{author.discriminator}",
+                              colour=discord.Colour.orange(),
+                              url=f"https://getbeaned.me/users/{guild.id}/{author.id}",
+                              description=f"\n[► View The Message](https://discordapp.com/channels/{guild.id}/{channel_id}/{message_id}).\n\n"
+                                          f"Channel: \t`[{channel_id}]` [#{channel.name}](https://discordapp.com/channels/{guild.id}/{channel_id}) \n"
+                                          f"Author: \t`[{author.id}]` {author.mention} \n"
+                                          f"Message: \t`[{message_id}]`"
+                              )
+
+        embed.set_thumbnail(url=str(author.avatar_url))
+        embed.set_author(name="Message edited", url="https://getbeaned.me")#, icon_url="ICON_URL_EDIT")
+
+        if cached_message:
+            embed.timestamp = old_message.created_at
+
+            embed.set_footer(text="Message was originally created at",
+                             icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
+
+            embed.add_field(name="Original message",
+                            value=old_content)
+
+        embed.add_field(name="Edited message",
+                        value=new_content)
+
+        if not cached_message:
+            embed.set_footer(text="The message original posting date is not available",
+                             icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
+            embed.add_field(name="🙄",
+                            value="The message was **not** in the internal bot cache, and only the edited message is able to be displayed. This often means that the message was posted too long ago.")
+
+        if await self.perms_okay(channel):
+            await logging_channel.send(embed=embed)
+
+    @commands.Cog.listener()
     async def on_message_delete(self, message):
         """
         Handle message deletions. However, older deleted messages that aren't in discord internal cache will not fire
@@ -80,99 +217,59 @@ class Logging(commands.Cog):
         if not message.type == discord.MessageType.default:
             return
 
+        if len(message.content) == 0:
+            return
+
         self.snipes[message.channel].append(message)
         self.snipes.reset_expiry(message.channel)
 
-        channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
+        logging_channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
 
-        if not channel:
+        if not logging_channel:
             return
 
         ctx = await self.bot.get_context(message, cls=context.CustomContext)
         ctx.logger.info(f"Logging message deletion")
 
-        if await self.bot.settings.get(message.guild, 'logs_as_embed') and await self.perms_okay(channel):
 
-            embed = discord.Embed()
-            if message.attachments:
-                embed.add_field(name="Attachment", value=message.attachments[0].url)
+        if await self.bot.settings.get(message.guild, 'logs_as_embed') and await self.perms_okay(logging_channel):
+            author = message.author
+            guild = message.guild
+            channel = message.channel
+            channel_id = channel.id
+            message_id = message.id
 
-            embed.colour = discord.colour.Color.red()
+            embed = discord.Embed(title=f"{author.name}#{author.discriminator}",
+                                  colour=discord.Colour.red(),
+                                  url=f"https://getbeaned.me/users/{guild.id}/{author.id}",
+                                  description=f"\nChannel: \t`[{channel_id}]` [#{channel.name}](https://discordapp.com/channels/{guild.id}/{channel_id}) \n"
+                                              f"Author: \t`[{author.id}]` {author.mention} \n"
+                                              f"Message: \t`[{message_id}]`"
+                                  )
 
-            embed.title = f"Message deleted | By {message.author.name} ({message.author.id})"
-            embed.description = message.content
-            embed.add_field(name="Channel", value=message.channel.mention, inline=False)
-
-            embed.set_author(name=self.bot.user.name)
+            embed.set_thumbnail(url=str(author.avatar_url))
+            embed.set_author(name="Message deleted", url="https://getbeaned.me")  # , icon_url="ICON_URL_DELETE")
 
             embed.timestamp = message.created_at
 
-            await channel.send(embed=embed)
+            embed.set_footer(text="Message was created at",
+                             icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
+
+            embed.add_field(name="Deleted message content",
+                            value=message.content)
+
+            await logging_channel.send(embed=embed)
 
         else:
             textual_log = f"Message deleted | " \
-                f"By {message.author.name}#{message.author.discriminator}({message.author.id})\n" \
-                f"In {message.channel.mention}" \
-                f"**Content**:{message.content}"
+                          f"By {message.author.name}#{message.author.discriminator}({message.author.id})\n" \
+                          f"In {message.channel.mention}" \
+                          f"**Content**:{message.content}"
 
             try:
-                await channel.send(textual_log)
+                await logging_channel.send(textual_log)
             except discord.errors.Forbidden:
                 ctx.logger.info(f"Couldn't log message deletion {message} (No perms)")
-
-    @commands.Cog.listener()
-    async def on_message_edit(self, old, new):
-        """
-        Handle message edits. However, older messages that aren't in discord internal cache will not fire
-        this event so we kinda "hope" that the message wasn't too old when it was edited, and that it was in the cache
-
-        This dosen't logs other bots
-        """
-
-        if old.guild is None:
-            return
-
-        if old.author.bot:
-            return
-
-        if old.content == new.content:
-            return
-
-        channel = await self.get_logging_channel(old.guild, 'logs_edits_channel_id')
-
-        if not channel:
-            return
-
-        ctx = await self.bot.get_context(new, cls=context.CustomContext)
-        ctx.logger.info(f"Logging message edition {old}->{new}")
-
-        if await self.bot.settings.get(old.guild, 'logs_as_embed') and await self.perms_okay(channel):
-            embed = discord.Embed()
-
-            embed.colour = discord.colour.Color.orange()
-
-            embed.title = f"Message edited | By {old.author.name}({old.author.id})"
-            embed.description = new.content[:1023]
-
-            embed.add_field(name="Old content", value=old.content[:1023], inline=False)
-
-            embed.set_author(name=self.bot.user.name)
-
-            embed.timestamp = datetime.datetime.now()
-
-            await channel.send(embed=embed)
-
-        else:
-            textual_log = f"Message edited | " \
-                f"By {old.author.name}#{old.author.discriminator}({old.author.id})\n" \
-                f"**Old**:{old.content}\n" \
-                f"**New**:{new.content}"
-
-            try:
-                await channel.send(textual_log)
-            except discord.errors.Forbidden:
-                ctx.logger.info(f"Couldn't log message edition {old}->{new} (No perms)")
-
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -181,26 +278,30 @@ class Logging(commands.Cog):
         if not channel:
             return
 
-        self.bot.logger.info(f"Logging user join {member}")
-
         if await self.bot.settings.get(member.guild, 'logs_as_embed') and await self.perms_okay(channel):
-            embed = discord.Embed()
 
-            embed.colour = discord.colour.Color.green()
+            embed = discord.Embed(title=f"{member.name}#{member.discriminator}",
+                                  colour=discord.Colour.green(),
+                                  url=f"https://getbeaned.me/users/{member.guild.id}/{member.id}",
+                                  description=f"Member: \t `[{member.id}]` {member.mention} \n"
+                                  )
 
-            embed.title = f"New Member | {member.name} ({member.id})"
+            embed.set_thumbnail(url=str(member.avatar_url))
+            embed.set_author(name="Member joined", url="https://getbeaned.me")  # , icon_url="ICON_URL_DELETE")
 
-            embed.add_field(name="Current member count", value=str(member.guild.member_count))
+            embed.timestamp = member.created_at
 
-            embed.set_author(name=self.bot.user.name)
+            embed.set_footer(text="Member created his account on",
+                             icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
 
-            embed.timestamp = datetime.datetime.now()
+            embed.add_field(name="Current member count",
+                            value=str(member.guild.member_count))
 
             await channel.send(embed=embed)
 
         else:
             textual_log = f"Member Joined | {member.name}#{member.discriminator} (`{member.id}`)\n" \
-                f"**Current member count**: {member.guild.member_count}"
+                          f"**Current member count**: {member.guild.member_count}"
 
             try:
                 await channel.send(textual_log)
@@ -216,23 +317,30 @@ class Logging(commands.Cog):
         self.bot.logger.info(f"Logging user leave {member}")
 
         if await self.bot.settings.get(member.guild, 'logs_as_embed') and await self.perms_okay(channel):
-            embed = discord.Embed()
+            embed = discord.Embed(title=f"{member.name}#{member.discriminator}",
+                                  colour=discord.Colour.dark_orange(),
+                                  url=f"https://getbeaned.me/users/{member.guild.id}/{member.id}",
+                                  description=f"Member: \t `[{member.id}]` {member.mention} \n"
+                                             f"Joined: \t {str(member.joined_at)}\n"
+                                             f"Roles: \t `{len(member.roles)}` : {', '.join([r.name for r in member.roles])}"
+                                  )
 
-            embed.colour = discord.colour.Color.red()
+            embed.set_thumbnail(url=str(member.avatar_url))
+            embed.set_author(name="Member left/was kicked", url="https://getbeaned.me")  # , icon_url="ICON_URL_DELETE")
 
-            embed.title = f"Member Left | {member.name} ({member.id})"
+            embed.timestamp = member.created_at
 
-            embed.add_field(name="Current member count", value=str(member.guild.member_count))
+            embed.set_footer(text="Member created his account on",
+                             icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
 
-            embed.set_author(name=self.bot.user.name)
-
-            embed.timestamp = datetime.datetime.now()
+            embed.add_field(name="Current member count",
+                            value=str(member.guild.member_count))
 
             await channel.send(embed=embed)
         else:
 
             textual_log = f"Member Left | {member.name}#{member.discriminator} (`{member.id}`)\n" \
-                f"**Current member count**: {member.guild.member_count}"
+                          f"**Current member count**: {member.guild.member_count}"
             try:
                 await channel.send(textual_log)
             except discord.errors.Forbidden:
@@ -251,30 +359,33 @@ class Logging(commands.Cog):
             self.bot.logger.info(f"Logging user edit {old}->{new}")
 
             if await self.bot.settings.get(old.guild, 'logs_as_embed') and await self.perms_okay(channel):
-                embed = discord.Embed()
 
-                embed.colour = discord.colour.Color.red()
+                embed = discord.Embed(title=f"{new.name}#{new.discriminator}",
+                                      colour=discord.Colour.dark_orange(),
+                                      url=f"https://getbeaned.me/users/{new.guild.id}/{new.id}",
+                                      description=f"Member: \t `[{new.id}]` {new.mention} \n"
+                                                  f"Old nickname: \t {old.nick}\n"
+                                                  f"New nickname: \t {new.nick}"
+                                      )
 
-                embed.title = f"Member Nickname Change | {old.name} ({old.id})"
+                embed.set_thumbnail(url=str(new.avatar_url))
+                embed.set_author(name="Member changed nickname", url="https://getbeaned.me")  # , icon_url="ICON_URL_DELETE")
 
-                embed.add_field(name="Old nickname", value=old.nick)
-                embed.add_field(name="New nickname", value=new.nick)
+                embed.timestamp = new.joined_at
 
-                embed.set_author(name=self.bot.user.name)
-
-                embed.timestamp = datetime.datetime.now()
+                embed.set_footer(text="Member joined on",
+                                 icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
 
                 await channel.send(embed=embed)
-
             else:
                 textual_log = f"Member Nickname Edited | {old.name}#{old.discriminator} (`{old.id}`)\n" \
-                    f"**Old**: {old.nick}\n" \
-                    f"**New**: {new.nick}"
+                              f"**Old**: {old.nick}\n" \
+                              f"**New**: {new.nick}"
 
                 try:
                     await channel.send(textual_log)
                 except discord.errors.Forbidden:
-                    self.bot.logger.info(f"Couldn't log member uppdate {old}->{new} (No perms)")
+                    self.bot.logger.info(f"Couldn't log member update {old}->{new} (No perms)")
 
     @commands.command()
     @commands.guild_only()

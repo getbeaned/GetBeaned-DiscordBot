@@ -136,6 +136,9 @@ class Logging(commands.Cog):
         if not new_content:
             return
 
+        if len(new_content) > 450:
+            new_content = new_content[:450] + " [...] — Message too big to be shown here, full message available at " + upload_text(new_content)
+
         if raw_message_update.cached_message:
             cached_message = True
             old_message = raw_message_update.cached_message
@@ -176,13 +179,16 @@ class Logging(commands.Cog):
                               )
 
         embed.set_thumbnail(url=str(author.avatar_url))
-        embed.set_author(name="Message edited", url="https://getbeaned.me")#, icon_url="ICON_URL_EDIT")
+        embed.set_author(name="Message edited", url="https://getbeaned.me")  # , icon_url="ICON_URL_EDIT")
 
         if cached_message:
             embed.timestamp = old_message.created_at
 
             embed.set_footer(text="Message was originally created at",
                              icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
+
+            if len(old_content) > 450:
+                old_content = old_content[:450] + " [...] — Message too big to be shown here, full message available at " + upload_text(old_content)
 
             embed.add_field(name="Original message",
                             value=old_content)
@@ -220,6 +226,12 @@ class Logging(commands.Cog):
         if len(message.content) == 0:
             return
 
+        elif len(message.content) > 450:
+            content = message.content[:450] + " [...] — Message too big to be shown here, full message available at " + upload_text(message.content)
+
+        else:
+            content = message.content
+
         self.snipes[message.channel].append(message)
         self.snipes.reset_expiry(message.channel)
 
@@ -230,7 +242,6 @@ class Logging(commands.Cog):
 
         ctx = await self.bot.get_context(message, cls=context.CustomContext)
         ctx.logger.info(f"Logging message deletion")
-
 
         if await self.bot.settings.get(message.guild, 'logs_as_embed') and await self.perms_okay(logging_channel):
             author = message.author
@@ -256,7 +267,7 @@ class Logging(commands.Cog):
                              icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
 
             embed.add_field(name="Deleted message content",
-                            value=message.content)
+                            value=content)
 
             await logging_channel.send(embed=embed)
 
@@ -264,7 +275,7 @@ class Logging(commands.Cog):
             textual_log = f"Message deleted | " \
                           f"By {message.author.name}#{message.author.discriminator}({message.author.id})\n" \
                           f"In {message.channel.mention}" \
-                          f"**Content**:{message.content}"
+                          f"**Content**:{content}"
 
             try:
                 await logging_channel.send(textual_log)
@@ -321,8 +332,8 @@ class Logging(commands.Cog):
                                   colour=discord.Colour.dark_orange(),
                                   url=f"https://getbeaned.me/users/{member.guild.id}/{member.id}",
                                   description=f"Member: \t `[{member.id}]` {member.mention} \n"
-                                             f"Joined: \t {str(member.joined_at)}\n"
-                                             f"Roles: \t `{len(member.roles)}` : {', '.join([r.name for r in member.roles])}"
+                                              f"Joined: \t {str(member.joined_at)}\n"
+                                              f"Roles: \t `{len(member.roles)}` : {', '.join([r.name for r in member.roles])}"
                                   )
 
             embed.set_thumbnail(url=str(member.avatar_url))

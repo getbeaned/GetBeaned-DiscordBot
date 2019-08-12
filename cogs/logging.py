@@ -137,7 +137,7 @@ class Logging(commands.Cog):
             return
 
         if len(new_content) > 450:
-            new_content = new_content[:450] + " [...] — Message too big to be shown here, full message available at " + upload_text(new_content)
+            new_content = new_content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(new_content)
 
         if raw_message_update.cached_message:
             cached_message = True
@@ -188,7 +188,7 @@ class Logging(commands.Cog):
                              icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
 
             if len(old_content) > 450:
-                old_content = old_content[:450] + " [...] — Message too big to be shown here, full message available at " + upload_text(old_content)
+                old_content = old_content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(old_content)
 
             embed.add_field(name="Original message",
                             value=old_content)
@@ -227,7 +227,7 @@ class Logging(commands.Cog):
             return
 
         elif len(message.content) > 450:
-            content = message.content[:450] + " [...] — Message too big to be shown here, full message available at " + upload_text(message.content)
+            content = message.content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(message.content)
 
         else:
             content = message.content

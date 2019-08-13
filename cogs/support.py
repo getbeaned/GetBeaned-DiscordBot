@@ -17,42 +17,111 @@ class Support(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.conversations = {}
+        self.temp_ignores = []
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if not message.guild is None:
-            return
-
-        if message.author.id == self.bot.user.id:
-            return
-
+    async def handle_private_message(self, received_message):
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
 
-        attachments_list = [e.url for e in message.attachments]
+        attachments_list = [e.url for e in received_message.attachments]
 
-        message_transcribed = f"{message.author.mention} ({message.author.name}#{message.author.discriminator})\n"
+        message_transcribed = f"{received_message.author.mention} ({received_message.author.name}#{received_message.author.discriminator})\n"
 
-        if len(message.content) > 0:
-            message_transcribed += f"```{message.content[:1700]}```\n"
+        if len(received_message.content) > 0:
+            message_transcribed += f"```{received_message.content[:1700]}```\n"
 
         if len(attachments_list) > 0:
             message_transcribed += f"Attachments : {attachments_list}"
 
-        await pm_channel.send(message_transcribed)
-        await pm_channel.send(f"To answer, use `+answer {message.author.id} MESSAGE`")
+        sent_message = await pm_channel.send(message_transcribed)
+
+        emotes = [
+            "\U0001f507",  # SPEAKER WITH CANCELLATION STROKE - :mute:
+            # "\U0001f4f2",  # MOBILE PHONE WITH RIGHTWARDS ARROW AT LEFT - :calling:
+            "\U0001f4de",  # TELEPHONE RECEIVER - :telephone_receiver:"
+        ]
+
+        for emote in emotes:
+            await sent_message.add_reaction(emote)
+
+        def check(reaction, user):
+            return str(reaction.emoji) in emotes and reaction.message.id == sent_message.id
+
+        try:
+            while True:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=3600.0, check=check)
+
+                if user.id == self.bot.user.id:
+                    continue
+
+                if str(reaction.emoji) == "\U0001f507": # Mute
+                    await pm_channel.send(f"{user.mention}, you added {received_message.author.name} to the ignore list. "
+                                          f"He'll be unignored if the bot restart or if you send him a PM thru the bot: `+pm {received_message.author.id} MESSAGE`")
+
+                elif str(reaction.emoji) == "\U0001f4de":  # Answer
+                    await pm_channel.send(f"{user.mention}, you are now talking to {received_message.author.name}.")
+                    self.conversations[user.id] = received_message.author
+
+        except asyncio.TimeoutError:
+            await sent_message.clear_reactions()  # Nobody reacted :)
+
+    async def handle_support_message(self, message):
+        if message.content.startswith("#") or message.content.startswith("+"):
+            return
+
+        target_user = self.conversations.get(message.author.id, None)
+
+        if target_user is None:
+            return
+
+        r = await self.send_pm(sender=message.author, receiver=target_user, message_content=message.content)
+
+        if not r:
+            await message.add_reaction("👌")
+        else:
+            await message.add_reaction("❌")
+            pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
+            await pm_channel.send(r)
+
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.id == self.bot.user.id:
+            return
+
+        if not message.guild:
+            await self.handle_private_message(message)
+
+        elif message.channel.id == PM_VIEWING_CHANNEL_ID:
+            await self.handle_support_message(message)
+
+    @commands.command(aliases=["endpm"])
+    @checks.have_required_level(8)
+    async def end_pm(self, ctx):
+        self.conversations[ctx.author.id] = None
+        await ctx.message.add_reaction("👌")
 
     @commands.command(aliases=["answer", "send_pm", "sendpm"])
     @checks.have_required_level(8)
     async def pm(self, ctx, user: discord.User, *, message_content:str):
+        self.conversations[ctx.author.id] = user
+        await self.send_pm(sender=ctx.user, receiver=user, message_content=message_content)
+
+    async def send_pm(self, sender: discord.Member, receiver: discord.User, message_content:str):
+        try:  # Remove from ignore list if replying
+            self.temp_ignores.remove(receiver)
+        except ValueError:
+            pass
+
         try:
-            await user.send(f"🐦 {ctx.author.name}#{ctx.author.discriminator}, a bot moderator, sent you the following message:\n{message_content}")
+            await receiver.send(f"🐦 {sender.name}#{sender.discriminator}, a bot moderator, sent you the following message:\n{message_content}")
         except Exception as e:
-            await ctx.send(f"Error sending message : {e}")
-            return
+            return f"Error sending message to {sender.mention} ({sender.name}#{sender.discriminator}) : {e}"
 
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
 
-        await pm_channel.send(f"**{ctx.author.name}#{ctx.author.discriminator}** answered {user.mention} ({user.name}#{user.discriminator})\n```{message_content[:1900]}```")
+        await pm_channel.send(f"**{sender.name}#{sender.discriminator}** answered {sender.mention} ({sender.name}#{sender.discriminator})\n```{message_content[:1900]}```")
+
 
     @commands.command()
     @commands.guild_only()

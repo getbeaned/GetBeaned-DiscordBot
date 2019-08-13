@@ -21,6 +21,9 @@ class Support(commands.Cog):
         self.temp_ignores = []
 
     async def handle_private_message(self, received_message):
+        if received_message.author.id in self.temp_ignores:
+            return
+
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
 
         attachments_list = [e.url for e in received_message.attachments]
@@ -120,7 +123,7 @@ class Support(commands.Cog):
 
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
 
-        await pm_channel.send(f"**{sender.name}#{sender.discriminator}** answered {sender.mention} ({sender.name}#{sender.discriminator})\n```{message_content[:1900]}```")
+        await pm_channel.send(f"**{sender.name}#{sender.discriminator}** answered {receiver.mention} ({receiver.name}#{receiver.discriminator})\n```{message_content[:1900]}```")
 
 
     @commands.command()

@@ -14,6 +14,7 @@ async def upload_text(text: str):
                 async with cs.post(server + "/documents", data=text) as r:
                     res = await r.json()
                     return server + res["key"]
-            except:
-                break
+            except Exception as e:
+                print(f"{server} - Can't paste: e={e}, r={r}")
+                continue
     raise IOError("No paste servers available :(")

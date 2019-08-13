@@ -18,7 +18,7 @@ class Support(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.conversations = {}
-        self.temp_ignores = []
+        self.temp_ignores = set()
 
     async def handle_private_message(self, received_message):
         if received_message.author.id in self.temp_ignores:
@@ -58,6 +58,7 @@ class Support(commands.Cog):
                     continue
 
                 if str(reaction.emoji) == "\U0001f507": # Mute
+                    self.temp_ignores.add(received_message.author.id)
                     await pm_channel.send(f"{user.mention}, you added {received_message.author.name} to the ignore list. "
                                           f"He'll be unignored if the bot restart or if you send him a PM thru the bot: `+pm {received_message.author.id} MESSAGE`")
 
@@ -113,7 +114,7 @@ class Support(commands.Cog):
     async def send_pm(self, sender: discord.Member, receiver: discord.User, message_content:str):
         try:  # Remove from ignore list if replying
             self.temp_ignores.remove(receiver)
-        except ValueError:
+        except KeyError:
             pass
 
         try:

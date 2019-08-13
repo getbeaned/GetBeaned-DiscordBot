@@ -109,7 +109,7 @@ class Support(commands.Cog):
     @checks.have_required_level(8)
     async def pm(self, ctx, user: discord.User, *, message_content:str):
         self.conversations[ctx.author.id] = user
-        await self.send_pm(sender=ctx.user, receiver=user, message_content=message_content)
+        await self.send_pm(sender=ctx.author, receiver=user, message_content=message_content)
 
     async def send_pm(self, sender: discord.Member, receiver: discord.User, message_content:str):
         try:  # Remove from ignore list if replying

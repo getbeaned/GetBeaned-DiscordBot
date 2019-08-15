@@ -87,7 +87,15 @@ class AutoMod(commands.Cog):
         self.bot = bot
         self.api = bot.api
         self.invites_regex = re.compile(
-            r'discord(?:app\.com|\.gg)[\/invite\/]?(?:(?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32})')
+            r"""
+                discord
+                \s?           # Sometimes people use spaces before dots to twhart the AutoMod. Let's stop that by allowing 1 space here
+                (?:app\.com|\.gg) # All the domains
+                \s?           # And here too
+                [\/invite\/]? # You can sometimes add a /invite/ in there, so let's match it
+                \s?           # You get the idea
+                (?:(?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
+                """, flags=re.VERBOSE)
 
         #self.message_history = collections.defaultdict(
         #    lambda: collections.deque(maxlen=7))  # Member -> collections.deque(maxlen=7)
@@ -112,7 +120,7 @@ class AutoMod(commands.Cog):
         return contain, total_score
 
     async def get_invites(self, message: str):
-        message = message.lower().replace(' ', '')
+        message = message.lower()
 
         invites = self.invites_regex.findall(message)
 

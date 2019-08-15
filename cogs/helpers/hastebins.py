@@ -11,8 +11,10 @@ async def upload_text(text: str):
     async with aiohttp.ClientSession() as cs:
         for server in servers:
             try:
-                async with cs.post(server + "/documents", data=text) as r:
+                async with cs.post(server + "documents", data=text) as r:
                     res = await r.json()
+
+                    print(f"Pasted on {server} with key {res['rey']}")
                     return server + res["key"]
             except Exception as e:
                 print(f"{server} - Can't paste: e={e}, r={r}")

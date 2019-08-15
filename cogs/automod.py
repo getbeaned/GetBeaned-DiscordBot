@@ -112,6 +112,7 @@ class AutoMod(commands.Cog):
         return contain, total_score
 
     async def get_invites(self, message: str):
+        message = message.lower().replace(' ', '')
 
         invites = self.invites_regex.findall(message)
 

@@ -87,7 +87,6 @@ class Support(commands.Cog):
             pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
             await pm_channel.send(r)
 
-
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.id == self.bot.user.id:

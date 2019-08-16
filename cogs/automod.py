@@ -2,7 +2,7 @@ import collections
 import datetime
 import logging
 import re
-import time
+import unicodedata
 from typing import Union
 
 import discord
@@ -10,12 +10,10 @@ import numpy
 from discord.ext import commands
 
 from cogs.helpers import checks, context
+from cogs.helpers.actions import full_process, note, warn, kick, softban, ban
 from cogs.helpers.helpful_classes import LikeUser
-from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban
-
 from cogs.helpers.level import get_level
 from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots, SexBots
-import unicodedata
 
 ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
 DEBUG = False
@@ -59,8 +57,8 @@ class CheckMessage:
 
     def debug(self, s):
         fs = f"[s={self.score:+.2f} ({self.score - self.old_score:+.2f})," \
-                 f" m={self.multiplicator:+.2f} ({self.multiplicator - self.old_multiplicator:+.2f})," \
-                 f" t={self.total:+.2f} ({self.total - self.old_total:+.2f})] > " + s
+             f" m={self.multiplicator:+.2f} ({self.multiplicator - self.old_multiplicator:+.2f})," \
+             f" t={self.total:+.2f} ({self.total - self.old_total:+.2f})] > " + s
 
         if DEBUG:
             if self.message.channel:
@@ -86,18 +84,20 @@ class AutoMod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api = bot.api
+
+        # https://regex101.com/r/6EotUl/1
         self.invites_regex = re.compile(
             r"""
-                discord
-                \s?           # Sometimes people use spaces before dots to twhart the AutoMod. Let's stop that by allowing 1 space here
-                (?:app\.com|\.gg) # All the domains
-                \s?           # And here too
-                [\/invite\/]? # You can sometimes add a /invite/ in there, so let's match it
-                \s?           # You get the idea
-                (?:(?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
+                discord      # Literally just discord
+                \s?          # Sometimes people use spaces before dots to twhart the AutoMod. Let's stop that by allowing 1 space here
+                (?:app\.\s?com|\.\s?gg)\s?/ # All the domains
+                \s?          # And here too
+                (?:invite/)? # You can sometimes add a /invite/ in there, so let's match it
+                \s?          # You get the idea
+                ((?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
                 """, flags=re.VERBOSE)
 
-        #self.message_history = collections.defaultdict(
+        # self.message_history = collections.defaultdict(
         #    lambda: collections.deque(maxlen=7))  # Member -> collections.deque(maxlen=7)
 
         self.message_history = bot.cache.get_cache("automod_previous_messages", expire_after=600, default=lambda: collections.deque(maxlen=7))
@@ -169,7 +169,6 @@ class AutoMod(commands.Cog):
                     continue
 
             return total
-
 
     @commands.command()
     @commands.guild_only()

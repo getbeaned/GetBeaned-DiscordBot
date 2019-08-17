@@ -117,13 +117,13 @@ class Support(commands.Cog):
             pass
 
         try:
-            await receiver.send(f"🐦 {sender.name}#{sender.discriminator}, a bot moderator, sent you the following message:\n{message_content}")
+            await receiver.send(f"🐦 {sender.name}#{sender.discriminator}, a bot moderator, sent you the following message:\n>>> {message_content}")
         except Exception as e:
             return f"Error sending message to {sender.mention} ({sender.name}#{sender.discriminator}) : {e}"
 
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
 
-        await pm_channel.send(f"**{sender.name}#{sender.discriminator}** answered {receiver.mention} ({receiver.name}#{receiver.discriminator})\n```{message_content[:1900]}```")
+        await pm_channel.send(f"**{sender.name}#{sender.discriminator}** answered {receiver.mention} ({receiver.name}#{receiver.discriminator})\n>>> {message_content[:1900]}")
 
 
     @commands.command()

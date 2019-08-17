@@ -120,7 +120,7 @@ class AutoMod(commands.Cog):
         return contain, total_score
 
     async def get_invites(self, message: str):
-        message = message.lower()
+        #message = message.lower() -- Don't do that, invites are Case Sensitive :x
 
         invites = self.invites_regex.findall(message)
 

@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import time
 
 import discord
@@ -17,7 +18,7 @@ class Support(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.conversations = {}
+        self.conversations = bot.cache.get_cache("support_conversations", expire_after=3600, strict=True)
         self.temp_ignores = set()
 
     async def handle_private_message(self, received_message):
@@ -25,18 +26,22 @@ class Support(commands.Cog):
             return
 
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
+        user:discord.User = received_message.author
 
         attachments_list = [e.url for e in received_message.attachments]
 
-        message_transcribed = f"{received_message.author.mention} ({received_message.author.name}#{received_message.author.discriminator})\n"
+        embed = discord.Embed(title="Go to latest actions on the user", colour=discord.Colour(0x28d6ae), url=f"https://getbeaned.me/users/{user.id}",
+                              description=f"{received_message.content[:1700]}", timestamp=datetime.datetime.now())
 
-        if len(received_message.content) > 0:
-            message_transcribed += f"```{received_message.content[:1700]}```\n"
+        embed.set_author(name=f"{user.name}", url="https://getbeaned.me", icon_url=f"{user.avatar_url}")
+        embed.set_footer(text=f"{user.name}#{user.discriminator}", icon_url=f"{user.avatar_url}")
 
         if len(attachments_list) > 0:
-            message_transcribed += f"Attachments : {attachments_list}"
+            embed.add_field(name="📎 ", value=f"Attachments : {attachments_list}", inline=False)
+        # embed.add_field(name="\U0001f507 ", value="Mute the user")
+        # embed.add_field(name="\U0001f4de ", value="Join this conversation")
 
-        sent_message = await pm_channel.send(message_transcribed)
+        sent_message = await pm_channel.send(content=f"{user.id}", embed=embed)
 
         emotes = [
             "\U0001f507",  # SPEAKER WITH CANCELLATION STROKE - :mute:

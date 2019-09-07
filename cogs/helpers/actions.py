@@ -141,10 +141,11 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
                                    )
 
     url = "https://getbeaned.me" + res['result_url']
-
+    quoted_reason = '> '.join(('> ' + reason).splitlines(True))
     try:
-
-        asyncio.ensure_future(victim.send(f"You have received a {action_type}. For more info, please see {url}. "
+        asyncio.ensure_future(victim.send(f"You have received a {action_type}, with the following reason\n"
+                                          f"{quoted_reason}"
+                                          f"For more info, please see {url}, you may have to login with your Discord account. "
                                           f"You can appeal this with the moderator of your choice."))
     except AttributeError:
         # LikeUser dosen't have a send attr

@@ -1,5 +1,6 @@
 import collections
 import datetime
+import io
 
 import discord
 from discord.ext import commands
@@ -7,6 +8,7 @@ from discord.ext import commands
 from cogs.helpers import context, checks
 from cogs.helpers.hastebins import upload_text
 
+ATTACHMENTS_UPLOAD_CHANNEL_ID = 624129637928140802
 
 class Logging(commands.Cog):
     """
@@ -223,11 +225,46 @@ class Logging(commands.Cog):
         if not message.type == discord.MessageType.default:
             return
 
-        if len(message.content) == 0:
+        if len(message.content) == 0 and len(message.attachments) == 0:
             return
 
-        elif len(message.content) > 450:
+        if len(message.attachments) >= 1:
+            attachments_upload_channel = self.bot.get_channel(ATTACHMENTS_UPLOAD_CHANNEL_ID)
+            saved_attachments_files = []
+            attachments_unsaved_urls = []
+            total_files = len(message.attachments)
+            saved_files = 0
+            for i, attachment in enumerate(message.attachments):
+                file = io.BytesIO()
+                attachment: discord.Attachment
+                try:
+                    await attachment.save(file, seek_begin=True, use_cached=True)  # Works most of the time
+                except discord.HTTPException:
+                    try:
+                        await attachment.save(file, seek_begin=True, use_cached=False)  # Almost never works, but worth a try!
+                    except discord.HTTPException:
+                        attachments_unsaved_urls.append(attachment.url)
+                        break  # Couldn't save
+                saved_files += 1
+                saved_attachments_files.append(discord.File(fp=file, filename=attachment.filename))
+            if saved_files >= 0:
+                saved = await attachments_upload_channel.send(content=f"`[{saved_files}/{total_files}]` - Attachment(s) for message {message.id} on channel `[{message.channel.id}]` #{message.channel.name}, in guild `[{message.guild.id}]` {message.guild.name}",
+                                                              files=saved_attachments_files)
+                attachments_saved_urls = [a.url for a in saved.attachments]
+            else:
+                attachments_saved_urls = []
+            attachments_text = []
+
+            if len(attachments_saved_urls) >= 1:
+                attachments_text = ["\n- ".join(attachments_saved_urls)]
+            if len(attachments_saved_urls) < len(message.attachments):
+                attachments_text.append("The following attachments could **not** be saved by the bot: " + "\n- ".join(attachments_unsaved_urls))
+            attachments_text = "\n".join(attachments_text)
+
+        if len(message.content) > 450:
             content = message.content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(message.content)
+        elif len(message.content) == 0:
+            content = f"The message contained no text, and {len(message.attachments)} attachments."
 
         else:
             content = message.content
@@ -268,6 +305,10 @@ class Logging(commands.Cog):
 
             embed.add_field(name="Deleted message content",
                             value=content)
+
+            if len(message.attachments) >= 1:
+                embed.add_field(name="Message attachments",
+                                value=attachments_text)
 
             await logging_channel.send(embed=embed)
 

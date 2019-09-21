@@ -79,6 +79,9 @@ class Logging(commands.Cog):
         if first_message.guild is None:
             return
 
+        if "[getbeaned:disable_logging]" in str(first_message.channel.topic):
+            return
+
         logging_channel = await self.get_logging_channel(first_message.guild, 'logs_delete_channel_id')
 
         if not logging_channel:
@@ -138,6 +141,8 @@ class Logging(commands.Cog):
         if not new_content:
             return
 
+
+
         if len(new_content) > 450:
             new_content = new_content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(new_content)
 
@@ -159,6 +164,9 @@ class Logging(commands.Cog):
                 return
 
         if channel is None or isinstance(channel, discord.abc.PrivateChannel):
+            return
+
+        if "[getbeaned:disable_logging]" in str(channel.topic):
             return
 
         guild = channel.guild
@@ -223,6 +231,9 @@ class Logging(commands.Cog):
             return
 
         if not message.type == discord.MessageType.default:
+            return
+
+        if "[getbeaned:disable_logging]" in str(message.channel.topic):
             return
 
         if len(message.content) == 0 and len(message.attachments) == 0:

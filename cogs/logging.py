@@ -10,6 +10,7 @@ from cogs.helpers.hastebins import upload_text
 
 ATTACHMENTS_UPLOAD_CHANNEL_ID = 624129637928140802
 
+
 class Logging(commands.Cog):
     """
     Logging events.

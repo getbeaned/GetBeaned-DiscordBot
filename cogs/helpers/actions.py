@@ -144,7 +144,7 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
     quoted_reason = '> '.join(('> ' + reason).splitlines(True))
     try:
         asyncio.ensure_future(victim.send(f"You have received a {action_type}, with the following reason\n"
-                                          f"{quoted_reason}"
+                                          f"{quoted_reason}\n\n"
                                           f"For more info, please see {url}, you may have to login with your Discord account. "
                                           f"You can appeal this with the moderator of your choice."))
     except AttributeError:

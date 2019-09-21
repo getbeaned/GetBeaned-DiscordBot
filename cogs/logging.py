@@ -228,6 +228,11 @@ class Logging(commands.Cog):
         if len(message.content) == 0 and len(message.attachments) == 0:
             return
 
+        logging_channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
+
+        if not logging_channel:
+            return
+
         if len(message.attachments) >= 1:
             attachments_upload_channel = self.bot.get_channel(ATTACHMENTS_UPLOAD_CHANNEL_ID)
             saved_attachments_files = []
@@ -271,11 +276,6 @@ class Logging(commands.Cog):
 
         self.snipes[message.channel].append(message)
         self.snipes.reset_expiry(message.channel)
-
-        logging_channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
-
-        if not logging_channel:
-            return
 
         ctx = await self.bot.get_context(message, cls=context.CustomContext)
         ctx.logger.info(f"Logging message deletion")

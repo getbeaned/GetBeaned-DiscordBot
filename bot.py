@@ -147,7 +147,8 @@ class GetBeaned(commands.AutoShardedBot):
             await context.send_to('This command cannot be used in private messages.')
             return
         elif isinstance(exception, discord.ext.commands.errors.CommandInvokeError):
-            await context.author.send("Sorry, an error happened processing your command. Please review the bot permissions and try again.")
+            await context.author.send(f"Sorry, an error happened processing your command. "
+                                      f"Please review the bot permissions and try again. To report a bug, please give the support staff the following: ```py\n{e}\n{''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))}\n```")
             return
         elif isinstance(exception, discord.ext.commands.errors.NotOwner):
             return  # Jsk uses this

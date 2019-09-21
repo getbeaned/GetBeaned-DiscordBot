@@ -90,10 +90,8 @@ class AutoMod(commands.Cog):
             r"""
                 discord      # Literally just discord
                 \s?          # Sometimes people use spaces before dots to twhart the AutoMod. Let's stop that by allowing 1 space here
-                (?:app\.\s?com|\.\s?gg)\s?/ # All the domains
+                (?:app\s?\.\s?com\s?/invite|\.\s?gg)\s?/ # All the domains
                 \s?          # And here too
-                (?:invite/)? # You can sometimes add a /invite/ in there, so let's match it
-                \s?          # You get the idea
                 ((?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
                 """, flags=re.VERBOSE)
 

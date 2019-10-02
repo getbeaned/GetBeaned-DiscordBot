@@ -4,3 +4,4 @@ numpy
 objgraph
 psutil
 uvloop
+py-trello

@@ -1,4 +1,5 @@
 import random
+import re
 import time
 from collections import defaultdict
 
@@ -7,6 +8,7 @@ class Settings:
     def __init__(self, bot):
         self.bot = bot
         self.settings_cache = bot.cache.get_cache("settings", expire_after=60, strict=True)
+        self.vip_bad_regex_cache = bot.cache.get_cache("vip_bad_regex", expire_after=600, strict=False)
 
     async def add_to_cache(self, guild, settings):
         self.settings_cache[guild] = settings
@@ -30,3 +32,41 @@ class Settings:
         del self.settings_cache[guild]
 
         await self.bot.api.set_settings(guild, setting, value)
+
+    async def get_bad_word_matches(self, guild, string):
+        bad_regex_list = []
+
+        if not await self.get(guild, "vip"):
+            bad_words_list = ['nigga', 'fuck', 'cunt', 'dick', 'cock', 'sex', 'nigger']
+            for word in bad_words_list:
+                bad_regex_list.append(re.compile(f"\\b{word}\\b(?i)(?m)"))
+        else:
+            bad_regex_list = self.vip_bad_regex_cache[guild]
+
+            if bad_regex_list is None:
+                bad_regex_list = []
+                words = await self.get(guild, "vip_custom_bad_words_list")
+                bad_words_list = str(words).splitlines(keepends=False)
+                regexes = [f"\\b{word}\\b(?i)(?m)" for word in bad_words_list]
+
+                regexes_str = await self.get(guild, "vip_custom_bad_regex_list")
+                regexes = regexes + str(regexes_str).splitlines(keepends=False)
+
+                for regex in regexes:
+                    try:
+                        bad_regex_list.append(re.compile(regex))
+                    except Exception as e:
+                        self.bot.logger.debug(f"{regex} -> {e}")
+
+                self.vip_bad_regex_cache[guild] = bad_regex_list
+
+        matches = []
+        for regex in bad_regex_list:
+            match = regex.search(string)
+            if match:
+                matches.append((match.string, regex.pattern))
+
+        return matches
+
+
+

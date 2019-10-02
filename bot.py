@@ -148,7 +148,7 @@ class GetBeaned(commands.AutoShardedBot):
             return
         elif isinstance(exception, discord.ext.commands.errors.CommandInvokeError):
             await context.author.send(f"Sorry, an error happened processing your command. "
-                                      f"Please review the bot permissions and try again. To report a bug, please give the support staff the following: ```py\n{e}\n{''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))}\n```")
+                                      f"Please review the bot permissions and try again. To report a bug, please give the support staff the following: ```py\n{exception}\n{''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))}\n```")
             return
         elif isinstance(exception, discord.ext.commands.errors.NotOwner):
             return  # Jsk uses this
@@ -193,6 +193,7 @@ cogs = ['cogs.cache_control',
         'cogs.support',
         'cogs.dehoister',
         'cogs.autoinspect',
+        'cogs.suggestions',
         'jishaku']
 
 for extension in cogs:

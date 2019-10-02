@@ -142,8 +142,6 @@ class Logging(commands.Cog):
         if not new_content:
             return
 
-
-
         if len(new_content) > 450:
             new_content = new_content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(new_content)
 

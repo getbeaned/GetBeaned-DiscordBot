@@ -17,8 +17,6 @@ from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots,
 
 ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
 DEBUG = False
-BAD_WORDS = ['nigga', 'fuck', 'cunt', 'dick', 'cock', 'sex',
-             'nigger']
 
 TRIGGERS_ENABLED = [SexDatingDiscordBots, InstantEssayDiscordBots, SexBots]
 
@@ -302,12 +300,16 @@ class AutoMod(commands.Cog):
                 check_message.score += await self.bot.settings.get(message.guild, 'automod_score_repeated') * repeat
                 check_message.debug(f"Message was repeated by the author {repeat} times")
 
-        bad_words_in_message = {b_word for b_word in BAD_WORDS if b_word in check_message.message.content.lower()}
-        bad_words_count = len(bad_words_in_message)
+        bad_words_matches = await self.bot.settings.get_bad_word_matches(message.guild, check_message.message.content)
+        bad_words_count = len(bad_words_matches)
 
         if bad_words_count >= 1:
             check_message.score += await self.bot.settings.get(message.guild, 'automod_score_bad_words') * bad_words_count
-            check_message.debug(f"Message contains {bad_words_count} bad words ({', '.join(bad_words_in_message)})")
+            bad_words_list = []
+            for match in bad_words_matches:
+                string, pattern = match
+                bad_words_list.append(f"{string} matched by {pattern}")
+            check_message.debug(f"Message contains {bad_words_count} bad words ({', '.join(bad_words_list)})")
 
         if not check_message.message.content.lower().startswith(("dh", "!", "?", "§", "t!", ">", "<", "-", "+")) or len(
                 check_message.message.content) > 30 \

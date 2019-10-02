@@ -194,6 +194,7 @@ cogs = ['cogs.cache_control',
         'cogs.dehoister',
         'cogs.autoinspect',
         'cogs.suggestions',
+        'cogs.donators',
         'jishaku']
 
 for extension in cogs:

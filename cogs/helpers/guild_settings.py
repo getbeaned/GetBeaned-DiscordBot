@@ -28,8 +28,10 @@ class Settings:
 
     async def set(self, guild, setting, value):
         await self.bot.wait_until_ready()
-
-        del self.settings_cache[guild]
+        try:
+            del self.settings_cache[guild]
+        except KeyError:
+            pass
 
         await self.bot.api.set_settings(guild, setting, value)
 

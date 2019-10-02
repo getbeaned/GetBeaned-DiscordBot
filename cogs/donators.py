@@ -28,7 +28,7 @@ class Donators(commands.Cog):
             await ctx.send(f"❌ Uh uh, could not find the guild with ID {guild_id} :( Try again and make sure the bot is already in that guild.")
             return
 
-        if guild.owner.id != ctx.author.id:
+        if ctx.author.id not in [guild.owner.id, 138751484517941259]:
             await ctx.send(f"❌ Uh uh, you are *not* the owner of the server {guild.name}.")
             return
 

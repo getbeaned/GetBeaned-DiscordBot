@@ -18,8 +18,14 @@ class AutoInspect(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api = bot.api
-        self.checks = {'autoinspect_pornspam_bots': self.pornspam_bots_check}
+        self.checks = {'autoinspect_pornspam_bots': self.pornspam_bots_check,
+                       'autoinspect_username_check': self.username_check}
         self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
+
+    async def username_check(self, member) -> bool:
+        string = member.name
+        matches = await self.bot.settings.get_bad_word_matches(member.guild, string)
+        return bool(len(matches))
 
     async def pornspam_bots_check(self, member) -> bool:
         # https://regex101.com/r/IeIqbl/1

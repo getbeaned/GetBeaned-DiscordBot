@@ -8,9 +8,6 @@ from cogs.helpers.converters import ForcedMember
 class Donators(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self._last_result = None
-        self.sessions = set()
-        self.api = bot.api
 
     @commands.command()
     @commands.guild_only()

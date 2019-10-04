@@ -23,7 +23,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def unban(self, ctx, banned_users: commands.Greedy[BannedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
+    async def unban(self, ctx, banned_users: commands.Greedy[BannedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Unban a member from the server. The member must be currently banned for this command to work.
 

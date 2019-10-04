@@ -3,8 +3,8 @@ import time
 
 from typing import Dict, Callable
 
-class CacheStorageDict(collections.MutableMapping):
 
+class CacheStorageDict(collections.MutableMapping):
     def __init__(self, expire_after=60, strict=False, default:Callable = None, *args, **kwargs):
         self.store = dict()
         self.times = dict()

@@ -22,10 +22,13 @@ class FakeCtx:
 class Dehoister(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.bypass = bot.cache.get_cache("dehoister_bypass", expire_after=3, strict=True, default=list)
 
     async def dehoist_user_in_guild(self, user, guild) -> bool:
         if await self.bot.settings.get(guild, "dehoist_enable"):
             member = guild.get_member(user.id)
+            if user.id in self.bypass[guild]:
+                return False
 
             if await get_level(FakeCtx(guild, self.bot), member) >= int(await self.bot.settings.get(guild, "dehoist_ignore_level")):
                 return False
@@ -96,6 +99,20 @@ class Dehoister(commands.Cog):
         for guild in self.bot.guilds:
             if user in guild.members:
                 await self.dehoist_user_in_guild(user, guild)
+
+    @commands.command(aliases=["rename_user", "rename_member"])
+    @commands.guild_only()
+    @checks.have_required_level(2)
+    @checks.bot_have_permissions()
+    @commands.cooldown(rate=10, per=30, type=commands.BucketType.guild)
+    async def rename(self, ctx, user: discord.Member, *, name: str = None):
+
+        await ctx.send(f"Processing, please wait.")
+
+        self.bypass[ctx.guild].append(user.id)
+        self.bypass.reset_expiry(ctx.guild)
+        await user.edit(nick=name)
+        await ctx.send(f"User renamed!")
 
     @commands.command()
     @commands.guild_only()

@@ -232,11 +232,16 @@ class Logging(commands.Cog):
         if not message.type == discord.MessageType.default:
             return
 
+        if len(message.content) == 0 and len(message.attachments) == 0:
+            return
+
+        self.snipes[message.channel].append(message)
+        self.snipes.reset_expiry(message.channel)
+
         if "[getbeaned:disable_logging]" in str(message.channel.topic):
             return
 
-        if len(message.content) == 0 and len(message.attachments) == 0:
-            return
+
 
         logging_channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
 
@@ -283,9 +288,6 @@ class Logging(commands.Cog):
 
         else:
             content = message.content
-
-        self.snipes[message.channel].append(message)
-        self.snipes.reset_expiry(message.channel)
 
         ctx = await self.bot.get_context(message, cls=context.CustomContext)
         ctx.logger.info(f"Logging message deletion")

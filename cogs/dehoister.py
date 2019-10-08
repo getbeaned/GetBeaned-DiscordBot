@@ -39,6 +39,13 @@ class Dehoister(commands.Cog):
             new_nickname = previous_nickname
 
             if intensity >= 1:
+                for pos, char in enumerate(new_nickname):
+                    if char in ["!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/"]:
+                        continue
+                    else:
+                        new_nickname = new_nickname[pos:]
+                        break
+
                 new_nickname = previous_nickname.lstrip("!")
 
             if intensity >= 2:

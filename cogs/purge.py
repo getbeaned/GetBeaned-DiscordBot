@@ -34,7 +34,7 @@ class ModPurge(commands.Cog):
     @commands.group(aliases=['purge'])
     @commands.guild_only()
     @checks.bot_have_permissions()
-    @checks.have_required_level(3)
+    @checks.have_required_level(2)
     async def remove(self, ctx):
         """Removes messages that meet a criteria.
         When the command is done doing its work, you will get a message

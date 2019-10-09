@@ -78,7 +78,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def unmute(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
+    async def unmute(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         UnMute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
         Using this command require a specific role, that you can create using the +create_muted_role command

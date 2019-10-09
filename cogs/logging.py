@@ -241,8 +241,6 @@ class Logging(commands.Cog):
         if "[getbeaned:disable_logging]" in str(message.channel.topic):
             return
 
-
-
         logging_channel = await self.get_logging_channel(message.guild, 'logs_delete_channel_id')
 
         if not logging_channel:

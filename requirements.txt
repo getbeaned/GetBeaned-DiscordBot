@@ -1,3 +1,5 @@
+parsedatetime
+python-dateutil
 discord.py
 git+https://github.com/Gorialis/jishaku
 numpy

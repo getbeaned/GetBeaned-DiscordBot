@@ -164,3 +164,42 @@ class Api:
                     raise
                 # self.logger.debug(f"(add_to_staff) <- {res}")
                 return res
+
+    async def get_tasks(self):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(API_URL + f"/tasks/", headers=headers) as r:
+                try:
+                    res = await r.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    print(await r.text())
+                    raise
+                #self.logger.debug(f"(get_tasks) <- {res}")
+                return res
+
+    async def create_task(self, task_type, arguments=None, execute_at=None):
+        if arguments is not None and not isinstance(arguments, str):
+            arguments = json.dumps(arguments)
+
+        if execute_at is not None and not isinstance(arguments, str):
+            execute_at = str(execute_at)
+
+        async with aiohttp.ClientSession() as cs:
+            async with cs.post(API_URL + f"/tasks/", headers=headers, data={"execute_at": execute_at, "task_type": task_type, "arguments": arguments}) as r:
+                try:
+                    res = await r.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    print(await r.text())
+                    raise
+                self.logger.debug(f"(create_task) <- {res}")
+                return res
+
+    async def complete_task(self, task_id:int):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.post(API_URL + f"/tasks/{task_id}/complete", headers=headers) as r:
+                try:
+                    res = await r.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    print(await r.text())
+                    raise
+                self.logger.debug(f"(complete_task) <- {res}")
+                return res

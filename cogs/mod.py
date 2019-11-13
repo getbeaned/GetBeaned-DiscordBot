@@ -1,4 +1,8 @@
 import asyncio
+import datetime
+import typing
+
+from cogs.helpers import time
 
 import discord
 from discord.ext import commands
@@ -29,19 +33,21 @@ class Mod(commands.Cog):
             raise commands.BadArgument("Some users were seen twice in your command. Please check and try again.")
 
         for user in users:
+
             if user.id == ctx.author.id:
                 raise commands.BadArgument("Targeting self...")
             elif user.id == self.bot.user.id:
                 raise commands.BadArgument("Targeting GetBeaned...")
 
-            can_execute = ctx.author == ctx.guild.owner or \
-                          ctx.author.top_role > user.top_role
+            if isinstance(user, discord.Member):
+                can_execute = ctx.author == ctx.guild.owner or \
+                              ctx.author.top_role > user.top_role
 
-            if can_execute:
-                if user.top_role > ctx.guild.me.top_role:
-                    raise commands.BadArgument(f'You cannot do this action on {user.name} due to role hierarchy between the bot and {user.name}.')
-            else:
-                raise commands.BadArgument(f'You cannot do this action on {user.name} due to role hierarchy.')
+                if can_execute:
+                    if user.top_role > ctx.guild.me.top_role:
+                        raise commands.BadArgument(f'You cannot do this action on {user.name} due to role hierarchy between the bot and {user.name}.')
+                else:
+                    raise commands.BadArgument(f'You cannot do this action on {user.name} due to role hierarchy.')
 
         if len(users) >= 2:
 
@@ -84,13 +90,16 @@ class Mod(commands.Cog):
             if len(reason) < 10:
                 raise commands.BadArgument("You must justify your actions by adding a detailed reason to your command")
 
-
-    async def run_actions(self, ctx, users, reason, attachments_saved_url, action):
+    async def run_actions(self, ctx, users, reason, attachments_saved_url, action, duration=None):
         cases_urls = []
 
         for user in users:
             act = await full_process(ctx.bot, action, user, ctx.author, reason, attachement_url=attachments_saved_url)
             cases_urls.append(act['url'])
+
+            if duration:
+                if action is mute:
+                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up ({time.human_timedelta(duration.dt, source=datetime.datetime.utcnow())})"}, execute_at=duration.dt)
 
         await ctx.send(f":ok_hand: - See {', '.join(cases_urls)} for details")
 
@@ -201,17 +210,22 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def mute(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def mute(self, ctx, duration:typing.Optional[time.FutureTime], users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Mute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
         Using this command require a specific role, that you can create using the +create_muted_role command
 
         If thresholds are enabled, muting a user can lead to kicks.
 
-        Use like +mute [member(s)] <reason>.
+        Use like +mute <duration> [member(s)] <reason>.
 
+        <duration> is the time until the mute expire (for example, 1h, 1d, 1w, 3m, ...)
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your mute reason.
+
+        The duration can be a a short time form, e.g. 30d or a more human
+        duration such as "until thursday at 3PM" or a more concrete time
+        such as "2024-12-31". Don't forget the quotes.
         """
         ROLE_NAME = "GetBeaned_muted"
         muted_role = discord.utils.get(ctx.guild.roles, name=ROLE_NAME)
@@ -223,8 +237,7 @@ class Mod(commands.Cog):
         attachments_saved_url = await self.parse_arguments(ctx, users=users)
         await self.check_reason(ctx, reason, attachments_saved_url)
 
-        await self.run_actions(ctx, users, reason, attachments_saved_url, mute)
-
+        await self.run_actions(ctx, users, reason, attachments_saved_url, mute, duration=duration)
 
     @commands.command()
     @commands.guild_only()

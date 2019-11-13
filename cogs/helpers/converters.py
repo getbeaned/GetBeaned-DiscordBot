@@ -39,7 +39,7 @@ class ForcedMember(commands.Converter):
 
     async def convert(self, ctx, argument):
         try:
-            m = await InferiorMember().convert(ctx, argument)
+            m = await commands.MemberConverter().convert(ctx, argument)
             return m
         except commands.BadArgument:
             try:

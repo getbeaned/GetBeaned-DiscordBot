@@ -25,13 +25,23 @@ class Mod(commands.Cog):
         if len(users) == 0:
             raise commands.BadArgument("No users provided")
 
-        uids = [u.id for u in users]
+        if len(users) != len(set(users)):
+            raise commands.BadArgument("Some users were seen twice in your command. Please check and try again.")
 
-        if ctx.author.id in uids:
-            raise commands.BadArgument("Targeting self...")
+        for user in users:
+            if user.id == ctx.author.id:
+                raise commands.BadArgument("Targeting self...")
+            elif user.id == self.bot.user.id:
+                raise commands.BadArgument("Targeting GetBeaned...")
 
-        if self.bot.user.id in uids:
-            raise commands.BadArgument("Targeting GetBeaned...")
+            can_execute = ctx.author == ctx.guild.owner or \
+                          ctx.author.top_role > user.top_role
+
+            if can_execute:
+                if user.top_role > ctx.guild.me.top_role:
+                    raise commands.BadArgument(f'You cannot do this action on {user.name} due to role hierarchy between the bot and {user.name}.')
+            else:
+                raise commands.BadArgument(f'You cannot do this action on {user.name} due to role hierarchy.')
 
         if len(users) >= 2:
 
@@ -99,7 +109,7 @@ class Mod(commands.Cog):
         <reason> is your unban reason.
         """
 
-        attachments_saved_url = await self.parse_arguments(ctx, users=[b.u for b in banned_users])
+        attachments_saved_url = await self.parse_arguments(ctx, users=[b.user for b in banned_users])
         cases_urls = []
 
         for ban in banned_users:

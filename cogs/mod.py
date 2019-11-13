@@ -52,7 +52,12 @@ class Mod(commands.Cog):
 
         attachments_saved_urls, attachments_unsaved_urls = await save_attachments(self.bot, ctx.message)
 
-        attachments_saved_url = attachments_saved_urls[0] if len(attachments_saved_urls) > 0 else None
+        if len(attachments_saved_urls) > 0:
+            attachments_saved_url = attachments_saved_urls[0]
+        elif len(attachments_unsaved_urls) > 0:
+            attachments_saved_url = attachments_unsaved_urls[0]
+        else:
+            attachments_saved_url = None
 
         return attachments_saved_url
 
@@ -167,7 +172,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
-    async def warn(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = None):
+    async def warn(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Warn a member on the server. If thresholds are enabled, warning a user can lead to worse actions, like bans and kicks.
 

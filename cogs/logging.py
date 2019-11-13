@@ -32,9 +32,14 @@ async def save_attachments(bot, message):
             saved_files += 1
             saved_attachments_files.append(discord.File(fp=file, filename=attachment.filename))
         if saved_files >= 0:
-            saved = await attachments_upload_channel.send(
-                content=f"`[{saved_files}/{total_files}]` - Attachment(s) for message {message.id} on channel `[{message.channel.id}]` #{message.channel.name}, in guild `[{message.guild.id}]` {message.guild.name}",
-                files=saved_attachments_files)
+            try:
+                saved = await attachments_upload_channel.send(
+                    content=f"`[{saved_files}/{total_files}]` - Attachment(s) for message {message.id} on channel `[{message.channel.id}]` #{message.channel.name}, in guild `[{message.guild.id}]` {message.guild.name}",
+                    files=saved_attachments_files)
+            except discord.HTTPException:
+                # Too large for the bot
+                return [], [a.url for a in message.attachments]
+
             attachments_saved_urls = [a.url for a in saved.attachments]
         else:
             attachments_saved_urls = []
@@ -42,6 +47,7 @@ async def save_attachments(bot, message):
         return [], []
 
     return attachments_saved_urls, attachments_unsaved_urls
+
 
 class Logging(commands.Cog):
     """

@@ -11,6 +11,38 @@ from cogs.helpers.hastebins import upload_text
 ATTACHMENTS_UPLOAD_CHANNEL_ID = 624129637928140802
 
 
+async def save_attachments(bot, message):
+    if len(message.attachments) >= 1:
+        attachments_upload_channel = bot.get_channel(ATTACHMENTS_UPLOAD_CHANNEL_ID)
+        saved_attachments_files = []
+        attachments_unsaved_urls = []
+        total_files = len(message.attachments)
+        saved_files = 0
+        for i, attachment in enumerate(message.attachments):
+            file = io.BytesIO()
+            attachment: discord.Attachment
+            try:
+                await attachment.save(file, seek_begin=True, use_cached=True)  # Works most of the time
+            except discord.HTTPException:
+                try:
+                    await attachment.save(file, seek_begin=True, use_cached=False)  # Almost never works, but worth a try!
+                except discord.HTTPException:
+                    attachments_unsaved_urls.append(attachment.url)
+                    break  # Couldn't save
+            saved_files += 1
+            saved_attachments_files.append(discord.File(fp=file, filename=attachment.filename))
+        if saved_files >= 0:
+            saved = await attachments_upload_channel.send(
+                content=f"`[{saved_files}/{total_files}]` - Attachment(s) for message {message.id} on channel `[{message.channel.id}]` #{message.channel.name}, in guild `[{message.guild.id}]` {message.guild.name}",
+                files=saved_attachments_files)
+            attachments_saved_urls = [a.url for a in saved.attachments]
+        else:
+            attachments_saved_urls = []
+    else:
+        return [], []
+
+    return attachments_saved_urls, attachments_unsaved_urls
+
 class Logging(commands.Cog):
     """
     Logging events.
@@ -214,6 +246,8 @@ class Logging(commands.Cog):
         if await self.perms_okay(channel):
             await logging_channel.send(embed=embed)
 
+
+
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         """
@@ -247,32 +281,9 @@ class Logging(commands.Cog):
             return
 
         if len(message.attachments) >= 1:
-            attachments_upload_channel = self.bot.get_channel(ATTACHMENTS_UPLOAD_CHANNEL_ID)
-            saved_attachments_files = []
-            attachments_unsaved_urls = []
-            total_files = len(message.attachments)
-            saved_files = 0
-            for i, attachment in enumerate(message.attachments):
-                file = io.BytesIO()
-                attachment: discord.Attachment
-                try:
-                    await attachment.save(file, seek_begin=True, use_cached=True)  # Works most of the time
-                except discord.HTTPException:
-                    try:
-                        await attachment.save(file, seek_begin=True, use_cached=False)  # Almost never works, but worth a try!
-                    except discord.HTTPException:
-                        attachments_unsaved_urls.append(attachment.url)
-                        break  # Couldn't save
-                saved_files += 1
-                saved_attachments_files.append(discord.File(fp=file, filename=attachment.filename))
-            if saved_files >= 0:
-                saved = await attachments_upload_channel.send(content=f"`[{saved_files}/{total_files}]` - Attachment(s) for message {message.id} on channel `[{message.channel.id}]` #{message.channel.name}, in guild `[{message.guild.id}]` {message.guild.name}",
-                                                              files=saved_attachments_files)
-                attachments_saved_urls = [a.url for a in saved.attachments]
-            else:
-                attachments_saved_urls = []
-            attachments_text = []
+            attachments_saved_urls, attachments_unsaved_urls = await save_attachments(self.bot, message)
 
+            attachments_text = []
             if len(attachments_saved_urls) >= 1:
                 attachments_text = ["\n- ".join(attachments_saved_urls)]
             if len(attachments_saved_urls) < len(message.attachments):

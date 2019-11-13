@@ -349,18 +349,21 @@ class Support(commands.Cog):
             everything_good = True
             message = ["Logs are globally enabled on this server. The following specific logs are activated and configured: \n```diff"]
             for setting, display_name in logs.items():
-                setting_value = int(await self.bot.settings.get(guild, setting))
-
-                if setting_value == 0:
-                    message.append(f"- {display_name} log")
-                    everything_good = False
+                try:
+                    setting_value = int(await self.bot.settings.get(guild, setting))
+                except ValueError:
+                    message.append(f"= {display_name} log (enabled but there is text in the ID field, I can't parse it)")
                 else:
-                    channel_logged = discord.utils.get(guild.channels, id=setting_value)
-                    if channel_logged:
-                        message.append(f"+ {display_name} log (in #{channel_logged.name})")
-                    else:
-                        message.append(f"= {display_name} log (enabled but couldn't find the channel by that goes by ID {setting_value})")
+                    if setting_value == 0:
+                        message.append(f"- {display_name} log")
                         everything_good = False
+                    else:
+                        channel_logged = discord.utils.get(guild.channels, id=setting_value)
+                        if channel_logged:
+                            message.append(f"+ {display_name} log (in #{channel_logged.name})")
+                        else:
+                            message.append(f"= {display_name} log (enabled but couldn't find the channel by that goes by ID {setting_value})")
+                            everything_good = False
 
             message.append("```")
 

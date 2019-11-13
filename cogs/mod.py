@@ -102,7 +102,7 @@ class Mod(commands.Cog):
 
             if duration:
                 if action is mute:
-                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"}, execute_at=duration.dt)
+                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"},  execute_at=duration.dt)
                 elif action is ban:
                     await self.api.create_task("unban", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"}, execute_at=duration.dt)
 

@@ -93,13 +93,18 @@ class Mod(commands.Cog):
     async def run_actions(self, ctx, users, reason, attachments_saved_url, action, duration=None):
         cases_urls = []
 
+        if duration:
+            reason = reason + f"\n🕰️ Duration: {time.human_timedelta(duration.dt, source=datetime.datetime.utcnow())}"
+
         for user in users:
             act = await full_process(ctx.bot, action, user, ctx.author, reason, attachement_url=attachments_saved_url)
             cases_urls.append(act['url'])
 
             if duration:
                 if action is mute:
-                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up ({time.human_timedelta(duration.dt, source=datetime.datetime.utcnow())})"}, execute_at=duration.dt)
+                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"}, execute_at=duration.dt)
+                elif action is ban:
+                    await self.api.create_task("unban", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"}, execute_at=duration.dt)
 
         await ctx.send(f":ok_hand: - See {', '.join(cases_urls)} for details")
 
@@ -284,20 +289,25 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def ban(self, ctx, users: commands.Greedy[ForcedMember(may_be_banned=False)], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def ban(self, ctx, duration:typing.Optional[time.FutureTime], users: commands.Greedy[ForcedMember(may_be_banned=False)], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Banning a user is the ultimate punishment, where is is kicked from the server and can't return
 
-        Use like +ban [member(s)] <reason>.
+        Use like +ban <duration> [member(s)] <reason>.
 
+        <duration> is the time until the ban expire (for example, 1h, 1d, 1w, 3m, ...)
         [member] can be an ID, a username#discrim or a mention.
         <reason> is your ban reason.
+
+        The duration can be a a short time form, e.g. 30d or a more human
+        duration such as "until thursday at 3PM" or a more concrete time
+        such as "2024-12-31". Don't forget the quotes.
         """
 
         attachments_saved_url = await self.parse_arguments(ctx, users=users)
         await self.check_reason(ctx, reason, attachments_saved_url)
 
-        await self.run_actions(ctx, users, reason, attachments_saved_url, ban)
+        await self.run_actions(ctx, users, reason, attachments_saved_url, ban, duration=duration)
 
 
 def setup(bot):

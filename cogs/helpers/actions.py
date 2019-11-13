@@ -210,4 +210,5 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
 
     return {"user_informed": None,
             "url": url,
-            "thresholds_enforced": th}
+            "thresholds_enforced": th,
+            "case_number": case_number}

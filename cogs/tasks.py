@@ -17,7 +17,8 @@ class Tasks(commands.Cog):
         self.run_tasks.start()
         self.tasks_mapping = {
             "refresh_user": self.refresh_user,
-            "unmute": self.unmute_task
+            "unmute": self.unmute_task,
+            "unban": self.unban_task,
         }
 
     def cog_unload(self):
@@ -34,6 +35,19 @@ class Tasks(commands.Cog):
             if member:
                 tasks_user = LikeUser(did=5, name="DoItLater", guild=guild)
                 act = await full_process(self.bot, unmute, member, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
+                return True
+
+    async def unban_task(self, task):
+        arguments = json.loads(task['arguments'])  # {"target": 514557845111570447, "guild": 512328935304855555, "reason": "Time is up (1 week, 2 days and 23 hours)"}
+        guild_id = arguments["guild"]
+
+        guild: discord.Guild = self.bot.get_guild(guild_id)
+
+        if guild:
+            member = guild.get_member(arguments["target"])
+            if member:
+                tasks_user = LikeUser(did=5, name="DoItLater", guild=guild)
+                act = await full_process(self.bot, unban, member, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
                 return True
 
         # Failed because no such guild/user

@@ -28,6 +28,11 @@ class Support(commands.Cog):
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
         user:discord.User = received_message.author
 
+        if "discord.gg/" in received_message.content:
+            await user.send("I've notice you just sent me an invite. This is **not** how you add a bot to a server. To invite GetBeaned, please click on this link: "
+                            "https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=201714887&scope=bot")
+            await user.send("If you have any questions, join the support server -> https://discord.gg/cPbhK53")
+
         attachments_list = [e.url for e in received_message.attachments]
 
         embed = discord.Embed(title="Go to latest actions on the user", colour=discord.Colour(0x28d6ae), url=f"https://getbeaned.me/users/{user.id}",

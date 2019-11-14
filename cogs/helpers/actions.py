@@ -141,6 +141,7 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
                                    )
 
     url = "https://getbeaned.me" + res['result_url']
+    case_number = res['case_number']
     quoted_reason = '> '.join(('> ' + reason).splitlines(True))
     try:
         asyncio.ensure_future(victim.send(f"You have received a {action_type}, with the following reason\n"
@@ -172,8 +173,6 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
                 bot.logger.warning(f"There is something fishy going on with guild={victim.guild.id}! "
                                    f"Their logs_channel_id={channel_id} don't belong to them!")
             else:
-
-                case_number = res['case_number']
                 if await bot.settings.get(victim.guild, 'logs_as_embed'):
                     embed = await get_action_log_embed(bot,
                                                        case_number,

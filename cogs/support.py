@@ -431,8 +431,8 @@ class Support(commands.Cog):
 
         ids = await self.bot.settings.get(guild, 'permissions_trusted')
         if len(ids) > 0:
-            message = ["The following user(s) have been granted server **trusted** (3) here "
-                       "(This is not a complete list since it does **not** include people with the `ban_members` permission) \n```diff"]
+            message = ["The following user(s) have been granted server **trusted** (2) here "
+                       "(This is not a complete list since it does **not** include people with the `kick_members` permission) \n```diff"]
             for trusted_id in ids:
                 trusted = discord.utils.get(guild.members, id=trusted_id)
                 if trusted:
@@ -445,7 +445,7 @@ class Support(commands.Cog):
                         message.append(f"- User left the server ({trusted_id})")
             message.append("```")
 
-            embed.add_field(name="Trusted moderators", value="\n".join(message))
+            embed.add_field(name="Trusted users", value="\n".join(message))
 
 
         messages["Staff"] = embed

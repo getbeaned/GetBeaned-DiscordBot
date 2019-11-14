@@ -429,6 +429,25 @@ class Support(commands.Cog):
 
             embed.add_field(name="Server moderators", value="\n".join(message))
 
+        ids = await self.bot.settings.get(guild, 'permissions_trusted')
+        if len(ids) > 0:
+            message = ["The following user(s) have been granted server **trusted** (3) here "
+                       "(This is not a complete list since it does **not** include people with the `ban_members` permission) \n```diff"]
+            for trusted_id in ids:
+                trusted = discord.utils.get(guild.members, id=trusted_id)
+                if trusted:
+                    message.append(f"+ {trusted.name}#{trusted.discriminator} ({trusted_id})")
+                else:
+                    role = discord.utils.get(guild.roles, id=trusted_id)
+                    if role:
+                        message.append(f"+ (Role) {role.name} ({trusted_id})")
+                    else:
+                        message.append(f"- User left the server ({trusted_id})")
+            message.append("```")
+
+            embed.add_field(name="Trusted moderators", value="\n".join(message))
+
+
         messages["Staff"] = embed
 
         embed = discord.Embed(description="This is stuff you can't do much about it, but just wait for the problems to go away if there are some. \n"

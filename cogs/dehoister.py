@@ -41,17 +41,17 @@ class Dehoister(commands.Cog):
             if intensity >= 1:
                 for pos, char in enumerate(new_nickname):
                     if char in ["!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/"]:
+                        new_nickname = new_nickname[1:]
                         continue
                     else:
-                        new_nickname = new_nickname[pos:]
                         break
 
             if intensity >= 2:
                 for pos, char in enumerate(new_nickname):
                     if char not in string.ascii_letters:
+                        new_nickname = new_nickname[1:]
                         continue
                     else:
-                        new_nickname = new_nickname[pos:]
                         break
 
             if intensity >= 3:

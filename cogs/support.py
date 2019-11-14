@@ -409,7 +409,7 @@ class Support(commands.Cog):
                         message.append(f"- User left the server ({admin_id})")
             message.append("```")
 
-            embed.add_field(name="Server administrators", value="\n".join(message))
+            embed.add_field(name="Server administrators", value="\n".join(message), inline=False)
 
         ids = await self.bot.settings.get(guild, 'permissions_moderators')
         if len(ids) > 0:
@@ -427,7 +427,7 @@ class Support(commands.Cog):
                         message.append(f"- User left the server ({mod_id})")
             message.append("```")
 
-            embed.add_field(name="Server moderators", value="\n".join(message))
+            embed.add_field(name="Server moderators", value="\n".join(message), inline=False)
 
         ids = await self.bot.settings.get(guild, 'permissions_trusted')
         if len(ids) > 0:
@@ -445,7 +445,7 @@ class Support(commands.Cog):
                         message.append(f"- User left the server ({trusted_id})")
             message.append("```")
 
-            embed.add_field(name="Trusted users", value="\n".join(message))
+            embed.add_field(name="Trusted users", value="\n".join(message), inline=False)
 
 
         messages["Staff"] = embed

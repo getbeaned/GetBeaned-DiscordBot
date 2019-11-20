@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Union
+from typing import Union, List
 
 import aiohttp
 import discord
@@ -203,3 +203,49 @@ class Api:
                     raise
                 self.logger.debug(f"(complete_task) <- {res}")
                 return res
+
+    async def save_roles(self, guild:discord.guild, user:Union[discord.Member, discord.User], roles:List[Union[discord.Role, int]]):
+        await self.add_user(user)
+        await self.add_guild(guild)
+
+        roles_list = []
+
+        for role in roles:
+            if isinstance(role, discord.Role):
+                roles_list.append(str(role.id))
+            else:
+                roles_list.append(str(role))
+
+        roles_list = ",".join(roles_list)
+
+        async with aiohttp.ClientSession() as cs:
+            async with cs.post(API_URL + f"/rolepersist/{guild.id}/{user.id}", headers=headers, data={"roles_ids": roles_list}) as r:
+                try:
+                    res = await r.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    print(await r.text())
+                    raise
+                self.logger.debug(f"(save_roles) <- {res}")
+                return res
+
+    async def get_stored_roles(self, guild:discord.Guild, user:Union[discord.Member, discord.User]) -> List[discord.Role]:
+        await self.add_user(user)
+        await self.add_guild(guild)
+
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(API_URL + f"/rolepersist/{guild.id}/{user.id}", headers=headers) as r:
+                try:
+                    res = await r.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    print(await r.text())
+                    raise
+                self.logger.debug(f"(get_stored_roles) <- {res}")
+
+        roles = []
+
+        for role_id in res["roles"].split(","):
+            role = discord.utils.get(guild.roles, id=int(role_id))
+            if role:
+                roles.append(role)
+                
+        return roles

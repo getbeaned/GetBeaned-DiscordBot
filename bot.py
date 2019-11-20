@@ -196,7 +196,8 @@ cogs = ['cogs.cache_control',
         'cogs.suggestions',
         'cogs.donators',
         'cogs.tasks',
-        'jishaku']
+        'cogs.role_persist',
+        'jishaku',]
 
 for extension in cogs:
     try:

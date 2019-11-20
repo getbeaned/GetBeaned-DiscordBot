@@ -323,6 +323,7 @@ class Support(commands.Cog):
                              "thresholds_enable": "Thresholds (automatic action when a users received X strikes)",
                              "logs_enable": "Logs",
                              "autoinspect_enable": "AutoInspect (Verification of new members that join your server)",
+                             "rolepersist_enable": "RolePersist (VIP)"
                              }
 
         for setting, display_name in settings_to_check.items():
@@ -342,6 +343,7 @@ class Support(commands.Cog):
         if logs_enabled:
             logs = {"logs_moderation_channel_id": "Moderation acts",
                     "logs_joins_channel_id": "Users joining/leaving",
+                    "logs_rolepersist_channel_id": "Roles persist",
                     "logs_member_edits_channel_id": "Users edits",
                     "logs_edits_channel_id": "Message edits",
                     "logs_delete_channel_id": "Message deletions",

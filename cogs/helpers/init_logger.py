@@ -146,5 +146,15 @@ def init_logger():
     logger.debug("Logger created, will now send messages this way")
     logger.info("Hello!")
 
+    discord_logger = logging.getLogger('discord')
+    discord_logger.setLevel(logging.WARNING)
+
+    discord_formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
+
+
+    discord_steam_handler = ColorStreamHandler()
+    discord_steam_handler.setLevel(logging.INFO)
+    discord_steam_handler.setFormatter(discord_formatter)
+    discord_logger.addHandler(discord_steam_handler)
 
     return base_logger, logger

@@ -12,22 +12,33 @@ from cogs.helpers.cache import Cache
 print("Loading...")
 
 # Importing the discord API warpper
+
+print("Loading discord...")
 import discord
 import discord.ext.commands as commands
 
 # Load some essentials modules
+print("Loading traceback...")
 import traceback
-import collections
-import json
-import datetime
 
-from cogs.helpers.converters import NotStrongEnough, HierarchyError
-from cogs.helpers.guild_settings import Settings
+print("Loading collections...")
+import collections
+
+print("Loading json...")
+import json
+
+print("Loading datetime...")
+import datetime
 
 from cogs.helpers.init_logger import init_logger
 
+print("Setting up logging")
+
 base_logger, logger = init_logger()
 
+
+from cogs.helpers.converters import NotStrongEnough, HierarchyError
+from cogs.helpers.guild_settings import Settings
 
 # Setting up asyncio to use uvloop if possible, a faster implementation on the event loop
 import asyncio

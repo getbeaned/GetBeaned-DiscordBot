@@ -245,8 +245,9 @@ class Api:
 
         if len(res["roles"]) > 0:
             for role_id in res["roles"].split(","):
-                role = discord.utils.get(guild.roles, id=int(role_id))
-                if role:
-                    roles.append(role)
+                if len(role_id) > 0:
+                    role = discord.utils.get(guild.roles, id=int(role_id))
+                    if role:
+                        roles.append(role)
 
         return roles

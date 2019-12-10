@@ -56,38 +56,54 @@ class Tasks(commands.Cog):
         user = self.bot.get_user(int(task["arguments"]))
 
         if user is None:
-            user = await self.bot.fetch_user(int(task["arguments"]))
+            try:
+                user = await self.bot.fetch_user(int(task["arguments"]))
+            except discord.errors.NotFound:
+                self.bot.logger.warning(f"Completing task #{task['id']} failed. User not found.")
+                return True  # Returning true anyway
 
-        if user:
+        if user is not None:
             await self.bot.api.add_user(user)
             return True
         else:
-            return False
+            self.bot.logger.warning(f"Completing task #{task['id']} failed. User not found.")
+            return True  # Returning true anyway
 
     async def dispatch_task(self, task):
-        self.bot.logger.info(f"Running task #{task['id']}")
+        self.bot.logger.info(f"Running task #{task['id']}...")
         self.bot.logger.debug(str(task))
 
         task_type = task["type"]
 
         try:
             res = await self.tasks_mapping[task_type](task)
+            self.bot.logger.debug(f"Ran task #{task['id']}, result is {res}")
             if res is not False:  # So if res is None, it'll still return True
                 return True
+            else:
+                return False
         except KeyError:
             self.bot.logger.warning(f"Unsupported task #{task['id']}, type is {task['type']}")
             return False  # Unsupported task type
 
     @tasks.loop(minutes=1)
     async def run_tasks(self):
-        #self.bot.logger.info("Cleaning up cache")
-        tasks = await self.bot.api.get_tasks()
-        for task in tasks:
-            res = await self.dispatch_task(task)
+        try:
+            #self.bot.logger.info("Cleaning up cache")
+            tasks = await self.bot.api.get_tasks()
+            self.bot.logger.debug(f"Got task list: {tasks}")
+            for task in tasks:
+                res = await self.dispatch_task(task)
 
-            if res:
-                self.bot.logger.info(f"Completed task #{task['id']}")
-                await self.bot.api.complete_task(task["id"])
+                if res:
+                    self.bot.logger.info(f"Completed task #{task['id']}")
+                    await self.bot.api.complete_task(task["id"])
+                else:
+                    self.bot.logger.warning(f"Completing task #{task['id']} failed. res={res}")
+        except Exception as e:
+            self.bot.logger.exception(f"Failed in tasks loop...")
+            raise
+
 
     @run_tasks.before_loop
     async def before_task(self):

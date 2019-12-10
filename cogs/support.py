@@ -305,7 +305,10 @@ class Support(commands.Cog):
 
         top_role = ctx.message.guild.me.top_role
 
-        message.append(f"= Bot top role is at position {top_role.position}/{len(ctx.guild.roles)} [higher is better] - "
+        # Position isn't guaranteed to not have gaps
+        # Discord pls
+
+        message.append(f"= Bot top role is at position {top_role.position}/{ctx.guild.roles[-1].position} [higher is better] - "
                        f"Any user that have a role equal or higher to <{top_role.name}> can't be kicked/banned")
         message.append("```")
 
@@ -364,7 +367,7 @@ class Support(commands.Cog):
                         if channel_logged:
                             message.append(f"+ {display_name} log (in #{channel_logged.name})")
                         else:
-                            message.append(f"= {display_name} log (enabled but couldn't find the channel by that goes by ID {setting_value})")
+                            message.append(f"= {display_name} log (enabled but couldn't find the channel that goes by ID {setting_value})")
                             everything_good = False
 
             message.append("```")

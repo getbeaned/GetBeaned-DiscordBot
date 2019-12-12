@@ -70,5 +70,20 @@ class Meta(commands.Cog):
         """Show the current channel ID."""
         await ctx.send_to(f"{ctx.channel.mention} ID is {ctx.channel.id}")
 
+    @commands.command()
+    @checks.have_required_level(5)
+    async def fake_message(self, ctx, who: discord.User, *, message:str):
+        """Refresh a user profile on the website."""
+        avatar = await who.avatar_url.read()
+
+        try:
+            webhook = await ctx.channel.create_webhook(name=who.display_name, avatar=avatar, reason=f"Fakemessage from {ctx.message.author.name}")
+        except discord.Forbidden:
+            await ctx.send_to("No permission to create webhooks :(")
+            return
+
+        await webhook.send(message)
+        await webhook.delete()
+
 def setup(bot):
     bot.add_cog(Meta(bot))

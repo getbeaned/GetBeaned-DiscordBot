@@ -466,6 +466,23 @@ class Logging(commands.Cog):
                 except discord.errors.Forbidden:
                     self.bot.logger.info(f"Couldn't log member update {old}->{new} (No perms)")
 
+    @staticmethod
+    async def snipe_as_embed(ctx, message):
+        embed = discord.Embed()
+        embed.title = f"Sniped message | {message.id}"
+        embed.add_field(name="By", value=message.author.mention)
+        embed.add_field(name="In", value=message.channel.mention)
+        embed.description = message.content
+        embed.set_footer(text=f"You can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}")
+        embed.timestamp = message.created_at
+        await ctx.send(embed=embed)
+
+    @staticmethod
+    async def snipe_as_webhook(ctx, webhook, message):
+        await webhook.send(message.content)
+        await webhook.send(f"```\nThe message was created at {message.created_at}\nYou can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}```")
+        await webhook.delete()
+
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_minimal_permissions()
@@ -477,14 +494,19 @@ class Logging(commands.Cog):
             await ctx.send("❌ Nothing to snipe")
             return
 
-        embed = discord.Embed()
-        embed.title = f"Sniped message | {message.id}"
-        embed.add_field(name="By", value=message.author.mention)
-        embed.add_field(name="In", value=message.channel.mention)
-        embed.description = message.content
-        embed.set_footer(text=f"You can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}")
-        embed.timestamp = message.created_at
-        await ctx.send(embed=embed)
+        avatar = await message.author.avatar_url.read()
+
+        try:
+            webhook = await ctx.channel.create_webhook(name=message.author.display_name, avatar=avatar, reason=f"Snipe command from {ctx.message.author.name}")
+            await self.snipe_as_webhook(ctx, webhook, message)
+        except discord.Forbidden:
+            await self.snipe_as_embed(ctx, message)
+            return
+
+
+
+
+
 
 
 def setup(bot):

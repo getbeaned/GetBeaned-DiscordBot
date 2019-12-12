@@ -44,13 +44,17 @@ class Tasks(commands.Cog):
         guild: discord.Guild = self.bot.get_guild(guild_id)
 
         if guild:
-            member = guild.get_member(arguments["target"])
-            if member:
+            user = await self.bot.fetch_user(int(task["arguments"]))
+
+            if user:
+                if not user.id in [b.user.id for b in await guild.bans()]:
+                    return True  # Already unbanned
                 tasks_user = LikeUser(did=5, name="DoItLater", guild=guild)
-                act = await full_process(self.bot, unban, member, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
+                act = await full_process(self.bot, unban, user, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
                 return True
 
         # Failed because no such guild/user
+        return True  # Anyway
 
     async def refresh_user(self, task):
         user = self.bot.get_user(int(task["arguments"]))

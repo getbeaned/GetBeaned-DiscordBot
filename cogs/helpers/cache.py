@@ -13,6 +13,8 @@ class CacheStorageDict(collections.MutableMapping):
         self.default_func = default
         self.update(dict(*args, **kwargs))  # use the free update to set keys
         self._expired_keys = 0
+        self.hits = 0
+        self.misses = 0
 
     def get(self, key, default=None):
         try:
@@ -46,6 +48,8 @@ class CacheStorageDict(collections.MutableMapping):
             "stored_keys_count": 0,
             "stored_expired_keys_count": 0,
             "expired_keys_count": 0,
+            "hits": self.hits,
+            "misses": self.misses,
         }
 
         for key, expire in self.times.items():
@@ -60,6 +64,7 @@ class CacheStorageDict(collections.MutableMapping):
 
     def __getitem__(self, key):
         if key not in self.store:
+            self.misses += 1
             if self.default_func is not None:
                 self[key] = self.default_func()
                 return self[key]
@@ -67,6 +72,7 @@ class CacheStorageDict(collections.MutableMapping):
                 return None
 
         if self.strict and time.time() > self.times.get(key, 0):
+            self.misses += 1
             self._expired_keys += 1
             del self[key]
             if self.default_func is not None:
@@ -76,7 +82,7 @@ class CacheStorageDict(collections.MutableMapping):
                 return None
 
             # raise KeyError("The key expired and strict mode is set")
-
+        self.hits += 1
         return self.store[key]
 
     def __contains__(self, item):
@@ -95,6 +101,9 @@ class CacheStorageDict(collections.MutableMapping):
 
     def __len__(self):
         return len(self.store)
+
+    def __str__(self):
+        return f"<Cache ttl={self.expire_after} keys_stored_count={len(self.store)} strict={self.strict}>"
 
 
 class Cache:

@@ -7,8 +7,8 @@ from collections import defaultdict
 class Settings:
     def __init__(self, bot):
         self.bot = bot
-        self.settings_cache = bot.cache.get_cache("settings", expire_after=60, strict=True)
-        self.vip_bad_regex_cache = bot.cache.get_cache("vip_bad_regex", expire_after=600, strict=False)
+        self.settings_cache = bot.cache.get_cache("settings", expire_after=900, strict=True)
+        self.vip_bad_regex_cache = bot.cache.get_cache("vip_bad_regex", expire_after=1200, strict=False)
 
     async def add_to_cache(self, guild, settings):
         self.settings_cache[guild] = settings

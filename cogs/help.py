@@ -565,7 +565,7 @@ class Help(commands.Cog):
         Get this bot invite link
         """
         await ctx.send_to(
-            "https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=201714887&scope=bot")
+            "https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=1878392007&scope=bot")
 
     @commands.command(name='info')
     @checks.have_required_level(1)

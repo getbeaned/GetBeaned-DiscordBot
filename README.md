@@ -18,7 +18,7 @@ Please, feel free to read the code, comment, ask, and create issues and pull req
 If you do submit a pull request, please use descriptive commit messages, using emojis as described [here](https://gitmoji.carloscuesta.me/)
 
 ## Self-hosting
-> Please **do not** self-host this bot if you don't know how to secure and manage a server, a database, websites and discord bots. You can use the hosted version, for free, by using the official invite @ https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=201714887&scope=bot
+> Please **do not** self-host this bot if you don't know how to secure and manage a server, a database, websites and discord bots. You can use the hosted version, for free, by using the official invite @ https://discordapp.com/oauth2/authorize?client_id=492797767916191745&permissions=1878392007&scope=bot
 > If you do self-host, please respect the authors and give credit where it's due. **Do not claim the bot is yours, and follow informations of rules set in the license file**
 
 The bot code is available here for demonstrations and audit purposes. You can however self-host the bot, but, as noted above, only limited support will be available to you. In any case, if you self-host the bot or copy/remix the code, please follow the license file and drop Eyesofcreeper#0001 a PM on discord (Support server https://discord.gg/rB8eZNs)

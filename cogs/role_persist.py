@@ -1,7 +1,11 @@
 import datetime
+import typing
 
 import discord
 from discord.ext import commands
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
 
 
 class RolePersist(commands.Cog):
@@ -9,14 +13,14 @@ class RolePersist(commands.Cog):
     RolePersist
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
 
-    async def is_role_persist_enabled(self, guild:discord.Guild):
+    async def is_role_persist_enabled(self, guild: discord.Guild):
         return await self.bot.settings.get(guild, "rolepersist_enable") and await self.bot.settings.get(guild, "vip")
 
-    async def get_restorable_roles(self, guild, roles):
+    async def get_restorable_roles(self, guild: discord.Guild, roles: typing.List[discord.Role]):
         my_top_role = guild.me.top_role
 
         restorable_roles = []
@@ -24,10 +28,9 @@ class RolePersist(commands.Cog):
             if role < my_top_role:
                 restorable_roles.append(my_top_role)
 
-    async def log_role_persist(self, guild, member, roles_to_give):
+    async def log_role_persist(self, guild: discord.Guild, member: discord.Member, roles_to_give: typing.List[discord.Role]):
         roles_to_give_names = [r.name for r in roles_to_give]
         roles_to_give_mentions = [r.mention for r in roles_to_give]
-
 
         reason = f"Restoring roles for {member.name}#{member.discriminator} in {guild}: {len(roles_to_give)} roles to give: {roles_to_give_names}"
         self.bot.logger.info(reason)
@@ -74,5 +77,6 @@ class RolePersist(commands.Cog):
         self.bot.logger.debug(f"User {member} left, saving {len(member.roles)} roles")
         await self.api.save_roles(guild, member, member.roles)
 
-def setup(bot):
+
+def setup(bot: 'GetBeaned'):
     bot.add_cog(RolePersist(bot))

@@ -1,11 +1,11 @@
 import collections
 import time
-
+import typing
 from typing import Dict, Callable
 
 
 class CacheStorageDict(collections.MutableMapping):
-    def __init__(self, expire_after=60, strict=False, default:Callable = None, *args, **kwargs):
+    def __init__(self, expire_after: float = 60, strict: bool = False, default: Callable = None, *args, **kwargs):
         self.store = dict()
         self.times = dict()
         self.expire_after = expire_after
@@ -16,7 +16,7 @@ class CacheStorageDict(collections.MutableMapping):
         self.hits = 0
         self.misses = 0
 
-    def get(self, key, default=None):
+    def get(self, key: typing.Hashable, default: typing.Any = None):
         try:
             r = self[key]
             if r is None:
@@ -26,13 +26,13 @@ class CacheStorageDict(collections.MutableMapping):
         except KeyError:
             return default
 
-    def reset_expiry(self, key, seconds=None):
+    def reset_expiry(self, key: typing.Hashable, seconds: float = None):
         if seconds is None:
             self.times[key] = time.time() + self.expire_after
         else:
             self.times[key] = time.time() + seconds
 
-    def cleanup(self):
+    def cleanup(self) -> int:
         i = 0
         for key, expire in list(self.times.items()):
             if time.time() > expire:
@@ -42,7 +42,7 @@ class CacheStorageDict(collections.MutableMapping):
         self._expired_keys += i
         return i
 
-    def get_status(self):
+    def get_status(self) -> typing.Dict[str, int]:
         status_dict = {
             "expired_keys": set(),
             "stored_keys_count": 0,
@@ -62,7 +62,7 @@ class CacheStorageDict(collections.MutableMapping):
 
         return status_dict
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: typing.Hashable):
         if key not in self.store:
             self.misses += 1
             if self.default_func is not None:
@@ -88,11 +88,11 @@ class CacheStorageDict(collections.MutableMapping):
     def __contains__(self, item):
         return item in self.times and (not self.strict or time.time() <= self.times[item])
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: typing.Hashable, value):
         self.store[key] = value
         self.times[key] = time.time() + self.expire_after
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: typing.Hashable):
         del self.store[key]
         del self.times[key]
 
@@ -111,13 +111,13 @@ class Cache:
         self.bot = bot
         self.storage: Dict[str, CacheStorageDict] = {}
 
-    def create_or_reset_cache(self, name, *args, **kwargs):
+    def create_or_reset_cache(self, name: str, *args, **kwargs):
         self.storage[name] = CacheStorageDict(*args, **kwargs)
 
-    def ensure_cache(self, name, *args, **kwargs):
+    def ensure_cache(self, name: str, *args, **kwargs):
         if name not in self.storage:
             self.create_or_reset_cache(name, *args, **kwargs)
 
-    def get_cache(self, name, *args, **kwargs):
+    def get_cache(self, name: str, *args, **kwargs):
         self.ensure_cache(name, *args, **kwargs)
         return self.storage[name]

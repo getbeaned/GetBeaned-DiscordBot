@@ -1,8 +1,13 @@
 import collections
-import datetime
 import io
+import typing
 
 import discord
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
+
 from discord.ext import commands
 
 from cogs.helpers import context, checks
@@ -11,7 +16,7 @@ from cogs.helpers.hastebins import upload_text
 ATTACHMENTS_UPLOAD_CHANNEL_ID = 624129637928140802
 
 
-async def save_attachments(bot, message):
+async def save_attachments(bot: 'GetBeaned', message: discord.Message):
     if len(message.attachments) >= 1:
         attachments_upload_channel = bot.get_channel(ATTACHMENTS_UPLOAD_CHANNEL_ID)
         saved_attachments_files = []
@@ -57,12 +62,12 @@ class Logging(commands.Cog):
     and post the appropriate embeds in the appropriate channels if asked to by the guild settings
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
         self.snipes = bot.cache.get_cache("logging_deleted_messages", expire_after=7200, default=lambda: collections.deque(maxlen=15))  # channel: [message, message]
 
-    async def perms_okay(self, channel):
+    async def perms_okay(self, channel: discord.TextChannel):
         wanted_permissions = discord.permissions.Permissions.none()
         wanted_permissions.update(
             send_messages=True,
@@ -74,7 +79,7 @@ class Logging(commands.Cog):
 
         return my_permissions.is_strict_superset(wanted_permissions)
 
-    async def get_logging_channel(self, guild, pref):
+    async def get_logging_channel(self, guild: discord.Guild, pref: str):
         # Beware to see if the channel id is actually in the same server (to compare, we will see if the current server
         # owner is the same as the one in the target channel). If yes, even if it's not the same server, we will allow
         # logging there
@@ -105,7 +110,7 @@ class Logging(commands.Cog):
             return channel
 
     @commands.Cog.listener()
-    async def on_bulk_message_delete(self, messages):
+    async def on_bulk_message_delete(self, messages: typing.List[discord.Message]):
         """
         Handle bulk message deletions. However, older deleted messages that aren't in discord internal cache will not fire
         this event so we kinda "hope" that the messages weren't too old when they were deleted, and that they were in the cache
@@ -164,7 +169,7 @@ class Logging(commands.Cog):
             await logging_channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_raw_message_edit(self, raw_message_update):
+    async def on_raw_message_edit(self, raw_message_update: discord.RawMessageUpdateEvent):
         """
         Handle **raw** message edits. ~~However, older messages that aren't in discord internal cache will not fire
         this event so we kinda "hope" that the message wasn't too old when it was edited, and that it was in the cache~~
@@ -252,10 +257,8 @@ class Logging(commands.Cog):
         if await self.perms_okay(channel):
             await logging_channel.send(embed=embed)
 
-
-
     @commands.Cog.listener()
-    async def on_message_delete(self, message):
+    async def on_message_delete(self, message: discord.Message):
         """
         Handle message deletions. However, older deleted messages that aren't in discord internal cache will not fire
         this event so we kinda "hope" that the message wasn't too old when it was deleted, and that it was in the cache
@@ -351,7 +354,7 @@ class Logging(commands.Cog):
                 ctx.logger.info(f"Couldn't log message deletion {message} (No perms)")
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
 
         if not channel:
@@ -388,7 +391,7 @@ class Logging(commands.Cog):
                 self.bot.logger.info(f"Couldn't log user leave {member} (No perms)")
 
     @commands.Cog.listener()
-    async def on_member_remove(self, member):
+    async def on_member_remove(self, member: discord.Member):
         channel = await self.get_logging_channel(member.guild, 'logs_joins_channel_id')
         if not channel:
             return
@@ -426,7 +429,7 @@ class Logging(commands.Cog):
                 self.bot.logger.info(f"Couldn't log user leave {member} (No perms)")
 
     @commands.Cog.listener()
-    async def on_member_update(self, old, new):
+    async def on_member_update(self, old: discord.Member, new: discord.Member):
 
         if old.nick != new.nick:
             # Nickname update
@@ -467,7 +470,7 @@ class Logging(commands.Cog):
                     self.bot.logger.info(f"Couldn't log member update {old}->{new} (No perms)")
 
     @staticmethod
-    async def snipe_as_embed(ctx, message):
+    async def snipe_as_embed(ctx: 'CustomContext', message: discord.Message):
         embed = discord.Embed()
         embed.title = f"Sniped message | {message.id}"
         embed.add_field(name="By", value=message.author.mention)
@@ -478,7 +481,7 @@ class Logging(commands.Cog):
         await ctx.send(embed=embed)
 
     @staticmethod
-    async def snipe_as_webhook(ctx, webhook:discord.Webhook, message):
+    async def snipe_as_webhook(ctx: 'CustomContext', webhook: discord.Webhook, message: discord.Message):
         embed = discord.Embed()
         embed.title = f"Sniped message | {message.id}"
         embed.description = "This is a GetBeaned sniped message"
@@ -486,14 +489,14 @@ class Logging(commands.Cog):
         embed.timestamp = message.created_at
 
         await webhook.send(message.content, embed=embed)
-        #await webhook.send(f"```\nThe message was created at {message.created_at}\nYou can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}```")
+        # await webhook.send(f"```\nThe message was created at {message.created_at}\nYou can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}```")
         await webhook.delete()
 
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_minimal_permissions()
     @checks.have_required_level(2)
-    async def snipe(self, ctx):
+    async def snipe(self, ctx: 'CustomContext'):
         try:
             message = self.snipes[ctx.channel].pop()
         except IndexError:  # Nothing in deque
@@ -510,10 +513,5 @@ class Logging(commands.Cog):
             return
 
 
-
-
-
-
-
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Logging(bot))

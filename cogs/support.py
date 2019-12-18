@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import time
+import typing
 
 import discord
 from discord import Color
@@ -10,23 +11,27 @@ from cogs.helpers import checks
 from cogs.helpers.hastebins import upload_text
 from cogs.helpers.level import get_level
 
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
+
 PM_VIEWING_CHANNEL_ID = 557294214417874945
 
 
 class Support(commands.Cog):
     """Cog for various support commands."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.conversations = bot.cache.get_cache("support_conversations", expire_after=3600, strict=True)
         self.temp_ignores = set()
 
-    async def handle_private_message(self, received_message):
+    async def handle_private_message(self, received_message: discord.Message):
         if received_message.author.id in self.temp_ignores:
             return
 
         pm_channel = self.bot.get_channel(PM_VIEWING_CHANNEL_ID)
-        user:discord.User = received_message.author
+        user: discord.User = received_message.author
 
         if "discord.gg/" in received_message.content:
             await user.send("I've notice you just sent me an invite. This is **not** how you add a bot to a server. To invite GetBeaned, please click on this link: "
@@ -57,7 +62,7 @@ class Support(commands.Cog):
         for emote in emotes:
             await sent_message.add_reaction(emote)
 
-        def check(reaction, user):
+        def check(reaction: discord.Reaction, user: discord.User):
             return str(reaction.emoji) in emotes and reaction.message.id == sent_message.id
 
         try:
@@ -67,7 +72,7 @@ class Support(commands.Cog):
                 if user.id == self.bot.user.id:
                     continue
 
-                if str(reaction.emoji) == "\U0001f507": # Mute
+                if str(reaction.emoji) == "\U0001f507":  # Mute
                     self.temp_ignores.add(received_message.author.id)
                     await pm_channel.send(f"{user.mention}, you added {received_message.author.name} to the ignore list. "
                                           f"He'll be unignored if the bot restart or if you send him a PM thru the bot: `+pm {received_message.author.id} MESSAGE`")
@@ -79,7 +84,7 @@ class Support(commands.Cog):
         except asyncio.TimeoutError:
             await sent_message.clear_reactions()  # Nobody reacted :)
 
-    async def handle_support_message(self, message):
+    async def handle_support_message(self, message: discord.Message):
         if message.content.startswith("#") or message.content.startswith("+"):
             return
 
@@ -98,7 +103,7 @@ class Support(commands.Cog):
             await pm_channel.send(r)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author.id == self.bot.user.id:
             return
 
@@ -110,17 +115,17 @@ class Support(commands.Cog):
 
     @commands.command(aliases=["endpm"])
     @checks.have_required_level(8)
-    async def end_pm(self, ctx):
+    async def end_pm(self, ctx: 'CustomContext'):
         self.conversations[ctx.author.id] = None
         await ctx.message.add_reaction("👌")
 
     @commands.command(aliases=["answer", "send_pm", "sendpm"])
     @checks.have_required_level(8)
-    async def pm(self, ctx, user: discord.User, *, message_content:str):
+    async def pm(self, ctx: 'CustomContext', user: discord.User, *, message_content: str):
         self.conversations[ctx.author.id] = user
         await self.send_pm(sender=ctx.author, receiver=user, message_content=message_content)
 
-    async def send_pm(self, sender: discord.Member, receiver: discord.User, message_content:str):
+    async def send_pm(self, sender: discord.Member, receiver: discord.User, message_content: str):
         try:  # Remove from ignore list if replying
             self.temp_ignores.remove(receiver)
         except KeyError:
@@ -135,11 +140,10 @@ class Support(commands.Cog):
 
         await pm_channel.send(f"**{sender.name}#{sender.discriminator}** answered {receiver.mention} ({receiver.name}#{receiver.discriminator})\n>>> {message_content[:1900]}")
 
-
     @commands.command()
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def level(self, ctx, user: discord.Member = None):
+    async def level(self, ctx: 'CustomContext', user: discord.Member = None):
         """
         Show your current access level
 
@@ -180,7 +184,7 @@ class Support(commands.Cog):
 
         await ctx.send(f"Current level: {l} ({levels_names[l]})")
 
-    async def safe_add_field(self, embed, *, name, value, inline=None, strip=True):
+    async def safe_add_field(self, embed: discord.Embed, *, name: str, value: str, inline: bool = None, strip: bool = True):
         if len(value) > 1000:
             if strip:
                 value = value.strip("`")
@@ -191,9 +195,9 @@ class Support(commands.Cog):
     @commands.command(aliases=["message_info", "report_message", "message_report", "minfo"])
     @commands.guild_only()
     @checks.have_required_level(2)
-    async def info_message(self, ctx, message_id:int):
+    async def info_message(self, ctx: 'CustomContext', message_id: int):
         try:
-            target_message:discord.Message = await ctx.channel.fetch_message(message_id)
+            target_message: discord.Message = await ctx.channel.fetch_message(message_id)
         except discord.NotFound:
             await ctx.send("❌ Message not found in the channel.")
             return False
@@ -210,11 +214,11 @@ class Support(commands.Cog):
             attachments = ", ".join(target_message.attachments)
             embed.add_field(name="Attachement(s)", value=attachments, inline=False)
 
-        embed.add_field(name="Author ID", value=target_message.author.id, inline=True)
-        embed.add_field(name="Channel ID", value=target_message.channel.id, inline=True)
-        embed.add_field(name="Message ID", value=target_message.id, inline=True)
+        embed.add_field(name="Author ID", value=str(target_message.author.id), inline=True)
+        embed.add_field(name="Channel ID", value=str(target_message.channel.id), inline=True)
+        embed.add_field(name="Message ID", value=str(target_message.id), inline=True)
 
-        embed.add_field(name="Author created at", value=target_message.author.created_at, inline=True)
+        embed.add_field(name="Author created at", value=str(target_message.author.created_at), inline=True)
 
         await self.safe_add_field(embed, name="Automod Logs", value="```\n" + automod_cache.get(message_id, "None stored :(") + "\n```", inline=False)
 
@@ -223,7 +227,7 @@ class Support(commands.Cog):
     @commands.command(aliases=["permissions_checks", "permission_check", "bot_permissions_check"])
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def permissions_check(self, ctx):
+    async def permissions_check(self, ctx: 'CustomContext'):
         current_permissions: discord.Permissions = ctx.message.guild.me.permissions_in(ctx.channel)
 
         emojis = {
@@ -246,7 +250,7 @@ class Support(commands.Cog):
     @commands.command(aliases=["hierarchy", "check_hierarchy"])
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def hierarchy_check(self, ctx, m:discord.Member):
+    async def hierarchy_check(self, ctx: 'CustomContext', m: discord.Member):
         can_execute = ctx.author == ctx.guild.owner or \
                       ctx.author.top_role > m.top_role
 
@@ -264,7 +268,7 @@ class Support(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(2, 60, commands.BucketType.guild)
     @checks.have_required_level(1)
-    async def doctor(self, ctx):
+    async def doctor(self, ctx: 'CustomContext'):
         waiting_message = await ctx.send("<a:loading:393852367751086090> Please wait, running `doctor` checks")  # <a:loading:393852367751086090> is a loading emoji
         t_1 = time.perf_counter()
         await ctx.trigger_typing()  # tell Discord that the bot is "typing", which is a very simple request
@@ -452,7 +456,6 @@ class Support(commands.Cog):
 
             embed.add_field(name="Trusted users", value="\n".join(message), inline=False)
 
-
         messages["Staff"] = embed
 
         embed = discord.Embed(description="This is stuff you can't do much about it, but just wait for the problems to go away if there are some. \n"
@@ -474,5 +477,5 @@ class Support(commands.Cog):
         await waiting_message.delete()
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Support(bot))

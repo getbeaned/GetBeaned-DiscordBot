@@ -1,6 +1,9 @@
+import typing
+
 import discord
 from discord.ext import commands
 
+from cogs.helpers.context import CustomContext
 from cogs.helpers.helpful_classes import LikeUser, FakeMember
 
 
@@ -16,7 +19,7 @@ class HierarchyError(Exception):
 # Stolen from R.Danny source code, as should do any discord bot anyway
 # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/mod.py#L63
 class InferiorMember(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: CustomContext, argument) -> discord.Member:
         try:
             m = await commands.MemberConverter().convert(ctx, argument)
             can_execute = ctx.author == ctx.guild.owner or \
@@ -37,7 +40,7 @@ class ForcedMember(commands.Converter):
         super().__init__()
         self.may_be_banned = may_be_banned
 
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: CustomContext, argument) -> typing.Union[discord.Member, FakeMember, LikeUser]:
         try:
             m = await commands.MemberConverter().convert(ctx, argument)
             return m
@@ -60,8 +63,8 @@ class ForcedMember(commands.Converter):
                         u = await ctx.bot.fetch_user(did)
                         return FakeMember(u, ctx.guild)
                 except:
-                    ctx.bot.logger.exception("An error happened trying to convert a discord ID to a User instance. "
-                                             "Relying on a LikeUser")
+                    ctx.logger.exception("An error happened trying to convert a discord ID to a User instance. "
+                                         "Relying on a LikeUser")
                     return LikeUser(did=int(argument, base=10), name="Unknown member", guild=ctx.guild)
             except ValueError:
                 raise commands.BadArgument(f"{argument} is not a valid member or member ID.") from None
@@ -70,7 +73,7 @@ class ForcedMember(commands.Converter):
 
 
 class BannedMember(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: CustomContext, argument):
         ban_list = await ctx.guild.bans()
         try:
             member_id = int(argument, base=10)

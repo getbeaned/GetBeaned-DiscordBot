@@ -2,11 +2,18 @@ import collections
 import datetime
 import logging
 import re
+import typing
 import unicodedata
 from typing import Union
 
 import discord
 import numpy
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+
+from cogs.helpers.context import CustomContext
+
 from discord.ext import commands
 
 from cogs.helpers import checks, context
@@ -22,7 +29,7 @@ TRIGGERS_ENABLED = [SexDatingDiscordBots, InstantEssayDiscordBots, SexBots]
 
 
 class CheckMessage:
-    def __init__(self, bot, message: discord.Message):
+    def __init__(self, bot: 'GetBeaned', message: discord.Message):
         self.bot = bot
         self.message = message
         self.multiplicator = 1
@@ -38,19 +45,19 @@ class CheckMessage:
         self.debug(f"MESSAGE : {message.content:.100} (on #{message.channel.name})")
 
     @property
-    def total(self):
+    def total(self) -> float:
         return round(self.multiplicator * self.score, 3)
 
     @property
-    def old_total(self):
+    def old_total(self) -> float:
         return round(self.old_multiplicator * self.old_score, 3)
 
     @property
-    def invites_code(self):
+    def invites_code(self) -> typing.Iterable[str]:
         return [i.code for i in self.invites]
 
     @property
-    def logs_for_discord(self):
+    def logs_for_discord(self) -> str:
         return "```\n" + "\n".join(self.logs) + "\n```"
 
     def debug(self, s):
@@ -79,7 +86,7 @@ class AutoMod(commands.Cog):
     Custom on_message parser to detect and prevent things like spam, AThere/everyone mentions...
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
 
@@ -102,7 +109,7 @@ class AutoMod(commands.Cog):
 
         self.automod_cache = bot.cache.get_cache("automod_logs", expire_after=3600)
 
-    async def contains_zalgo(self, message):
+    async def contains_zalgo(self, message: str):
         THRESHOLD = 0.5
         if len(message) == 0:
             return False, 0
@@ -115,14 +122,14 @@ class AutoMod(commands.Cog):
         contain = total_score > THRESHOLD
         return contain, total_score
 
-    async def get_invites(self, message: str):
-        #message = message.lower() -- Don't do that, invites are Case Sensitive :x
+    async def get_invites(self, message: str) -> typing.List[str]:
+        #  message = message.lower() -- Don't do that, invites are Case Sensitive :x
 
         invites = self.invites_regex.findall(message)
 
         return list(set(invites)) or None
 
-    async def get_invites_count(self, check_message: CheckMessage):
+    async def get_invites_count(self, check_message: CheckMessage) -> int:
         message_str = check_message.message.content
         invites = await self.get_invites(message_str)
 
@@ -170,7 +177,7 @@ class AutoMod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_minimal_permissions()
     # @checks.have_required_level(8)
-    async def automod_debug(self, ctx, *, message_str):
+    async def automod_debug(self, ctx: 'CustomContext', *, message_str: str):
         ctx.message.content = message_str
         cm = await self.check_message(ctx.message, act=False)
         if isinstance(cm, CheckMessage):
@@ -180,13 +187,13 @@ class AutoMod(commands.Cog):
 
     @commands.command()
     # @checks.have_required_level(8)
-    async def automod_logs(self, ctx, message_id: int):
+    async def automod_logs(self, ctx: 'CustomContext', message_id: int):
         await ctx.send_to("This command is deprecated. Please use the new `message_info` command. :)")
         log = self.automod_cache.get(message_id, "No logs found for this message ID, maybe it was purged ?")
 
         await ctx.send_to(log)
 
-    async def check_message(self, message, act=True) -> Union[CheckMessage, str]:
+    async def check_message(self, message: discord.Message, act: bool = True) -> Union[CheckMessage, str]:
         await self.bot.wait_until_ready()
         author = message.author
 
@@ -406,7 +413,7 @@ class AutoMod(commands.Cog):
         return check_message
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         await self.bot.wait_until_ready()
         if not message.guild:
             return False  # No PMs
@@ -421,7 +428,7 @@ class AutoMod(commands.Cog):
         self.automod_cache[message.id] = logs
 
     @commands.Cog.listener()
-    async def on_message_edit(self, _, message):
+    async def on_message_edit(self, _: discord.Message, message: discord.Message):
         await self.bot.wait_until_ready()
         if not len(message.content): return
         ret = await self.check_message(message)
@@ -436,5 +443,5 @@ class AutoMod(commands.Cog):
         self.automod_cache[message.id] = logs
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(AutoMod(bot))

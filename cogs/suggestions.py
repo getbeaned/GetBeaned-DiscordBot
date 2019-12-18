@@ -1,12 +1,17 @@
 import asyncio
 import json
 
-from trello import TrelloClient
-
 from discord.ext import commands
+from trello import TrelloClient
 
 with open("credentials.json", "r") as f:
     credentials = json.load(f)
+
+import typing
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 TRELLO_KEY = credentials["trello_api_key"]
 TRELLO_TOKEN = credentials["trello_api_token"]
@@ -17,7 +22,7 @@ trello_client = TrelloClient(
 )
 
 
-async def wait_for_answer(ctx, additional_check=None):
+async def wait_for_answer(ctx: 'CustomContext', additional_check: typing.Callable = None):
     if additional_check is None:
         def additional_check(m):
             return True
@@ -41,19 +46,20 @@ async def wait_for_answer(ctx, additional_check=None):
 
 
 class Suggestions(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.trello_board = trello_client.get_board('tWZ9O8yZ')  # GetBeaned Suggestions
         self.trello_list = self.trello_board.get_list("5d8697a124f30c4f48ae836e")  # New
         self.labels = {l.name: l for l in self.trello_board.get_labels()}  # Index by name
 
     @commands.command(aliases=["suggest", "bug", "bug_report"])
-    async def improve(self, ctx):
+    async def improve(self, ctx: 'CustomContext'):
         label_keys = list(self.labels.keys())
         report_type_message = "Hello there! Thanks for using this command and improving the bot. " \
                               "To start, I'll have to ask you a few questions. " \
                               "You can answer me in there normally, you don't need to use any prefix. You can exit at any time by typing `exit`\n\n" \
-                              "First off, what do you want to submit. (Please answer with a number)\n- " + "\n- ".join([f"**{i + 1}**) {name}" for i, name in enumerate(label_keys)])
+                              "First off, what do you want to submit. (Please answer with a number)\n- " + "\n- ".join(
+            [f"**{i + 1}**) {name}" for i, name in enumerate(label_keys)])
         await ctx.send(report_type_message)
         res = await wait_for_answer(ctx, additional_check=lambda m: m.content.isdigit() and 0 < int(m.content) <= len(label_keys))
         if res is None:
@@ -90,5 +96,5 @@ class Suggestions(commands.Cog):
         await ctx.send(f"Your report was successfully sent. To track the progress, please see {trello_card.url}.")
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Suggestions(bot))

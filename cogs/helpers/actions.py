@@ -1,10 +1,14 @@
 import asyncio
 import datetime
+import typing
 
 import discord
 from discord import Color
 
-from cogs.helpers.helpful_classes import LikeUser
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+
+from cogs.helpers.helpful_classes import LikeUser, FakeMember
 
 colours = {'unban': Color.green(),
            'unmute': Color.dark_green(),
@@ -17,7 +21,7 @@ colours = {'unban': Color.green(),
            }
 
 
-async def thresholds_enforcer(bot, victim, action_type):
+async def thresholds_enforcer(bot, victim: discord.Member, action_type: str):
     if not await bot.settings.get(victim.guild, 'thresholds_enable'):
         return False
 
@@ -58,42 +62,44 @@ async def thresholds_enforcer(bot, victim, action_type):
     return True
 
 
-async def ban(victim, reason=None):
+async def ban(victim: discord.Member, reason: str = None):
     await victim.guild.ban(victim, reason=reason)
 
 
-async def softban(victim, reason=None):
+async def softban(victim: discord.Member, reason: str = None):
     await victim.guild.ban(victim, reason=reason)
     await victim.guild.unban(victim, reason=reason)
 
 
-async def kick(victim, reason=None):
+async def kick(victim: discord.Member, reason: str = None):
     await victim.guild.kick(victim, reason=reason)
 
 
-async def mute(victim, reason=None):
+async def mute(victim: discord.Member, reason: str = None):
     muted_role = discord.utils.get(victim.guild.roles, name="GetBeaned_muted")
     await victim.add_roles(muted_role, reason=reason)
 
-async def unmute(victim, reason=None):
+
+async def unmute(victim: discord.Member, reason: str = None):
     muted_role = discord.utils.get(victim.guild.roles, name="GetBeaned_muted")
     await victim.remove_roles(muted_role, reason=reason)
 
 
-async def warn(victim, reason=None):
+async def warn(victim: discord.Member, reason: str = None):
     pass
 
 
-async def note(victim, reason=None):
+async def note(victim: discord.Member, reason: str = None):
     pass
 
 
-async def unban(victim, reason=None):
+async def unban(victim: discord.Member, reason: str = None):
     await victim.guild.unban(victim, reason=reason)
 
 
-async def get_action_log_embed(bot, case_number, webinterface_url, action_type, victim, moderator, reason=None, attachement_url=None,
-                               automod_logs=None):
+async def get_action_log_embed(bot: 'GetBeaned', case_number: int, webinterface_url: str, action_type: str, victim: discord.Member, moderator: discord.Member, reason: str = None,
+                               attachement_url: str = None,
+                               automod_logs: str = None):
     embed = discord.Embed()
     if attachement_url:
         embed.set_image(url=attachement_url)
@@ -116,7 +122,8 @@ async def get_action_log_embed(bot, case_number, webinterface_url, action_type, 
     return embed
 
 
-async def full_process(bot, action_coroutine, victim, moderator, reason=None, attachement_url=None, automod_logs=None):
+async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, str], typing.Awaitable], victim: typing.Union[discord.Member, FakeMember],
+                       moderator: typing.Union[discord.Member, LikeUser], reason: str = None, attachement_url: str = None, automod_logs: str = None):
     """
     A little bit of explanation about what's going on there.
 
@@ -195,10 +202,11 @@ async def full_process(bot, action_coroutine, victim, moderator, reason=None, at
                     asyncio.ensure_future(send(embed))
                 else:
                     textual_log = f"**{action_type}** #{case_number} " \
-                        f"on {victim.name}#{victim.discriminator} (`{victim.id}`)\n" \
-                        f"**Reason**: {reason}\n" \
-                        f"**Moderator**: {moderator.name}#{moderator.discriminator} (`{moderator.id}`)\n" \
-                        f"More info at {url} "
+                                  f"on {victim.name}#{victim.discriminator} (`{victim.id}`)\n" \
+                                  f"**Reason**: {reason}\n" \
+                                  f"**Moderator**: {moderator.name}#{moderator.discriminator} (`{moderator.id}`)\n" \
+                                  f"More info at {url} "
+
                     async def send(log):
                         try:
                             await channel.send(log)

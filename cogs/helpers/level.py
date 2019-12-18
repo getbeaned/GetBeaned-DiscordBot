@@ -1,5 +1,9 @@
+import typing
+
 import discord
 
+if typing.TYPE_CHECKING:
+    from cogs.helpers.context import CustomContext
 
 BANNED_MEMBERS_IDS = [
 
@@ -20,7 +24,7 @@ MODERATORS_IDS = [
 
 
 # noinspection PyUnreachableCode
-async def get_level(ctx, user: discord.Member):
+async def get_level(ctx: 'CustomContext', user: discord.Member):
     """
     Levels are a permission system so that you can access your level command and below.
 

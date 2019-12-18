@@ -1,20 +1,22 @@
-import collections
-import time
+import typing
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 from discord.ext import tasks, commands
-from typing import Dict
 
 from cogs.helpers import checks
 
 
 class Cache(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.housekeeping.start()
 
     @commands.command()
     @checks.have_required_level(8)
-    async def cache_status(self, ctx):
+    async def cache_status(self, ctx: 'CustomContext'):
         status_message = []
         global_stored_keys_count = 0
         global_stored_expired_keys_count = 0
@@ -70,7 +72,7 @@ class Cache(commands.Cog):
 
     @commands.command()
     @checks.have_required_level(8)
-    async def cache_cleanup(self, ctx):
+    async def cache_cleanup(self, ctx: 'CustomContext'):
         message = []
         total_deleted = 0
 
@@ -106,6 +108,6 @@ class Cache(commands.Cog):
         await self.bot.wait_until_ready()
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     cache = Cache(bot)
     bot.add_cog(cache)

@@ -3,11 +3,16 @@ A good enough help command for general use
 """
 import asyncio
 import random
+import typing
 
 import discord
 from discord.ext import commands
 
 from cogs.helpers import checks
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 
 class CannotPaginate(Exception):
@@ -530,11 +535,11 @@ class HelpPaginator(Pages):
 
 
 class Help(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
 
     @commands.command(name='help')
-    async def _help(self, ctx, *, command: str = None):
+    async def _help(self, ctx: 'CustomContext', *, command: str = None):
         """Shows help about a command or the bot"""
 
         await ctx.send("This help viewer is now deprecated for the new and beautiful docs available here: https://docs.getbeaned.me/bot-documentation/list-of-commands\n"
@@ -560,7 +565,7 @@ class Help(commands.Cog):
 
     @commands.command(aliases=["join"])
     @checks.have_required_level(1)
-    async def invite(self, ctx):
+    async def invite(self, ctx: 'CustomContext'):
         """
         Get this bot invite link
         """
@@ -569,7 +574,7 @@ class Help(commands.Cog):
 
     @commands.command(name='info')
     @checks.have_required_level(1)
-    async def _info(self, ctx):
+    async def _info(self, ctx: 'CustomContext'):
         """Shows bot info"""
 
         await ctx.send_to(f"This bot was made by Eyesofcreeper#0001. For help, type {ctx.prefix}help, for support go to https://discord.gg/cPbhK53. "
@@ -636,6 +641,6 @@ class Help(commands.Cog):
 #             await ctx.send_to(message)
 
 
-def setup(bot):
+def setup(bot: GetBeaned):
     bot.remove_command("help")
     bot.add_cog(Help(bot))

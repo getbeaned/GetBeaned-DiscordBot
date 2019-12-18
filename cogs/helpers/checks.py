@@ -2,9 +2,10 @@
 These are checks to see if some commands can be executed by users.
 """
 import discord
-
-from cogs.helpers.level import get_level
 from discord.ext import commands
+
+from cogs.helpers.context import CustomContext
+from cogs.helpers.level import get_level
 
 
 class PermissionsError(commands.CheckFailure):
@@ -18,7 +19,7 @@ class NoPermissionsError(commands.CheckFailure):
 
 
 def have_required_level(required: int = 0):
-    async def predicate(ctx):
+    async def predicate(ctx: CustomContext) -> bool:
         # await ctx.bot.wait_until_ready()
         level = await get_level(ctx, ctx.message.author)
         cond = level >= required
@@ -33,7 +34,7 @@ def have_required_level(required: int = 0):
 
 
 def bot_have_permissions():
-    async def predicate(ctx):
+    async def predicate(ctx: CustomContext) -> bool:
         await ctx.bot.wait_until_ready()
         current_permissions = ctx.message.guild.me.permissions_in(ctx.channel)
         wanted_permissions = discord.permissions.Permissions.none()
@@ -64,7 +65,7 @@ def bot_have_permissions():
 
 
 def bot_have_minimal_permissions():
-    async def predicate(ctx):
+    async def predicate(ctx: CustomContext) -> bool:
         await ctx.bot.wait_until_ready()
         current_permissions = ctx.message.guild.me.permissions_in(ctx.channel)
         wanted_permissions = discord.permissions.Permissions.none()

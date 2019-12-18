@@ -1,6 +1,8 @@
-def init_logger():
-    import logging
+import logging
+import typing
 
+
+def init_logger() -> typing.Tuple[logging.Logger, logging.LoggerAdapter]:
     # Create the logger
 
     base_logger = logging.getLogger("duckhunt")

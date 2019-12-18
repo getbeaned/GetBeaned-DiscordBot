@@ -1,11 +1,17 @@
 import logging
+import typing
 
+import discord
 from discord.ext import commands
 
 from cogs.helpers.hastebins import upload_text
 
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned  # Good hack 👌
+
 
 class CustomContext(commands.Context):
+    bot: 'GetBeaned'
 
     def __init__(self, **attrs):
         super().__init__(**attrs)
@@ -22,7 +28,7 @@ class CustomContext(commands.Context):
         logger = logging.LoggerAdapter(self.bot.base_logger, extra)
         return logger
 
-    async def send_to(self, message, user=None, **kwargs):
+    async def send_to(self, message: str, user: typing.Optional[discord.User] = None, **kwargs):
         if user is None:
             user = self.author
 

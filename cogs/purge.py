@@ -3,31 +3,30 @@ Since purge is a more complex command, I've thrown it in a separate file
 
 Stolen from R.Danny, will probably need a rewrite to be more user-friendly
 """
-import asyncio
-import shlex
-import textwrap
-from collections import Counter
-
 import argparse
-import discord
-from discord.ext import commands
-from cogs.helpers import checks
-
-from discord.ext import commands
-from collections import Counter
-
 import re
 import shlex
-import logging
+import textwrap
+import typing
+from collections import Counter
+
+import discord
+from discord.ext import commands
+
+from cogs.helpers import checks
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 
 class Arguments(argparse.ArgumentParser):
-    def error(self, message):
+    def error(self, message: str):
         raise RuntimeError(message)
 
 
 class ModPurge(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
 
@@ -35,15 +34,15 @@ class ModPurge(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
-    async def remove(self, ctx):
+    async def remove(self, ctx: 'CustomContext'):
         """Removes messages that meet a criteria.
         When the command is done doing its work, you will get a message
         detailing which users got removed and how many messages got removed.
         """
 
         if ctx.invoked_subcommand is None:
-            #help_cmd = self.bot.get_command('help')
-            #await ctx.invoke(help_cmd, command='remove')
+            # help_cmd = self.bot.get_command('help')
+            # await ctx.invoke(help_cmd, command='remove')
             await ctx.send_to(textwrap.dedent(f"""
             This is a purge command on steroids. Some quick examples include:
 
@@ -71,7 +70,7 @@ class ModPurge(commands.Cog):
             For more information, visit https://docs.getbeaned.me/bot-documentation/using-the-purge-command-to-remove-messages
             """))
 
-    async def do_removal(self, ctx, limit, predicate_given, *, before=None, after=None):
+    async def do_removal(self, ctx: 'CustomContext', limit: int, predicate_given: typing.Callable, *, before: int = None, after: int = None):
         if limit > 2000:
             return await ctx.send(f'Too many messages to search given ({limit}/2000)')
 
@@ -110,32 +109,32 @@ class ModPurge(commands.Cog):
             await ctx.send(to_send)
 
     @remove.command()
-    async def embeds(self, ctx, search=100):
+    async def embeds(self, ctx: 'CustomContext', search: int = 100):
         """Removes messages that have embeds in them."""
         await self.do_removal(ctx, search, lambda e: len(e.embeds))
 
     @remove.command()
-    async def files(self, ctx, search=100):
+    async def files(self, ctx: 'CustomContext', search: int = 100):
         """Removes messages that have attachments in them."""
         await self.do_removal(ctx, search, lambda e: len(e.attachments))
 
     @remove.command()
-    async def images(self, ctx, search=100):
+    async def images(self, ctx: 'CustomContext', search: int = 100):
         """Removes messages that have embeds or attachments."""
         await self.do_removal(ctx, search, lambda e: len(e.embeds) or len(e.attachments))
 
     @remove.command(name='all')
-    async def _remove_all(self, ctx, search=100):
+    async def _remove_all(self, ctx: 'CustomContext', search: int = 100):
         """Removes all messages."""
         await self.do_removal(ctx, search, lambda e: True)
 
     @remove.command()
-    async def user(self, ctx, member: discord.Member, search=100):
+    async def user(self, ctx: 'CustomContext', member: discord.Member, search: int = 100):
         """Removes all messages by the member."""
         await self.do_removal(ctx, search, lambda e: e.author == member)
 
     @remove.command()
-    async def contains(self, ctx, *, substr: str):
+    async def contains(self, ctx: 'CustomContext', *, substr: str):
         """Removes all messages containing a substring.
         The substring must be at least 3 characters long.
         """
@@ -145,7 +144,7 @@ class ModPurge(commands.Cog):
             await self.do_removal(ctx, 100, lambda e: substr in e.content)
 
     @remove.command(name='bot')
-    async def _bot(self, ctx, prefix=None, search=100):
+    async def _bot(self, ctx: 'CustomContext', prefix: str = None, search: int = 100):
         """Removes a bot user's messages and messages with their optional prefix."""
 
         def predicate(m):
@@ -154,7 +153,7 @@ class ModPurge(commands.Cog):
         await self.do_removal(ctx, search, predicate)
 
     @remove.command(name='emoji')
-    async def _emoji(self, ctx, search=100):
+    async def _emoji(self, ctx: 'CustomContext', search: int = 100):
         """Removes all messages containing custom emoji."""
         custom_emoji = re.compile(r'<:(\w+):(\d+)>')
 
@@ -164,7 +163,7 @@ class ModPurge(commands.Cog):
         await self.do_removal(ctx, search, predicate)
 
     @remove.command(name='reactions')
-    async def _reactions(self, ctx, search=100):
+    async def _reactions(self, ctx: 'CustomContext', search: int = 100):
         """Removes all reactions from messages that have them."""
 
         if search > 2000:
@@ -179,7 +178,7 @@ class ModPurge(commands.Cog):
         await ctx.send(f'Successfully removed {total_reactions} reactions.')
 
     @remove.command()
-    async def custom(self, ctx, *, args: str):
+    async def custom(self, ctx: 'CustomContext', *, args: str):
         """A more advanced purge command.
         This command uses a powerful "command line" syntax.
         Most options support multiple values to indicate 'any' match.
@@ -277,5 +276,5 @@ class ModPurge(commands.Cog):
         await self.do_removal(ctx, args.search, predicate, before=args.before, after=args.after)
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(ModPurge(bot))

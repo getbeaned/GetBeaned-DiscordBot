@@ -6,10 +6,13 @@ from discord.ext import commands
 from cogs.helpers import checks
 from cogs.helpers.helpful_classes import LikeUser
 
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
+
 
 class Importation(commands.Cog):
-
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
 
@@ -17,7 +20,7 @@ class Importation(commands.Cog):
     @commands.command(aliases=["addadmin"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_admin(self, ctx, user: typing.Union[discord.Member, discord.Role]):
+    async def add_admin(self, ctx: 'CustomContext', user: typing.Union[discord.Member, discord.Role]):
         """
         Add some server admins. They can moderate the server but also edit other moderator reasons on the webinterface.
 
@@ -34,7 +37,7 @@ class Importation(commands.Cog):
     @commands.command(aliases=["addmoderator"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_moderator(self, ctx, user: typing.Union[discord.Member, discord.Role]):
+    async def add_moderator(self, ctx: 'CustomContext', user: typing.Union[discord.Member, discord.Role]):
         """
         Add a moderator on this server. Moderators can do things such as banning, kicking, warning, softbanning...
 
@@ -51,7 +54,7 @@ class Importation(commands.Cog):
     @commands.command(aliases=["addtrusted", "addtrustedmember", "add_trusted"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_trusted_member(self, ctx, user: typing.Union[discord.Member, discord.Role]):
+    async def add_trusted_member(self, ctx: 'CustomContext', user: typing.Union[discord.Member, discord.Role]):
         """
         Add a trusted member on this server. Trusted members can do basic moderation actions as kicking, warning or
         noting people.
@@ -69,7 +72,7 @@ class Importation(commands.Cog):
     @commands.command(aliases=["add_banned", "addbanned", "addbannedmember"])
     @commands.guild_only()
     @checks.have_required_level(4)
-    async def add_banned_member(self, ctx, user: typing.Union[discord.Member, discord.Role]):
+    async def add_banned_member(self, ctx: 'CustomContext', user: typing.Union[discord.Member, discord.Role]):
         """
         Ban a member from the bot on this server. They will get a malus on the automod, and won't be able to use most
         of the commands there
@@ -83,7 +86,7 @@ class Importation(commands.Cog):
     @commands.command(aliases=["me"])
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def urls(self, ctx, user: discord.Member = None):
+    async def urls(self, ctx: 'CustomContext', user: discord.Member = None):
         """
         See your profile and other useful URLs
         """
@@ -104,5 +107,5 @@ class Importation(commands.Cog):
         await self.api.add_guild(guild)
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Importation(bot))

@@ -1,18 +1,22 @@
-import discord
+import typing
+
 from discord.ext import commands
 
 from cogs.helpers import checks
-from cogs.helpers.converters import ForcedMember
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 
 class Donators(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
 
     @commands.command()
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def make_vip(self, ctx, guild_id:int):
+    async def make_vip(self, ctx: 'CustomContext', guild_id: int):
         """
         Makes a server a VIP server.
         """
@@ -33,5 +37,5 @@ class Donators(commands.Cog):
         await ctx.send(f"👌 Thanks {ctx.message.author.mention}, the server {guild.name} (ID: `{guild.id}`) is now VIP, and can use VIP settings.")
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Donators(bot))

@@ -1,5 +1,8 @@
+import discord
+
+
 class LikeUser:
-    def __init__(self, did, name, guild, discriminator='0000',
+    def __init__(self, did: int, name: str, guild: discord.Guild, discriminator: str = '0000',
                  avatar_url="https://cdn.discordapp.com/embed/avatars/1.png", bot=False,
                  do_not_update=True):
         # Special users IDs:
@@ -25,7 +28,7 @@ class LikeUser:
 
 
 class FakeMember:
-    def __init__(self, user, guild):
+    def __init__(self, user: discord.User, guild: discord.Guild):
         self._user = user
         self.guild = guild
 

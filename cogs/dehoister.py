@@ -1,8 +1,10 @@
-import asyncio
-import time
+import typing
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 import discord
-from discord import Color
 from discord.ext import commands
 
 from cogs.helpers import checks
@@ -14,17 +16,17 @@ import string
 
 
 class FakeCtx:
-    def __init__(self, guild, bot):
+    def __init__(self, guild: discord.Guild, bot: 'GetBeaned'):
         self.guild = guild
         self.bot = bot
 
 
 class Dehoister(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.bypass = bot.cache.get_cache("dehoister_bypass", expire_after=3, strict=True, default=list)
 
-    async def dehoist_user_in_guild(self, user, guild) -> bool:
+    async def dehoist_user_in_guild(self, user: typing.Union[discord.User, discord.Member], guild: discord.Guild) -> bool:
         if await self.bot.settings.get(guild, "dehoist_enable"):
             member = guild.get_member(user.id)
             if user.id in self.bypass[guild]:
@@ -100,7 +102,7 @@ class Dehoister(commands.Cog):
         else:
             return False
 
-    async def dehoist_user(self, user):
+    async def dehoist_user(self, user: discord.User):
         for guild in self.bot.guilds:
             if user in guild.members:
                 await self.dehoist_user_in_guild(user, guild)
@@ -110,7 +112,7 @@ class Dehoister(commands.Cog):
     @checks.have_required_level(2)
     @checks.bot_have_permissions()
     @commands.cooldown(rate=10, per=30, type=commands.BucketType.guild)
-    async def rename(self, ctx, user: discord.Member, *, name: str = None):
+    async def rename(self, ctx: 'CustomContext', user: discord.Member, *, name: str = None):
 
         await ctx.send(f"Processing, please wait.")
 
@@ -124,7 +126,7 @@ class Dehoister(commands.Cog):
     @checks.have_required_level(4)
     @checks.bot_have_permissions()
     @commands.cooldown(rate=1, per=300, type=commands.BucketType.guild)
-    async def dehoist_users(self, ctx):
+    async def dehoist_users(self, ctx: 'CustomContext'):
         guild = ctx.guild
         dehoisted_users_count = 0
 
@@ -136,23 +138,24 @@ class Dehoister(commands.Cog):
         await ctx.send(f"{dehoisted_users_count} users were dehoisted.")
 
     @commands.Cog.listener()
-    async def on_member_update(self, before, after):
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.nick != after.nick:
             self.bot.logger.info(f"Member {after} changed nick ({before.nick} -> {after.nick}), running dehoister")
 
             await self.dehoist_user_in_guild(after, after.guild)
 
     @commands.Cog.listener()
-    async def on_user_update(self, before, after):
+    async def on_user_update(self, before: discord.User, after: discord.User):
         if before.name != after.name:
             self.bot.logger.info(f"User {after} changed name ({before.name} -> {after.name}), running dehoister")
 
             await self.dehoist_user(after)
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         self.bot.logger.info(f"User {member} joined server {member.guild}, running dehoister")
         await self.dehoist_user_in_guild(member, member.guild)
 
-def setup(bot):
+
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Dehoister(bot))

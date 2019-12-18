@@ -6,29 +6,33 @@ import datetime
 import re
 import sys
 import traceback
+import typing
 from typing import List
 
 import discord
 
+if typing.TYPE_CHECKING:
+    from cogs.automod import CheckMessage
+
 
 class AutoTrigger:
-    def __init__(self, message):
+    def __init__(self, message: 'CheckMessage'):
         self.check_message = message
         self.message = message.message
         self.autotrigger_name = "Generic AutoTrigger"
         self.autotrigger_dbname = "generic"
 
-    async def is_enabled(self):
+    async def is_enabled(self) -> bool:
         pref_name = f"autotrigger_{self.autotrigger_dbname}_score"
 
         return (await self.check_message.bot.settings.get(self.message.guild, pref_name)) != 0
 
-    async def get_score(self):
+    async def get_score(self) -> float:
         pref_name = f"autotrigger_{self.autotrigger_dbname}_score"
 
         return await self.check_message.bot.settings.get(self.message.guild, pref_name)
 
-    async def check(self):
+    async def check(self) -> bool:
         return False
 
     async def run(self) -> float:

@@ -1,16 +1,20 @@
 import asyncio
 import json
+import typing
+from datetime import datetime
 from typing import Union, List
 
 import aiohttp
 import discord
 
+from cogs.helpers.context import CustomContext
 from cogs.helpers.helpful_classes import FakeMember, LikeUser
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
 
 with open("credentials.json", "r") as f:
     credentials = json.load(f)
-
-
 
 API_URL = "https://getbeaned.me/api"
 
@@ -20,11 +24,11 @@ headers = {'Authorization': API_TOKEN}
 
 
 class Api:
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.logger = bot.logger
 
-    async def add_action_from_ctx(self, ctx, on, action_type, reason):
+    async def add_action_from_ctx(self, ctx: CustomContext, on: Union[discord.User, discord.Member, LikeUser, FakeMember], action_type: str, reason: str):
         if ctx.message.attachments:
             attachments_url = ctx.message.attachments[0].url
         else:
@@ -35,7 +39,7 @@ class Api:
 
         # await ctx.send(res)
 
-    async def add_user(self, user:Union[discord.User, discord.Member, LikeUser, FakeMember]):
+    async def add_user(self, user: Union[discord.User, discord.Member, LikeUser, FakeMember]):
 
         if hasattr(user, 'do_not_update'):
             do_not_update = user.do_not_update
@@ -81,8 +85,9 @@ class Api:
                 # self.logger.debug(f"(add_guild) <- {res}")
                 return res
 
-    async def add_action(self, guild, user, action_type, reason, responsible_moderator, attachment='',
-                         automod_logs=None):
+    async def add_action(self, guild: discord.guild, user: Union[discord.User, discord.Member, LikeUser, FakeMember], action_type: str, reason: str,
+                         responsible_moderator: Union[discord.User, discord.Member, LikeUser, FakeMember], attachment: str = '',
+                         automod_logs: typing.Optional[str] = None):
         # Add the guild and the victim+moderator to the website... at the same time :O
         # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
         await asyncio.gather(
@@ -106,7 +111,7 @@ class Api:
                 self.logger.debug(f"(add_action) <- {res}")
                 return res
 
-    async def get_settings(self, guild):
+    async def get_settings(self, guild: discord.Guild):
         await self.add_guild(guild)
         guild_id = guild.id
         # self.logger.debug(f"(get_settings) -> {guild_id}")
@@ -116,7 +121,7 @@ class Api:
                 # self.logger.debug(f"(get_settings) <- {res}")
                 return res
 
-    async def set_settings(self, guild, setting, value):
+    async def set_settings(self, guild: discord.Guild, setting: str, value: str):
         await self.add_guild(guild)
         guild_id = guild.id
         data = {"setting": setting,
@@ -128,7 +133,7 @@ class Api:
                 self.logger.debug(f"(set_settings) <- {res}")
                 return res
 
-    async def get_counters(self, guild, user):
+    async def get_counters(self, guild: discord.Guild, user: discord.User):
         await self.add_guild(guild)
         await self.add_user(user)
 
@@ -142,7 +147,7 @@ class Api:
                 # self.logger.debug(f"(get_counters) <- {res}")
                 return res
 
-    async def add_to_staff(self, guild, user, staff_type: str):
+    async def add_to_staff(self, guild: discord.Guild, user: discord.User, staff_type: str):
         await self.add_user(user)
         await self.add_guild(guild)
         assert staff_type in ['banned', 'trusted', 'moderators', 'admins']
@@ -173,10 +178,10 @@ class Api:
                 except aiohttp.client_exceptions.ContentTypeError:
                     print(await r.text())
                     raise
-                #self.logger.debug(f"(get_tasks) <- {res}")
+                # self.logger.debug(f"(get_tasks) <- {res}")
                 return res
 
-    async def create_task(self, task_type, arguments=None, execute_at=None):
+    async def create_task(self, task_type: str, arguments: str = None, execute_at: Union[str, datetime] = None):
         if arguments is not None and not isinstance(arguments, str):
             arguments = json.dumps(arguments)
 
@@ -193,7 +198,7 @@ class Api:
                 self.logger.debug(f"(create_task) <- {res}")
                 return res
 
-    async def complete_task(self, task_id:int):
+    async def complete_task(self, task_id: int):
         async with aiohttp.ClientSession() as cs:
             async with cs.post(API_URL + f"/tasks/{task_id}/complete", headers=headers) as r:
                 try:
@@ -204,7 +209,7 @@ class Api:
                 self.logger.debug(f"(complete_task) <- {res}")
                 return res
 
-    async def save_roles(self, guild:discord.guild, user:Union[discord.Member, discord.User], roles:List[Union[discord.Role, int]]):
+    async def save_roles(self, guild: discord.guild, user: Union[discord.Member, discord.User], roles: List[Union[discord.Role, int]]):
         await self.add_user(user)
         await self.add_guild(guild)
 
@@ -228,7 +233,7 @@ class Api:
                 self.logger.debug(f"(save_roles) <- {res}")
                 return res
 
-    async def get_stored_roles(self, guild:discord.Guild, user:Union[discord.Member, discord.User]) -> List[discord.Role]:
+    async def get_stored_roles(self, guild: discord.Guild, user: Union[discord.Member, discord.User]) -> List[discord.Role]:
         await self.add_user(user)
         await self.add_guild(guild)
 

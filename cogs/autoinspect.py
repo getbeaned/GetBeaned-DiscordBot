@@ -1,13 +1,15 @@
 import datetime
+import re
+import typing
 
 import discord
-import re
-
 from discord.ext import commands
 
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
 
 from cogs.helpers.helpful_classes import LikeUser
-from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban
+from cogs.helpers.actions import full_process, softban, ban
 
 
 class AutoInspect(commands.Cog):
@@ -15,19 +17,19 @@ class AutoInspect(commands.Cog):
     Identifies and act on people joining servers.
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
         self.checks = {'autoinspect_pornspam_bots': self.pornspam_bots_check,
                        'autoinspect_username_check': self.username_check}
         self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
 
-    async def username_check(self, member) -> bool:
+    async def username_check(self, member: discord.Member) -> bool:
         string = member.name
         matches = await self.bot.settings.get_bad_word_matches(member.guild, string)
         return bool(len(matches))
 
-    async def pornspam_bots_check(self, member) -> bool:
+    async def pornspam_bots_check(self, member: discord.Member) -> bool:
         # https://regex101.com/r/IeIqbl/1
 
         first_version_result = bool(re.match(r"^([A-Z][a-z]+[0-9]{1,4}|[A-Z][a-z]+\.([a-z]+\.[a-z]+|[a-z]+[0-9]{1,2}))$", member.name))
@@ -42,7 +44,7 @@ class AutoInspect(commands.Cog):
 
         return first_version_result or second_version_result
 
-    async def check_and_act(self, check, name, context) -> bool:
+    async def check_and_act(self, check: typing.Callable[[discord.Member], typing.Awaitable], name: str, context: dict) -> bool:
         """
         This returns true if the search should continue, else False.
         """
@@ -89,7 +91,7 @@ class AutoInspect(commands.Cog):
         return True
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         await self.bot.wait_until_ready()
 
         if not await self.bot.settings.get(member.guild, 'autoinspect_enable'):
@@ -116,5 +118,5 @@ class AutoInspect(commands.Cog):
                 return True
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(AutoInspect(bot))

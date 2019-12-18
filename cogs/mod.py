@@ -2,16 +2,20 @@ import asyncio
 import datetime
 import typing
 
-from cogs.helpers import time
-
 import discord
 from discord.ext import commands
+
 from cogs.helpers import checks
+from cogs.helpers import time
 from cogs.helpers.actions import full_process, unban, note, warn, kick, softban, ban, mute, unmute
 from cogs.helpers.converters import ForcedMember, BannedMember, InferiorMember
-from cogs.helpers.helpful_classes import FakeMember
+from cogs.helpers.helpful_classes import FakeMember, LikeUser
 from cogs.helpers.level import get_level
 from cogs.logging import save_attachments
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 
 class Mod(commands.Cog):
@@ -21,11 +25,11 @@ class Mod(commands.Cog):
     Here you'll find, commands to ban, kick, warn and add notes to members.
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
 
-    async def parse_arguments(self, ctx, users):
+    async def parse_arguments(self, ctx: 'CustomContext', users: typing.List[typing.Union[discord.Member, discord.User, ForcedMember, LikeUser]]):
         if len(users) == 0:
             raise commands.BadArgument("No users provided")
 
@@ -77,7 +81,7 @@ class Mod(commands.Cog):
 
         return attachments_saved_url
 
-    async def check_reason(self, ctx, reason, attachments_saved_url):
+    async def check_reason(self, ctx: 'CustomContext', reason: str, attachments_saved_url: str):
         level = await get_level(ctx, ctx.message.author)
 
         justification_level_setting = await ctx.bot.settings.get(ctx.guild, "force_justification_level")
@@ -90,7 +94,8 @@ class Mod(commands.Cog):
             if len(reason) < 10:
                 raise commands.BadArgument("You must justify your actions by adding a detailed reason to your command")
 
-    async def run_actions(self, ctx, users, reason, attachments_saved_url, action, duration=None):
+    async def run_actions(self, ctx: 'CustomContext', users: typing.List[typing.Union[discord.Member, discord.User, ForcedMember, LikeUser]], reason: str,
+                          attachments_saved_url: str, action: typing.Callable[[discord.Member, str], typing.Awaitable], duration: time.FutureTime = None):
         cases_urls = []
 
         if duration:
@@ -102,18 +107,19 @@ class Mod(commands.Cog):
 
             if duration:
                 if action is mute:
-                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"},  execute_at=duration.dt)
+                    await self.api.create_task("unmute", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"},
+                                               execute_at=duration.dt)
                 elif action is ban:
                     await self.api.create_task("unban", arguments={"target": user.id, "guild": ctx.guild.id, "reason": f"Time is up | See case #{act['case_number']} for details"}, execute_at=duration.dt)
 
         await ctx.send(f":ok_hand: - See {', '.join(cases_urls)} for details")
 
-
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def unban(self, ctx, banned_users: commands.Greedy[BannedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def unban(self, ctx: 'CustomContext', banned_users: commands.Greedy[BannedMember], *,
+                    reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Unban a member from the server. The member must be currently banned for this command to work.
 
@@ -127,6 +133,8 @@ class Mod(commands.Cog):
         cases_urls = []
 
         for ban in banned_users:
+            ban: discord.guild.BanEntry
+
             # ban is in fact a guild.BanEntry recorvered from the ban list.
             on = ban.user
             ban_reason = ban.reason
@@ -144,13 +152,11 @@ class Mod(commands.Cog):
 
         await ctx.send(f":ok_hand: - See {', '.join(cases_urls)} for details")
 
-
-
     @commands.command()
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def unmute(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def unmute(self, ctx: 'CustomContext', users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         UnMute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
         Using this command require a specific role, that you can create using the +create_muted_role command
@@ -177,7 +183,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
-    async def note(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)):
+    async def note(self, ctx: 'CustomContext', users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False)):
         """
         Note a member on the server. A note does nothing but store information of a specific user.
 
@@ -196,7 +202,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(2)
-    async def warn(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def warn(self, ctx: 'CustomContext', users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Warn a member on the server. If thresholds are enabled, warning a user can lead to worse actions, like bans and kicks.
 
@@ -215,7 +221,8 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def mute(self, ctx, duration:typing.Optional[time.FutureTime], users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def mute(self, ctx: 'CustomContext', duration: typing.Optional[time.FutureTime], users: commands.Greedy[InferiorMember], *,
+                   reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Mute a member on the server. A mute is when you prevent a user from talking/speaking in any channel.
         Using this command require a specific role, that you can create using the +create_muted_role command
@@ -248,7 +255,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def kick(self, ctx, users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def kick(self, ctx: 'CustomContext', users: commands.Greedy[InferiorMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Kick a member from the server. If thresholds are enabled, kicking a user can lead to bans.
 
@@ -267,7 +274,7 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def softban(self, ctx, users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def softban(self, ctx: 'CustomContext', users: commands.Greedy[ForcedMember], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Softban a member on the server. A softban is when you ban a user to remove every message sent by him,
         before unbanning him/her so that he/she can join again.
@@ -289,7 +296,8 @@ class Mod(commands.Cog):
     @commands.guild_only()
     @checks.bot_have_permissions()
     @checks.have_required_level(3)
-    async def ban(self, ctx, duration:typing.Optional[time.FutureTime], users: commands.Greedy[ForcedMember(may_be_banned=False)], *, reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
+    async def ban(self, ctx: 'CustomContext', duration: typing.Optional[time.FutureTime], users: commands.Greedy[ForcedMember(may_be_banned=False)], *,
+                  reason: commands.clean_content(fix_channel_mentions=True, use_nicknames=False) = ""):
         """
         Banning a user is the ultimate punishment, where is is kicked from the server and can't return
 
@@ -310,5 +318,5 @@ class Mod(commands.Cog):
         await self.run_actions(ctx, users, reason, attachments_saved_url, ban, duration=duration)
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Mod(bot))

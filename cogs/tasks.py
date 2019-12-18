@@ -1,18 +1,18 @@
-import collections
 import json
-import time
+import typing
 
 import discord
 from discord.ext import tasks, commands
-from typing import Dict
 
-from cogs.helpers import checks
 from cogs.helpers.actions import full_process, unban, unmute
 from cogs.helpers.helpful_classes import LikeUser
 
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+
 
 class Tasks(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.run_tasks.start()
         self.tasks_mapping = {
@@ -24,11 +24,11 @@ class Tasks(commands.Cog):
     def cog_unload(self):
         self.run_tasks.stop()
 
-    async def unmute_task(self, task):
-        arguments = json.loads(task['arguments']) # {"target": 514557845111570447, "guild": 512328935304855555, "reason": "Time is up (1 week, 2 days and 23 hours)"}
+    async def unmute_task(self, task: dict):
+        arguments = json.loads(task['arguments'])  # {"target": 514557845111570447, "guild": 512328935304855555, "reason": "Time is up (1 week, 2 days and 23 hours)"}
         guild_id = arguments["guild"]
 
-        guild:discord.Guild = self.bot.get_guild(guild_id)
+        guild: discord.Guild = self.bot.get_guild(guild_id)
 
         if guild:
             member = guild.get_member(arguments["target"])
@@ -37,7 +37,7 @@ class Tasks(commands.Cog):
                 act = await full_process(self.bot, unmute, member, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
                 return True
 
-    async def unban_task(self, task):
+    async def unban_task(self, task: dict):
         arguments = json.loads(task['arguments'])  # {"target": 514557845111570447, "guild": 512328935304855555, "reason": "Time is up (1 week, 2 days and 23 hours)"}
         guild_id = arguments["guild"]
 
@@ -56,7 +56,7 @@ class Tasks(commands.Cog):
         # Failed because no such guild/user
         return True  # Anyway
 
-    async def refresh_user(self, task):
+    async def refresh_user(self, task: dict):
         user = self.bot.get_user(int(task["arguments"]))
 
         if user is None:
@@ -73,7 +73,7 @@ class Tasks(commands.Cog):
             self.bot.logger.warning(f"Completing task #{task['id']} failed. User not found.")
             return True  # Returning true anyway
 
-    async def dispatch_task(self, task):
+    async def dispatch_task(self, task: dict):
         self.bot.logger.info(f"Running task #{task['id']}...")
         self.bot.logger.debug(str(task))
 
@@ -115,6 +115,6 @@ class Tasks(commands.Cog):
         self.bot.logger.info("We are running tasks.")
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     tasks = Tasks(bot)
     bot.add_cog(tasks)

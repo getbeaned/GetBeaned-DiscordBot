@@ -1,5 +1,11 @@
+import typing
+
 import discord
 from discord.ext import commands
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
+    from cogs.helpers.context import CustomContext
 
 from cogs.helpers import checks
 from cogs.helpers.helpful_classes import LikeUser
@@ -7,7 +13,7 @@ from cogs.helpers.helpful_classes import LikeUser
 
 class Importation(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.api = bot.api
 
@@ -15,7 +21,7 @@ class Importation(commands.Cog):
     @commands.guild_only()
     @checks.have_required_level(4)
     @checks.bot_have_minimal_permissions()
-    async def import_bans(self, ctx):
+    async def import_bans(self, ctx: 'CustomContext'):
         """
         Import bans from the server banlist. If possible and available, also include the reason from the audit logs.
 
@@ -56,18 +62,13 @@ class Importation(commands.Cog):
     @checks.have_required_level(4)
     @checks.bot_have_permissions()
     @commands.cooldown(rate=2, per=300, type=commands.BucketType.guild)
-    async def create_muted_role(self, ctx):
+    async def create_muted_role(self, ctx: 'CustomContext'):
         """
         Create or update the muted role to disallow anyone with it to talk in any channel.
-
-        :param ctx:
-        :return:
         """
 
         ROLE_NAME = "GetBeaned_muted"
         REASON = f"create_muted_role command invoked by {ctx.message.author.name}"
-
-        ctx.guild: discord.Guild
 
         current_permissions = ctx.message.guild.me.permissions_in(ctx.channel)
 
@@ -123,5 +124,5 @@ class Importation(commands.Cog):
         await ctx.send("The muted role has been successfully created/updated.")
 
 
-def setup(bot):
+def setup(bot: 'GetBeaned'):
     bot.add_cog(Importation(bot))

@@ -1,19 +1,22 @@
-import random
 import re
-import time
-from collections import defaultdict
+import typing
+
+import discord
+
+if typing.TYPE_CHECKING:
+    from cogs.helpers.GetBeaned import GetBeaned
 
 
 class Settings:
-    def __init__(self, bot):
+    def __init__(self, bot: 'GetBeaned'):
         self.bot = bot
         self.settings_cache = bot.cache.get_cache("settings", expire_after=900, strict=True)
         self.vip_bad_regex_cache = bot.cache.get_cache("vip_bad_regex", expire_after=1200, strict=False)
 
-    async def add_to_cache(self, guild, settings):
+    async def add_to_cache(self, guild: discord.Guild, settings: dict):
         self.settings_cache[guild] = settings
 
-    async def get(self, guild, setting):
+    async def get(self, guild: discord.Guild, setting: str):
         await self.bot.wait_until_ready()
 
         gs = self.settings_cache[guild]
@@ -26,7 +29,7 @@ class Settings:
             await self.add_to_cache(guild, gs)
             return gs[setting]
 
-    async def set(self, guild, setting, value):
+    async def set(self, guild: discord.Guild, setting: str, value):
         await self.bot.wait_until_ready()
         try:
             del self.settings_cache[guild]
@@ -35,7 +38,7 @@ class Settings:
 
         await self.bot.api.set_settings(guild, setting, value)
 
-    async def get_bad_word_matches(self, guild, string):
+    async def get_bad_word_matches(self, guild: discord.Guild, string: str) -> typing.Iterable[typing.Tuple[str, str]]:
         bad_regex_list = []
 
         if not await self.get(guild, "vip"):
@@ -69,6 +72,3 @@ class Settings:
                 matches.append((match.string, regex.pattern))
 
         return matches
-
-
-

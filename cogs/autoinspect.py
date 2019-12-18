@@ -75,7 +75,7 @@ class AutoInspect(commands.Cog):
             embed.set_author(name=self.bot.user.name)
             embed.add_field(name="Member ID", value=context['member'].id)
             embed.add_field(name="Check name", value=name)
-            embed.add_field(name="Info", value=logs)
+            embed.add_field(name="Info", value=logs, inline=False)
 
             await context["logging_channel"].send(embed=embed)
 

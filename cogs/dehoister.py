@@ -149,6 +149,10 @@ class Dehoister(commands.Cog):
 
             await self.dehoist_user(after)
 
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        self.bot.logger.info(f"User {member} joined server {member.guild}, running dehoister")
+        await self.dehoist_user_in_guild(member, member.guild)
 
 def setup(bot):
     bot.add_cog(Dehoister(bot))

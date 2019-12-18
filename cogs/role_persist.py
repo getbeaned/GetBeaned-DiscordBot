@@ -56,7 +56,7 @@ class RolePersist(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         guild = member.guild
         if not await self.is_role_persist_enabled(guild):
             return
@@ -67,15 +67,12 @@ class RolePersist(commands.Cog):
         await self.log_role_persist(guild, member, roles_to_give)
 
     @commands.Cog.listener()
-    async def on_member_remove(self, member):
+    async def on_member_remove(self, member: discord.Member):
         guild = member.guild
         if not await self.is_role_persist_enabled(guild):
             return
         self.bot.logger.debug(f"User {member} left, saving {len(member.roles)} roles")
         await self.api.save_roles(guild, member, member.roles)
-
-
-
 
 def setup(bot):
     bot.add_cog(RolePersist(bot))

@@ -478,9 +478,15 @@ class Logging(commands.Cog):
         await ctx.send(embed=embed)
 
     @staticmethod
-    async def snipe_as_webhook(ctx, webhook, message):
-        await webhook.send(message.content)
-        await webhook.send(f"```\nThe message was created at {message.created_at}\nYou can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}```")
+    async def snipe_as_webhook(ctx, webhook:discord.Webhook, message):
+        embed = discord.Embed()
+        embed.title = f"Sniped message | {message.id}"
+        embed.description = "This is a GetBeaned sniped message"
+        embed.set_footer(text=f"You can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}")
+        embed.timestamp = message.created_at
+
+        await webhook.send(message.content, embed=embed)
+        #await webhook.send(f"```\nThe message was created at {message.created_at}\nYou can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}```")
         await webhook.delete()
 
     @commands.command()

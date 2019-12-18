@@ -72,7 +72,7 @@ class Meta(commands.Cog):
 
     @commands.command()
     @checks.have_required_level(5)
-    async def fake_message(self, ctx, who: discord.User, *, message:str):
+    async def fake_message(self, ctx, who: ForcedMember, *, message:str):
         """Refresh a user profile on the website."""
         avatar = await who.avatar_url.read()
 

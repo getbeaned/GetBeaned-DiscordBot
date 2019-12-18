@@ -8,7 +8,8 @@ from cogs.helpers.helpful_classes import LikeUser
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
+
+from cogs.helpers.context import CustomContext
 
 
 class Importation(commands.Cog):

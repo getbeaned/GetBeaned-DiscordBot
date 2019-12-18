@@ -9,7 +9,8 @@ from cogs.helpers.converters import ForcedMember
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
+
+from cogs.helpers.context import CustomContext
 
 
 class Meta(commands.Cog):

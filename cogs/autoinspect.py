@@ -10,6 +10,7 @@ if typing.TYPE_CHECKING:
 
 from cogs.helpers.helpful_classes import LikeUser
 from cogs.helpers.actions import full_process, softban, ban
+from cogs.helpers.context import CustomContext
 
 
 class AutoInspect(commands.Cog):

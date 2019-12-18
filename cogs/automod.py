@@ -12,7 +12,6 @@ import numpy
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
 
-from cogs.helpers.context import CustomContext
 
 from discord.ext import commands
 
@@ -21,6 +20,7 @@ from cogs.helpers.actions import full_process, note, warn, kick, softban, ban
 from cogs.helpers.helpful_classes import LikeUser
 from cogs.helpers.level import get_level
 from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots, SexBots
+from cogs.helpers.context import CustomContext
 
 ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
 DEBUG = False

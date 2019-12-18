@@ -6,8 +6,8 @@ from cogs.helpers import checks
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
 
+from cogs.helpers.context import CustomContext
 
 class Donators(commands.Cog):
     def __init__(self, bot: 'GetBeaned'):

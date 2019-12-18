@@ -13,7 +13,8 @@ from cogs.helpers.level import get_level
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
+
+from cogs.helpers.context import CustomContext
 
 PM_VIEWING_CHANNEL_ID = 557294214417874945
 

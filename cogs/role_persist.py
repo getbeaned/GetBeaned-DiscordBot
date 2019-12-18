@@ -8,6 +8,7 @@ if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
 
 
+
 class RolePersist(commands.Cog):
     """
     RolePersist

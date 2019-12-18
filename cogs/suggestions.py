@@ -11,7 +11,8 @@ import typing
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
+
+from cogs.helpers.context import CustomContext
 
 TRELLO_KEY = credentials["trello_api_key"]
 TRELLO_TOKEN = credentials["trello_api_token"]

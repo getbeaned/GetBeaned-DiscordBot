@@ -6,12 +6,12 @@ import discord
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
 
 from discord.ext import commands
 
 from cogs.helpers import context, checks
 from cogs.helpers.hastebins import upload_text
+from cogs.helpers.context import CustomContext
 
 ATTACHMENTS_UPLOAD_CHANNEL_ID = 624129637928140802
 

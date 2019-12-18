@@ -2,7 +2,6 @@ import typing
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
 
 import discord
 from discord.ext import commands
@@ -11,6 +10,7 @@ from cogs.helpers import checks
 from cogs.helpers.helpful_classes import LikeUser
 from cogs.helpers.level import get_level
 from cogs.helpers.actions import full_process, note, warn
+from cogs.helpers.context import CustomContext
 
 import string
 

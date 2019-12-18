@@ -5,10 +5,10 @@ from discord.ext import commands
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
 
 from cogs.helpers import checks
 from cogs.helpers.helpful_classes import LikeUser
+from cogs.helpers.context import CustomContext
 
 
 class Importation(commands.Cog):

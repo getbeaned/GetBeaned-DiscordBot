@@ -12,7 +12,8 @@ from cogs.helpers import checks
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
+
+from cogs.helpers.context import CustomContext
 
 
 class CannotPaginate(Exception):
@@ -641,6 +642,6 @@ class Help(commands.Cog):
 #             await ctx.send_to(message)
 
 
-def setup(bot: GetBeaned):
+def setup(bot: 'GetBeaned'):
     bot.remove_command("help")
     bot.add_cog(Help(bot))

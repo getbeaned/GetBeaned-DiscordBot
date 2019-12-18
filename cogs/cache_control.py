@@ -2,11 +2,11 @@ import typing
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
-    from cogs.helpers.context import CustomContext
 
 from discord.ext import tasks, commands
 
 from cogs.helpers import checks
+from cogs.helpers.context import CustomContext
 
 
 class Cache(commands.Cog):

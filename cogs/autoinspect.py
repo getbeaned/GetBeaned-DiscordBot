@@ -49,8 +49,8 @@ class AutoInspect(commands.Cog):
     async def bitcoin_bots_check(self, member: discord.Member) -> bool:
         avatar_url = member.avatar_url
 
+        # https://regex101.com/r/nMAQog/1
         return bool(re.match(r"^[A-Z][a-z]{2,10}($| [A-Z][a-z]{2,10}$)", member.name)) and "b97f153f3aadc5ae28cb1461d3f2be0c" in avatar_url and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=3))
-
 
     async def check_and_act(self, check: typing.Callable[[discord.Member], typing.Awaitable], name: str, context: dict) -> bool:
         """

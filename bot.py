@@ -59,7 +59,8 @@ logger.debug("Loading cogs : ")
 #                 V  #
 # ###############   ##
 
-cogs = ['cogs.cache_control',
+cogs = ['jishaku',
+        'cogs.cache_control',
         'cogs.mod',
         'cogs.purge',
         'cogs.importation',
@@ -76,7 +77,8 @@ cogs = ['cogs.cache_control',
         'cogs.donators',
         'cogs.tasks',
         'cogs.role_persist',
-        'jishaku',]
+        'cogs.inspector',
+        ]
 
 for extension in cogs:
     try:

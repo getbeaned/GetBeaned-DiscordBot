@@ -301,7 +301,7 @@ class AutoMod(commands.Cog):
 
         if message.content and "[getbeaned:disable_spam_detection]" not in str(message.channel.topic):
             # TODO: Check images repeat
-            repeat = self.message_history[check_message.message.author].count(check_message.message.content)
+            repeat = [m.content for m in self.message_history[check_message.message.author]].count(check_message.message.content)
             if repeat >= 3:
                 check_message.score += await self.bot.settings.get(message.guild, 'automod_score_repeated') * repeat
                 check_message.debug(f"Message was repeated by the author {repeat} times")
@@ -317,15 +317,37 @@ class AutoMod(commands.Cog):
                 bad_words_list.append(f"{string} matched by {pattern}")
             check_message.debug(f"Message contains {bad_words_count} bad words ({', '.join(bad_words_list)})")
 
-        if not check_message.message.content.lower().startswith(("dh", "!", "?", "§", "t!", ">", "<", "-", "+")) or len(
-                check_message.message.content) > 30 \
-                and check_message.message.content.lower() not in ['yes', 'no', 'maybe', 'hey', 'hi', 'hello', 'oui',
-                                                                  'non', 'bonjour', '\o', 'o/', ':)', ':D', ':(', 'ok',
-                                                                  'this', 'that', 'yup'] \
-                and act:
+        spam_cond = (not check_message.message.content.lower().startswith(("dh", "!", "?", "§", "t!", ">", "<", "-", "+")) or
+                     len(message.mentions) or
+                     len(check_message.message.content) > 30) and (
+                check_message.message.content.lower() not in ['yes', 'no', 'maybe', 'hey', 'hi', 'hello', 'oui',
+                                                              'non', 'bonjour', '\o', 'o/', ':)', ':D', ':(', 'ok',
+                                                              'this', 'that', 'yup']
+        ) and act
+
+        if spam_cond:
             # Not a command or something
-            self.message_history[check_message.message.author].append(check_message.message.content)  # Add content for repeat-check later.
+            self.message_history[check_message.message.author].append(check_message.message)  # Add content for repeat-check later.
             self.message_history.reset_expiry(check_message.message.author)
+
+        if len(message.mentions):
+
+            historic_mentions_users = []
+
+            for historic_message in self.message_history[check_message.message.author]:
+                historic_mentions_users.extend(historic_message.mentions)
+
+            historic_mentions_total = len(historic_mentions_users)
+            historic_mentions_users = set(historic_mentions_users)
+            historic_mentions_different = len(historic_mentions_users)
+
+            if historic_mentions_total > 7:  # He mentioned 7 times in the last 7 messages
+                check_message.score += await self.bot.settings.get(message.guild, 'automod_score_multimessage_too_many_mentions')
+                check_message.debug(f"Message history contains too many mentions (historic_mentions_total={historic_mentions_total})")
+
+            if historic_mentions_different > 5:  # He mentioned 5 different users in the last 7 messages
+                check_message.score += await self.bot.settings.get(message.guild, 'automod_score_multimessage_too_many_users_mentions')
+                check_message.debug(f"Message history contains too many mentions (historic_mentions_different={historic_mentions_different} | users_mentionned: {historic_mentions_users})")
 
         contains_zalgo, zalgo_score = await self.contains_zalgo(message.content)
 

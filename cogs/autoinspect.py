@@ -22,7 +22,8 @@ class AutoInspect(commands.Cog):
         self.bot = bot
         self.api = bot.api
         self.checks = {'autoinspect_pornspam_bots': self.pornspam_bots_check,
-                       'autoinspect_username_check': self.username_check}
+                       'autoinspect_username': self.username_check,
+                       'autoinspect_bitcoin_bots': self.bitcoin_bots_check}
         self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
 
     async def username_check(self, member: discord.Member) -> bool:
@@ -44,6 +45,12 @@ class AutoInspect(commands.Cog):
                                 and member.avatar_url == member.default_avatar_url
 
         return first_version_result or second_version_result
+
+    async def bitcoin_bots_check(self, member: discord.Member) -> bool:
+        avatar_url = member.avatar_url
+
+        return bool(re.match(r"^[A-Z][a-z]{2,10}($| [A-Z][a-z]{2,10}$)", member.name)) and "b97f153f3aadc5ae28cb1461d3f2be0c" in avatar_url and (member.created_at > datetime.datetime.now() - datetime.timedelta(days=3))
+
 
     async def check_and_act(self, check: typing.Callable[[discord.Member], typing.Awaitable], name: str, context: dict) -> bool:
         """

@@ -68,6 +68,8 @@ class Dehoister(commands.Cog):
                 if len(new_nickname) == 0:
                     new_nickname = "z_Nickname_DeHoisted"
 
+                self.bot.logger.info(f"Dehoisted user {previous_nickname} -> {new_nickname} in {guild}")
+
                 reason = f"Automatic nickname DeHoist from {previous_nickname} to {new_nickname}. " \
                          f"Please try not to use special chars at the start of your nickname to appear at the top of the list of members."
 
@@ -140,20 +142,20 @@ class Dehoister(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.nick != after.nick:
-            self.bot.logger.info(f"Member {after} changed nick ({before.nick} -> {after.nick}), running dehoister")
+            self.bot.logger.debug(f"A member in {after.guild} changed nick ({before.nick} -> {after.nick}), running dehoister")
 
             await self.dehoist_user_in_guild(after, after.guild)
 
     @commands.Cog.listener()
     async def on_user_update(self, before: discord.User, after: discord.User):
         if before.name != after.name:
-            self.bot.logger.info(f"User {after} changed name ({before.name} -> {after.name}), running dehoister")
+            self.bot.logger.debug(f"A user changed name ({before.name} -> {after.name}), running dehoister")
 
             await self.dehoist_user(after)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        self.bot.logger.info(f"User {member} joined server {member.guild}, running dehoister")
+        self.bot.logger.debug(f"User {member} joined {member.guild}, running dehoister")
         await self.dehoist_user_in_guild(member, member.guild)
 
 

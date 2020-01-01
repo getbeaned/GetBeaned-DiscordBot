@@ -55,14 +55,16 @@ class GetBeaned(commands.AutoShardedBot):
         total_members = len(self.users)
         self.logger.info(f"I see {len(self.guilds)} guilds, and {total_members} members")
 
-    async def on_command_error(self, context, exception):
+    async def on_command_error(self, context: context.CustomContext, exception):
         if isinstance(exception, discord.ext.commands.errors.CommandNotFound):
             return
 
         context.logger.debug(f"Error during processing: {exception} ({repr(exception)})")
 
         if isinstance(exception, discord.ext.commands.errors.MissingRequiredArgument):
-            await context.send_to(f":x: A required argument is missing.\nUse it like : `{context.prefix}{context.command.signature}`")
+            await context.send_to(f":x: A required argument is missing.\nUse it like : `{context.prefix}{context.command.signature}`", delete_after=60)
+            await context.message.delete(delay=60)
+
             return
         elif isinstance(exception, checks.NoPermissionsError):
             await context.send_to(f":x: Oof, there was a problem! "
@@ -72,7 +74,8 @@ class GetBeaned(commands.AutoShardedBot):
             return
         elif isinstance(exception, checks.PermissionsError):
             await context.send_to(f":x: Heh, you don't have the required permissions to run this command! "
-                                  f"You are level {exception.current}, and you'd need {exception.required} :(")
+                                  f"You are level {exception.current}, and you'd need {exception.required} :(", delete_after=60)
+            await context.message.delete(delay=60)
             return
         # elif isinstance(exception, discord.ext.commands.errors.CheckFailure):
         #       return
@@ -80,7 +83,8 @@ class GetBeaned(commands.AutoShardedBot):
             if isinstance(exception.original, NotStrongEnough):
                 await context.send_to(f":x: Even if you have the required level to run this command, you can't target "
                                       f"someone with a higher/equal level than you :("
-                                      f"```{exception.original}```")
+                                      f"```{exception.original}```", delete_after=60)
+                await context.message.delete(delay=60)
                 return
             elif isinstance(exception.original, HierarchyError):
                 await context.send_to(f":x: You have the required level to run this command, but I can't do this "
@@ -90,15 +94,18 @@ class GetBeaned(commands.AutoShardedBot):
                 return
         elif isinstance(exception, discord.ext.commands.errors.BadArgument):
             await context.send_to(f":x: An argument provided is incorrect: \n"
-                                  f"**{exception}**")
+                                  f"**{exception}**", delete_after=60)
+            await context.message.delete(delay=60)
             return
         elif isinstance(exception, discord.ext.commands.errors.ArgumentParsingError):
             await context.send_to(f":x: There was a problem parsing your command, please ensure all quotes are correct: \n"
-                                  f"**{exception}**")
+                                  f"**{exception}**", delete_after=60)
+            await context.message.delete(delay=60)
             return
         elif isinstance(exception, discord.ext.commands.errors.BadUnionArgument):
             await context.send_to(f":x: There was a problem parsing your arguments, please ensure the are the correct type: \n"
-                                  f"**{exception}**")
+                                  f"**{exception}**", delete_after=60)
+            await context.message.delete(delay=60)
             return
         elif isinstance(exception, discord.ext.commands.errors.CommandOnCooldown):
             if context.message.author.id in [138751484517941259]:
@@ -107,17 +114,19 @@ class GetBeaned(commands.AutoShardedBot):
             else:
 
                 await context.send_to("You are on cooldown :(, try again in {seconds} seconds".format(
-                    seconds=round(exception.retry_after, 1)))
+                    seconds=round(exception.retry_after, 1)), delete_after=60)
                 return
         elif isinstance(exception, discord.ext.commands.errors.TooManyArguments):
-            await context.send_to(f":x: You gave me to many arguments. You may want to use quotes.\nUse the command like : `{context.prefix}{context.command.signature}`")
+            await context.send_to(f":x: You gave me to many arguments. You may want to use quotes.\nUse the command like : `{context.prefix}{context.command.signature}`", delete_after=60)
+            await context.message.delete(delay=60)
             return
         elif isinstance(exception, discord.ext.commands.NoPrivateMessage):
             await context.send_to('This command cannot be used in private messages.')
             return
         elif isinstance(exception, discord.ext.commands.errors.CommandInvokeError):
             await context.author.send(f"Sorry, an error happened processing your command. "
-                                      f"Please review the bot permissions and try again. To report a bug, please give the support staff the following: ```py\n{exception}\n{''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))}\n```")
+                                      f"Please review the bot permissions and try again. To report a bug, please give the support staff the following: ```py\n{exception}\n{''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))}\n```", delete_after=3600)
+            await context.message.delete(delay=3600)
             return
         elif isinstance(exception, discord.ext.commands.errors.NotOwner):
             return  # Jsk uses this

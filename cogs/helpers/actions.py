@@ -106,7 +106,7 @@ async def get_action_log_embed(bot: 'GetBeaned', case_number: int, webinterface_
 
     embed.colour = colours[action_type]
     embed.title = f"{action_type.title()} | Case #{case_number}"
-    embed.description = reason
+    embed.description = reason[:1000]
 
     embed.add_field(name="Responsible Moderator", value=f"{moderator.name}#{moderator.discriminator}", inline=True)
     embed.add_field(name="Victim", value=f"{victim.name}#{victim.discriminator} ({victim.id})", inline=True)
@@ -158,7 +158,7 @@ async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, s
     except AttributeError:
         # LikeUser dosen't have a send attr
         pass
-    await action_coroutine(victim, reason)
+    await action_coroutine(victim, reason[:510])
 
     th = await thresholds_enforcer(bot, victim, action_type)
 

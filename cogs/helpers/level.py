@@ -6,7 +6,7 @@ if typing.TYPE_CHECKING:
     from cogs.helpers.context import CustomContext
 
 BANNED_MEMBERS_IDS = [
-
+    556456702753636400,  # See https://getbeaned.me/actions/17049
 ]
 
 OWNERS_IDS = [

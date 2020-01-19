@@ -41,14 +41,14 @@ class AutoTrigger:
                 ret = await self.check()
             except AssertionError:
                 ret = False
-                _, _, tb = sys.exc_info()
+                #_, _, tb = sys.exc_info()
                 # traceback.print_tb(tb)  # Fixed format
-                tb_info = traceback.extract_tb(tb)
-                filename, line, func, text = tb_info[-1]
+                #tb_info = traceback.extract_tb(tb)
+                #filename, line, func, text = tb_info[-1]
 
-                shown_text = text.replace("assert await ", "").replace("assert ", "")
+                #shown_text = text.replace("assert await ", "").replace("assert ", "")
 
-                self.check_message.debug('The trigger failed on line {} (stmt is `{}`)'.format(line, shown_text))
+                #self.check_message.debug('The trigger failed on line {} (stmt is `{}`)'.format(line, shown_text))
 
             self.check_message.debug(f"> Check ran {self.autotrigger_name} with result {ret}")
             if ret:

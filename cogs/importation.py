@@ -120,7 +120,7 @@ class Importation(commands.Cog):
                 await channel.set_permissions(muted_role, overwrite=voice_overwrite, reason=REASON)
                 logs_content.append(f"\tV #{channel.name}")
 
-        await logs_message.edit(content="```" + '\n'.join(logs_content) + "```", delete_after=60)
+        await logs_message.edit(content="```" + '\n'.join(logs_content)[:1800] + "```", delete_after=60)
         await ctx.send("The muted role has been successfully created/updated.")
 
 

@@ -228,8 +228,12 @@ class Support(commands.Cog):
     @commands.command(aliases=["permissions_checks", "permission_check", "bot_permissions_check"])
     @commands.guild_only()
     @checks.have_required_level(1)
-    async def permissions_check(self, ctx: 'CustomContext'):
-        current_permissions: discord.Permissions = ctx.message.guild.me.permissions_in(ctx.channel)
+    async def permissions_check(self, ctx: 'CustomContext', channel: discord.TextChannel = None):
+
+        if not channel:
+            channel = ctx.channel
+
+        current_permissions: discord.Permissions = ctx.message.guild.me.permissions_in(channel)
 
         emojis = {
             True: "✅",

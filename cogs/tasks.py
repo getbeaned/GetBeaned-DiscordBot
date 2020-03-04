@@ -5,7 +5,7 @@ import discord
 from discord.ext import tasks, commands
 
 from cogs.helpers.actions import full_process, unban, unmute
-from cogs.helpers.helpful_classes import LikeUser
+from cogs.helpers.helpful_classes import LikeUser, FakeMember
 
 if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
@@ -44,13 +44,16 @@ class Tasks(commands.Cog):
         guild: discord.Guild = self.bot.get_guild(guild_id)
 
         if guild:
-            user = await self.bot.fetch_user(int(task["arguments"]))
+            user = await self.bot.fetch_user(int(arguments["target"]))
 
             if user:
                 if not user.id in [b.user.id for b in await guild.bans()]:
                     return True  # Already unbanned
+
+                fake_member = FakeMember(user, guild)
+
                 tasks_user = LikeUser(did=5, name="DoItLater", guild=guild)
-                act = await full_process(self.bot, unban, user, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
+                act = await full_process(self.bot, unban, fake_member, tasks_user, arguments["reason"], automod_logs=f"Task number #{task['id']}")
                 return True
 
         # Failed because no such guild/user

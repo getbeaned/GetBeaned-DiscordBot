@@ -1,3 +1,4 @@
+import collections
 import datetime
 import re
 import typing
@@ -23,8 +24,18 @@ class AutoInspect(commands.Cog):
         self.api = bot.api
         self.checks = {'autoinspect_pornspam_bots': self.pornspam_bots_check,
                        'autoinspect_username': self.username_check,
-                       'autoinspect_bitcoin_bots': self.bitcoin_bots_check}
+                       'autoinspect_bitcoin_bots': self.bitcoin_bots_check,
+                       'autoinspect_suspicious': self.suspicious_check,}
         self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
+
+    async def suspicious_check(self, member: discord.Member) -> bool:
+        suspiciousness = 0
+        suspiciousness += datetime.datetime.now() - datetime.timedelta(days=1) < member.created_at
+        suspiciousness += datetime.datetime.now() - datetime.timedelta(hours=3) < member.created_at
+        suspiciousness += member.avatar_url == member.default_avatar_url
+        suspiciousness += str(member.status) == str(discord.Status.offline)
+
+        return suspiciousness >= 3
 
     async def username_check(self, member: discord.Member) -> bool:
         string = member.name

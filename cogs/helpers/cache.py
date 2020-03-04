@@ -93,8 +93,15 @@ class CacheStorageDict(collections.MutableMapping):
         self.times[key] = time.time() + self.expire_after
 
     def __delitem__(self, key: typing.Hashable):
-        del self.store[key]
-        del self.times[key]
+        try:
+            del self.store[key]
+        except KeyError:
+            pass
+
+        try:
+            del self.times[key]
+        except KeyError:
+            pass
 
     def __iter__(self):
         return iter(self.store)

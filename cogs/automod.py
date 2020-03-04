@@ -289,7 +289,8 @@ class AutoMod(commands.Cog):
             check_message.debug(
                 f"Message contains an ATeveryone that discord did not register as a ping (failed attempt)")
 
-        mentions = set(message.mentions)
+        mentions = set(mention for mention in message.mentions if mention.id != author.id)
+
         if len(mentions) > 3:
             check_message.score += await self.bot.settings.get(message.guild, 'automod_score_too_many_mentions')
             m_list = [a.name + '#' + a.discriminator for a in mentions]
@@ -330,12 +331,12 @@ class AutoMod(commands.Cog):
             self.message_history[check_message.message.author].append(check_message.message)  # Add content for repeat-check later.
             self.message_history.reset_expiry(check_message.message.author)
 
-        if len(message.mentions):
+        if len([mention for mention in message.mentions if mention.id != author.id]):
 
             historic_mentions_users = []
 
             for historic_message in self.message_history[check_message.message.author]:
-                historic_mentions_users.extend(historic_message.mentions)
+                historic_mentions_users.extend(mention for mention in historic_message.mentions if mention.id != author.id)
 
             historic_mentions_total = len(historic_mentions_users)
             historic_mentions_users = set(historic_mentions_users)

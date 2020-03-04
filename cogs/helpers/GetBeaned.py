@@ -47,7 +47,7 @@ class GetBeaned(commands.AutoShardedBot):
     async def on_command(self, ctx: context.CustomContext):
         self.commands_used[ctx.command.name] += 1
         ctx.logger.info(f"<{ctx.command}> {ctx.message.clean_content}")
-        discret_mode = await self.settings.get(ctx.guild, "discret_mode")
+        discret_mode = await self.settings.get(ctx.guild, "bot_discret")
         if discret_mode:
             await ctx.message.delete(delay=7)
 

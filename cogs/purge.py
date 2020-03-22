@@ -4,6 +4,7 @@ Since purge is a more complex command, I've thrown it in a separate file
 Stolen from R.Danny, will probably need a rewrite to be more user-friendly
 """
 import argparse
+import asyncio
 import re
 import shlex
 import textwrap
@@ -44,7 +45,7 @@ class ModPurge(commands.Cog):
         if ctx.invoked_subcommand is None:
             # help_cmd = self.bot.get_command('help')
             # await ctx.invoke(help_cmd, command='remove')
-            await ctx.send_to(textwrap.dedent(f"""
+            m = await ctx.send_to(textwrap.dedent(f"""
             This is a purge command on steroids. Some quick examples include:
 
             **Purge the latest 50 messages**:
@@ -70,6 +71,21 @@ class ModPurge(commands.Cog):
             *For more complex usages, refer to `{ctx.prefix}purge custom`*.
             For more information, visit https://docs.getbeaned.me/bot-documentation/using-the-purge-command-to-remove-messages
             """))
+            await m.add_reaction("🗑️")
+
+            def check(reaction: discord.Reaction, user: discord.User):
+                return user == ctx.author and str(reaction.emoji) == '🗑️' and reaction.message.id == m.id
+
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=1200.0, check=check)
+            except asyncio.TimeoutError:
+                pass
+            else:
+                await m.delete(delay=0)
+                await ctx.message.delete(delay=0)
+
+
+
 
     async def do_removal(self, ctx: 'CustomContext', limit: int, predicate_given: typing.Callable, *, before: int = None, after: int = None):
         if limit > 2000:

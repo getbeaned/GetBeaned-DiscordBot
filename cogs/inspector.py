@@ -110,7 +110,11 @@ async def inspect_guild(ctx: 'CustomContext', inspected: discord.Guild):
     human_delta = human_timedelta(inspected.created_at, source=datetime.datetime.utcnow())
     e.add_field(name="Created at", value=str(inspected.created_at) + f" ({human_delta})", inline=False)
 
-    e.add_field(name="Icon URL", value=str(inspected.icon_url), inline=False)
+    icon_url = str(inspected.icon_url)
+    if not icon_url:
+        icon_url = "None"
+
+    e.add_field(name="Icon URL", value=icon_url, inline=False)
 
     icon_url = ctx.guild.me.avatar_url
     if ctx.guild.id == inspected.id:

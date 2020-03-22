@@ -37,4 +37,4 @@ class CustomContext(commands.Context):
 
         message = f"{user.mention} > {message}"
 
-        await self.send(message, **kwargs)
+        return await self.send(message, **kwargs)

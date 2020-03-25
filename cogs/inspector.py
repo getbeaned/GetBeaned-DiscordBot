@@ -86,7 +86,8 @@ async def inspect_channel(ctx: 'CustomContext', inspected: typing.Union[discord.
             topic = "None"
         e.add_field(name="Topic", value=topic, inline=False)
 
-    e.add_field(name="Category", value=inspected.category.name, inline=False)
+    if inspected.category:
+        e.add_field(name="Category", value=inspected.category.name, inline=False)
     await ctx.send(embed=e)
 
 

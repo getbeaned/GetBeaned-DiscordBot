@@ -472,6 +472,41 @@ class Support(commands.Cog):
 
         messages["Connexion"] = embed
 
+        ok = True
+
+        try:
+            widget = await guild.widget()
+        except discord.HTTPException:
+            widget = None
+            ok = False
+
+        invite_code = await self.bot.settings.get(guild, 'invite_code')
+
+        invite_error = False
+
+        if not invite_code:
+            ok = False
+            invite_error = "No invite is set in your server settings. Please add it on the dashboard!"
+        else:
+            try:
+                await self.bot.fetch_invite(invite_code)
+            except discord.NotFound:
+                invite_error = "The invite code was provided but is not working correctly. Please check that the invite is valid."
+                ok = False
+            except discord.HTTPException:
+                invite_error = "There was an error reading your invite code. Please check that the invite is valid."
+                ok = False
+
+
+
+        embed = discord.Embed(description="Checking discord server settings since 1990",
+                              color=Color.green() if ok else Color.red())
+
+        embed.add_field(name="Widget enabled", value=f"Yes" if widget else "You should enable the server widget for it to show up properly on your server webpage.")
+        embed.add_field(name="Invite provided", value=f"Yes" if not invite_error else invite_error)
+
+        messages["Server Settings"] = embed
+
         # Send everything
         for message_title, embed in messages.items():
             embed.title = message_title

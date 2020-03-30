@@ -150,17 +150,34 @@ async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, s
     url = "https://getbeaned.me" + res['result_url']
     case_number = res['case_number']
     quoted_reason = '> '.join(('> ' + reason).splitlines(True))
+    victim_message = f"You have received a {action_type}, with the following reason\n" \
+                     f"{quoted_reason}\n\n" \
+                     f"For more info, please see {url}"
+    if int(await bot.settings.get(victim.guild, 'logs_security_level')) > 2:
+        victim_message += ", you may have to login with your Discord account."
+
+    victim_message += "\n"
+
+    rules = await bot.settings.get(victim.guild, 'rules')
+    invite = await bot.settings.get(victim.guild, 'invite_code')
+
+    if invite and action_type in ['kick', 'unban', 'ban', 'softban']:
+        victim_message += f"The server admins have provided you an invite link to rejoin the server: {invite}\n"
+
+    if action_type in ['warn', 'kick', 'ban', 'mute']:
+        victim_message += f"You can appeal this with the moderator of your choice."
+
     try:
-        asyncio.ensure_future(victim.send(f"You have received a {action_type}, with the following reason\n"
-                                          f"{quoted_reason}\n\n"
-                                          f"For more info, please see {url}, you may have to login with your Discord account. \n"
-                                          f"You can appeal this with the moderator of your choice."))
+        asyncio.ensure_future(victim.send(victim_message))
+        if rules:
+            asyncio.ensure_future(victim.send(f"Make sure to read the server rules! \n>>> {rules}"))
     except AttributeError:
         # LikeUser dosen't have a send attr
         pass
-    await action_coroutine(victim, reason[:510])
-
-    th = await thresholds_enforcer(bot, victim, action_type)
+    try:
+        asyncio.ensure_future(action_coroutine(victim, reason[:510]))  # On ensure future ici aussi pour ne pas bloquer pendant l'execution de l'action.
+    except:
+        bot.logger.exeption(f"Error when {action_type}ing by {moderator}")
 
     if await bot.settings.get(victim.guild, 'logs_enable'):
         # Log this to #mod-log or whatever
@@ -214,6 +231,8 @@ async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, s
                             pass
 
                     asyncio.ensure_future(send(textual_log))
+
+    th = await thresholds_enforcer(bot, victim, action_type)
 
     return {"user_informed": None,
             "url": url,

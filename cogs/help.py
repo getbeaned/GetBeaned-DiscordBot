@@ -580,67 +580,6 @@ class Help(commands.Cog):
         await ctx.send_to(f"This bot was made by Eyesofcreeper#0001. For help, type {ctx.prefix}help, for support go to https://discord.gg/cPbhK53. "
                           f"To invite the bot, find the link using {ctx.prefix}invite. This bot universal prefix is g+")
 
-#
-#     @commands.command()
-#     @checks.have_required_level(1)
-#     async def help(self, ctx):
-#         """Get the bot help."""
-#
-#         message = textwrap.dedent(f"""
-#         ** {ctx.me.mention} help**
-#
-#         The following commands are the most used ones. The required access level is shown as a prefix to the command. Remember that {ctx.me.mention} features include the automod, which dosen't have any commands, but that can be configured on the webinterface.
-#         Also, if you have any question, we have answers on the support server: https://discord.gg/cPbhK53
-#
-#         ```
-#         1. {ctx.prefix}level\t\tCheck your current access level
-#         1. {ctx.prefix}urls <user>\tGive you the link to pages about a specific user on the webinterface
-#         1. {ctx.prefix}invite\t\tGive an invite link to invite me :)
-#
-#         3. {ctx.prefix}unban [banned user(s)] <reason>\tUnban users that were banned on the server
-#         2. {ctx.prefix}note [user(s)] [reason]\t\tAdd a note on users profiles. Notes are just informationnal and don't suffer from as many consequences as warns
-#         2. {ctx.prefix}warn [user(s)] <reason>\t\tWarn users, adding a note on their profile. Warning can be subject to thresholds
-#         2. {ctx.prefix}kick [user(s)] <reason>\t\tKick users from the server
-#         3. {ctx.prefix}softban [user(s)] <reason>\t\tKick users while also deleting their most recent messages
-#         3. {ctx.prefix}ban [user(s)] <reason>\t\tRemove users from the server and keep them out
-#
-#         4. {ctx.prefix}import_bans\t\tImport bans from the server banlist into the website
-#
-#         2. {ctx.prefix}purge\tMass delete messages (see {ctx.prefix}purge for usage info)
-#         ```
-#
-#         Most of the commands shown here require the bot permissions to be correctly setup. Please give the bot the following permissions if you encounter problems
-#         ```
-#         kick_members,
-#         ban_members,
-#         read_messages,
-#         send_messages,
-#         manage_messages,
-#         embed_links,
-#         attach_files,
-#         read_message_history,
-#         external_emojis,
-#         change_nickname
-#         ```
-#         """)
-#
-#         await ctx.send_to(message)
-#
-#         if await get_level(ctx, ctx.author) >= 4:
-#             message = textwrap.dedent(f"""
-#             Since you seem to be a server admin, a few more commands that could be helpful include
-#
-#             ```
-#             {ctx.prefix}add_admin\t[user]\tAdd a user to the admin rank (level 4)
-#             {ctx.prefix}add_moderator\t[user]\tAdd a user to the moderator rank (level 3)
-#             {ctx.prefix}add_trusted_member\t[user]\tAdd a user to the trusted rank (level 2)
-#             {ctx.prefix}add_banned_member\t[user]\tRemove a user right from using the bot on this server
-#             ```
-#             """)
-#
-#             await ctx.send_to(message)
-
-
 def setup(bot: 'GetBeaned'):
     bot.remove_command("help")
     bot.add_cog(Help(bot))

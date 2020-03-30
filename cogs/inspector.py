@@ -95,12 +95,15 @@ async def inspect_guild(ctx: 'CustomContext', inspected: discord.Guild):
     e = discord.Embed(title="GetBeaned inspection")
 
     e.add_field(name="Name", value=inspected.name, inline=True)
-    e.add_field(name="Members", value=str(inspected.member_count), inline=True)
+
+    bots_count = sum(m.bot for m in inspected.members)
+    online = sum(m.status is discord.Status.online for m in inspected.members)
+    e.add_field(name="Members", value=f"{inspected.member_count} ({online} online, {bots_count} bots)", inline=True)
     e.add_field(name="ID", value=str(inspected.id), inline=True)
 
     e.add_field(name="Channels", value=f"{len(inspected.channels)} total, {len(inspected.text_channels)} textual", inline=True)
     e.add_field(name="Categories", value=str(len(inspected.categories)), inline=True)
-    e.add_field(name="Emojis", value=f"{len(inspected.emojis)}/{inspected.emoji_limit}", inline=True)
+    e.add_field(name="Emojis", value=f"{len(inspected.emojis)}/{inspected.emoji_limit * 2}", inline=True)
 
     e.add_field(name="Region", value=inspected.region.name, inline=True)
     owner = inspected.owner
@@ -109,7 +112,11 @@ async def inspect_guild(ctx: 'CustomContext', inspected: discord.Guild):
     e.add_field(name="Bans", value=f"{len(bans)} currently", inline=True)
 
     human_delta = human_timedelta(inspected.created_at, source=datetime.datetime.utcnow())
-    e.add_field(name="Created at", value=str(inspected.created_at) + f" ({human_delta})", inline=False)
+    e.add_field(name="Created at", value=str(inspected.created_at) + f" ({human_delta})", inline=True)
+
+    if inspected.me:
+        human_delta = human_timedelta(inspected.me.joined_at, source=datetime.datetime.utcnow())
+        e.add_field(name="Joined at", value=str(inspected.me.joined_at) + f" ({human_delta})", inline=True)
 
     icon_url = str(inspected.icon_url)
     if not icon_url:

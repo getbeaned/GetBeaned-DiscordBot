@@ -296,9 +296,11 @@ class AutoMod(commands.Cog):
             m_list = [a.name + '#' + a.discriminator for a in mentions]
             check_message.debug(f"Message mentions more than 3 people ({m_list})")
 
-        if "[getbeaned:disable_invite_detection]" not in str(message.channel.topic) and await self.get_invites_count(check_message) >= 1:  # They can add multiple channels separated by a " "
-            check_message.score += await self.bot.settings.get(message.guild, 'automod_score_contain_invites')
-            check_message.debug(f"Message contains invite(s) ({check_message.invites_code})")
+        if "[getbeaned:disable_invite_detection]" not in str(message.channel.topic): # They can add multiple channels separated by a " "
+            invites_count = await self.get_invites_count(check_message)
+            if invites_count >= 1:
+                check_message.score += await self.bot.settings.get(message.guild, 'automod_score_contain_invites') * invites_count
+                check_message.debug(f"Message contains invite(s) ({check_message.invites_code})")
 
         if message.content and "[getbeaned:disable_spam_detection]" not in str(message.channel.topic):
             # TODO: Check images repeat

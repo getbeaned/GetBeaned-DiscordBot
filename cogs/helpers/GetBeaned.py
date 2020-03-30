@@ -134,6 +134,10 @@ class GetBeaned(commands.AutoShardedBot):
             return
         elif isinstance(exception, discord.ext.commands.errors.NotOwner):
             return  # Jsk uses this
+        elif isinstance(exception, discord.ext.commands.errors.MaxConcurrencyReached):
+            await context.send_to(str(exception),
+                                      delete_after=3600)
+            await context.message.delete(delay=3600)
         else:
             self.logger.error('Ignoring exception in command {}:'.format(context.command))
             self.logger.error("".join(traceback.format_exception(type(exception), exception, exception.__traceback__)))

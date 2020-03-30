@@ -54,6 +54,7 @@ class Suggestions(commands.Cog):
         self.labels = {l.name: l for l in self.trello_board.get_labels()}  # Index by name
 
     @commands.command(aliases=["suggest", "bug", "bug_report"])
+    @commands.max_concurrency(1, commands.BucketType.member)
     async def improve(self, ctx: 'CustomContext'):
         label_keys = list(self.labels.keys())
         report_type_message = "Hello there! Thanks for using this command and improving the bot. " \

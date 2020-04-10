@@ -94,6 +94,7 @@ class Logging(commands.Cog):
             return None
 
         channel = self.bot.get_channel(channel_id)
+        self.bot.logger.debug(f"Getting logging channel for {guild}, pref={pref}, channel_id={channel_id}, channel={channel}")
 
         if not channel:
             self.bot.logger.warning(f"There is something fishy going on with guild={guild.id}! Their {pref}="
@@ -186,7 +187,7 @@ class Logging(commands.Cog):
             return
 
         if len(new_content) > 450:
-            new_content = new_content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(new_content)
+            new_content = new_content[:450] + " [...]"
 
         if raw_message_update.cached_message:
             cached_message = True
@@ -240,7 +241,9 @@ class Logging(commands.Cog):
                              icon_url="https://cdn.discordapp.com/avatars/492797767916191745/759b16c274c3cec8aef7cedd67014ac1.png?size=128")
 
             if len(old_content) > 450:
-                old_content = old_content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(old_content)
+                old_content = old_content[:450] + " [...] "
+                if not old_message.author.bot:
+                    old_content += "— Message too big to be shown here, full message available at " + await upload_text(old_message.content)
 
             embed.add_field(name="Original message",
                             value=old_content)
@@ -300,7 +303,9 @@ class Logging(commands.Cog):
             attachments_text = "\n".join(attachments_text)
 
         if len(message.content) > 450:
-            content = message.content[:450] + " [...] — Message too big to be shown here, full message available at " + await upload_text(message.content)
+            content = message.content[:450] + " [...] "
+            if not message.author.bot:
+                content += "— Message too big to be shown here, full message available at " + await upload_text(message.content)
         elif len(message.content) == 0:
             content = f"The message contained no text, and {len(message.attachments)} attachments."
 
@@ -488,7 +493,7 @@ class Logging(commands.Cog):
         embed.set_footer(text=f"You can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}")
         embed.timestamp = message.created_at
 
-        await webhook.send(message.content, embed=embed)
+        await webhook.send(discord.utils.escape_mentions(message.content), embed=embed)
         # await webhook.send(f"```\nThe message was created at {message.created_at}\nYou can get more info about how automod treated this message with {ctx.prefix}automod_logs {message.id}```")
         await webhook.delete()
 

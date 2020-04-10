@@ -14,7 +14,7 @@ async def upload_text(text: str) -> str:
             try:
                 async with cs.post(server + "documents", data=text) as r:
                     res = await r.json()
-                    print(f"Pasted on {server} with key {res['key']}")
+                    print(f"Pasted on {server} with key {res['key']} - {server}/{res['key']} ")
                     return server + res["key"]
             except Exception as e:
                 print(f"{server} - Can't paste: error- {e} ({type(e)}), code- {r.status}")

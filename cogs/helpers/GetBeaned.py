@@ -22,6 +22,7 @@ class GetBeaned(commands.AutoShardedBot):
         self.cache = Cache(self)
         self.commands_used = collections.Counter()
         self.admins = [138751484517941259]
+        self.messages_seen = 0
         self.base_logger, self.logger = base_logger, logger
 
         # Load credentials so they can be used later
@@ -37,6 +38,7 @@ class GetBeaned(commands.AutoShardedBot):
         self.settings = Settings(self)
 
     async def on_message(self, message):
+        self.messages_seen += 1
         if message.author.bot:
             return  # ignore messages from other bots
 

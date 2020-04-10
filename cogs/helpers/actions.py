@@ -174,10 +174,9 @@ async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, s
     except AttributeError:
         # LikeUser dosen't have a send attr
         pass
-    try:
-        asyncio.ensure_future(action_coroutine(victim, reason[:510]))  # On ensure future ici aussi pour ne pas bloquer pendant l'execution de l'action.
-    except:
-        bot.logger.exeption(f"Error when {action_type}ing by {moderator}")
+    await action_coroutine(victim, reason[:510])
+
+    th = await thresholds_enforcer(bot, victim, action_type)
 
     if await bot.settings.get(victim.guild, 'logs_enable'):
         # Log this to #mod-log or whatever
@@ -185,10 +184,11 @@ async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, s
         # owner is the same as the one in the target channel). If yes, even if it's not the same server, we will allow
         # logging there
 
-        channel_id = await bot.settings.get(victim.guild, 'logs_moderation_channel_id')
+        channel_id = int(await bot.settings.get(victim.guild, 'logs_moderation_channel_id'))
 
         if channel_id != 0:
             channel = bot.get_channel(channel_id)
+            bot.logger.debug(f"B Getting logging channel for {victim.guild}, logs_channel_id, channel_id={channel_id}, channel={channel}")
 
             if not channel:
                 bot.logger.warning(f"There is something fishy going on with guild={victim.guild.id}! "
@@ -231,8 +231,6 @@ async def full_process(bot, action_coroutine: typing.Callable[[discord.Member, s
                             pass
 
                     asyncio.ensure_future(send(textual_log))
-
-    th = await thresholds_enforcer(bot, victim, action_type)
 
     return {"user_informed": None,
             "url": url,

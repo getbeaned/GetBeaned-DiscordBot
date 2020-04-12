@@ -68,8 +68,13 @@ class ModPurge(commands.Cog):
             {ctx.prefix}purge contains owo
             ```
 
+            **Purge the latest 8 that are sent by @mention**:
+            ```
+            {ctx.prefix}purge user @mention 8
+            ```
+
             *For more complex usages, refer to `{ctx.prefix}purge custom`*.
-            For more information, visit https://docs.getbeaned.me/bot-documentation/using-the-purge-command-to-remove-messages
+            For more information, and more filters,  visit https://docs.getbeaned.me/tutorials/using-the-purge-command-to-remove-messages
             """))
             await m.add_reaction("🗑️")
 

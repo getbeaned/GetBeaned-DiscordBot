@@ -68,7 +68,11 @@ class Api:
                 return res
 
     async def add_guild(self, guild):
-        await self.add_user(guild.owner)
+        if guild.owner is None:
+            owner = guild.fetch_member(guild.owner_id)
+        else:
+            owner = guild.owner
+        await self.add_user(owner)
 
         data = {'discord_id': guild.id,
                 'discord_name': guild.name,

@@ -61,6 +61,40 @@ class AutoTrigger:
             return 0
 
 
+class BadStrings(AutoTrigger):
+    def __init__(self, message):
+        super().__init__(message)
+        self.autotrigger_name = "Bad Strings"
+        self.autotrigger_dbname = "badstrings"
+
+    async def check(self):
+        # There are a tons of characters in there
+        assert await message_contains_any(self.message,
+                                          ["بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹 بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹",
+                                           "بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹 بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹",
+                                           "بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ"])
+        return True
+
+
+class LibraCryptoDiscordBots(AutoTrigger):
+    def __init__(self, message):
+        super().__init__(message)
+        self.autotrigger_name = "Libra Discord Bots"
+        self.autotrigger_dbname = "libradiscordbots"
+
+    async def check(self):
+        # Notice the weird i
+        assert await message_contains_any(self.message,
+                                          ["Fаcebook finally releаsed his own cryptocurrency",
+                                           "Lⅰbra",
+                                           "buylⅰbra.tech",
+                                           "https://imgur.com/Tv6aRws",
+                                           "(be fast its almost sold out!)"])
+        assert not await user_dont_have_a_profile_picture(self.message.author)
+        assert await member_joined_x_days_ago(self.message.author, x=2)
+        return True
+
+
 class SexDatingDiscordBots(AutoTrigger):
     def __init__(self, message):
         super().__init__(message)

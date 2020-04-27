@@ -72,7 +72,8 @@ class BadStrings(AutoTrigger):
         assert await message_contains_any(self.message,
                                           ["بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹 بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹",
                                            "بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹 بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ🇮🇹",
-                                           "بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ"])
+                                           "بٍٍٍٍََُُُِّّّْرٍٍٍٍََُُِِّّّْآٍٍٍَُّ",
+                                           "بٍٍٍرٍٍٍآٍٍٍ"])
         return True
 
 
@@ -88,6 +89,7 @@ class LibraCryptoDiscordBots(AutoTrigger):
                                           ["Fаcebook finally releаsed his own cryptocurrency",
                                            "Lⅰbra",
                                            "buylⅰbra.tech",
+                                           "buylibra.tech",
                                            "https://imgur.com/Tv6aRws",
                                            "(be fast its almost sold out!)"])
         assert not await user_dont_have_a_profile_picture(self.message.author)

@@ -189,6 +189,45 @@ async def inspect_message(ctx: 'CustomContext', inspected: discord.Message):
 
     await ctx.send(embed=e)
 
+async def inspect_invite(ctx: 'CustomContext', inspected: discord.Invite):
+    e = discord.Embed(title="GetBeaned inspection")
+    e.description = f"Depending on the invite, some fields here may have a value of None. That's because the bot don't know about them."
+    e.add_field(name="Guild", value=f"{inspected.guild.name} `[{inspected.guild.id}]`", inline=False)
+
+    if inspected.channel:
+        e.add_field(name="Channel", value=f"{inspected.channel.name} `[{inspected.channel.id}]`", inline=False)
+    else:
+        e.add_field(name="Channel", value=f"{inspected.channel}", inline=False)
+
+    if inspected.inviter:
+        e.add_field(name="Inviter", value=f"{inspected.inviter.name}#{inspected.inviter.discriminator} `[{inspected.inviter.id}]`", inline=False)
+    else:
+        e.add_field(name="Inviter", value=f"{inspected.inviter}", inline=False)
+
+    e.add_field(name="Members", value=f"{inspected.approximate_member_count}", inline=True)
+    e.add_field(name="Online members", value=f"{inspected.approximate_presence_count}", inline=True)
+    e.add_field(name="Uses", value=f"{inspected.uses}/{inspected.max_uses}", inline=True)
+
+    e.add_field(name="Revoked", value=f"{inspected.revoked}", inline=True)
+    e.add_field(name="Temporary", value=f"{inspected.temporary}", inline=True)
+    e.add_field(name="URL", value=f"{inspected.url}", inline=False)
+
+    if inspected.created_at:
+        human_delta = human_timedelta(inspected.created_at, source=datetime.datetime.utcnow())
+        e.add_field(name="Created at", value=str(inspected.created_at) + f" ({human_delta})", inline=False)
+    else:
+        e.add_field(name="Created at", value=str(inspected.created_at), inline=False)
+
+    icon_url = ctx.guild.me.avatar_url
+    if ctx.channel.id == inspected.channel.id:
+        e.set_footer(text="Invite is for this Channel", icon_url=icon_url)
+    elif ctx.guild.id == inspected.guild.id:
+        e.set_footer(text="Invite is for this Guild", icon_url=icon_url)
+    else:
+        e.set_footer(text="Invite is for another Guild", icon_url=icon_url)
+
+    await ctx.send(embed=e)
+
 
 class Inspector(commands.Cog):
 
@@ -235,7 +274,7 @@ class Inspector(commands.Cog):
     @commands.command(aliases=["inspector"])
     @commands.guild_only()
     @checks.have_required_level(2)
-    async def inspect(self, ctx: 'CustomContext', inspected: typing.Union[discord.Member, discord.User, discord.TextChannel, discord.VoiceChannel, int]):
+    async def inspect(self, ctx: 'CustomContext', inspected: typing.Union[discord.Member, discord.User, discord.TextChannel, discord.VoiceChannel, int, str]):
         """Inspect an object and return properties about it..."""
         if isinstance(inspected, int):
             inspected = await self.universal_converter(ctx, inspected)
@@ -254,6 +293,13 @@ class Inspector(commands.Cog):
 
         elif isinstance(inspected, discord.Message):
             return await inspect_message(ctx, inspected)
+
+        elif isinstance(inspected, str):
+            # Maybe an invite code
+            try:
+                return await inspect_invite(ctx, await self.bot.fetch_invite(inspected, with_counts=True))
+            except discord.NotFound:
+                pass
 
         await ctx.send(f"Type: {type(inspected)}, Str:{str(inspected)}")
 

@@ -69,7 +69,7 @@ class Api:
 
     async def add_guild(self, guild):
         if guild.owner is None:
-            owner = guild.fetch_member(guild.owner_id)
+            owner = await guild.fetch_member(guild.owner_id)
         else:
             owner = guild.owner
         await self.add_user(owner)

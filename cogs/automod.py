@@ -19,13 +19,13 @@ from cogs.helpers import checks, context
 from cogs.helpers.actions import full_process, note, warn, kick, softban, ban
 from cogs.helpers.helpful_classes import LikeUser
 from cogs.helpers.level import get_level
-from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots, SexBots, LibraCryptoDiscordBots, BadStrings
+from cogs.helpers.triggers import SexDatingDiscordBots, InstantEssayDiscordBots, SexBots, LibraCryptoDiscordBots, BadStrings, DMMeNudesDiscordBots
 from cogs.helpers.context import CustomContext
 
 ZALGO_CHAR_CATEGORIES = ['Mn', 'Me']
 DEBUG = False
 
-TRIGGERS_ENABLED = [BadStrings, LibraCryptoDiscordBots, SexDatingDiscordBots, InstantEssayDiscordBots, SexBots]
+TRIGGERS_ENABLED = [BadStrings, LibraCryptoDiscordBots, SexDatingDiscordBots, InstantEssayDiscordBots, SexBots, DMMeNudesDiscordBots]
 
 
 class CheckMessage:

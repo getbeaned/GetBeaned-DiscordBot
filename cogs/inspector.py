@@ -49,10 +49,16 @@ async def inspect_member(ctx: 'CustomContext', inspected: typing.Union[discord.M
     e.add_field(name="Avatar URL", value=inspected.avatar_url, inline=False)
 
     e.add_field(name="Default Avatar URL", value=inspected.default_avatar_url, inline=False)
+
+    if isinstance(inspected, discord.Member) and inspected.guild.id == ctx.guild.id:
+        counters = await ctx.bot.api.get_counters(inspected.guild, inspected)
+        for action_type in ['mute', 'note', 'warn', 'kick', 'ban']:
+            if counters.get(action_type, 0) > 0:
+                e.add_field(name=f"{action_type}s", value=str(counters[action_type]), inline=True)
+
     e.set_author(name=inspected.name, url=f"https://getbeaned.me/users/{inspected.id}", icon_url=inspected.avatar_url)
 
     e.set_image(url=str(inspected.avatar_url))
-
 
     await ctx.send(embed=e)
 
@@ -188,6 +194,7 @@ async def inspect_message(ctx: 'CustomContext', inspected: discord.Message):
     e.set_image(url=str(inspected.author.avatar_url))
 
     await ctx.send(embed=e)
+
 
 async def inspect_invite(ctx: 'CustomContext', inspected: discord.Invite):
     e = discord.Embed(title="GetBeaned inspection")

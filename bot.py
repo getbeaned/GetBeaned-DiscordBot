@@ -79,6 +79,7 @@ cogs = ['jishaku',
         'cogs.tasks',
         'cogs.role_persist',
         'cogs.inspector',
+        'cogs.publisher',
         ]
 
 for extension in cogs:

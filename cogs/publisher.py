@@ -22,7 +22,7 @@ class Publisher(commands.Cog):
     async def on_message(self, message:discord.Message):
         if not message.guild:
             return
-        if not "[getbeaned:autopublish]" in message.channel.topic:
+        if not "[getbeaned:auto_publish]" in message.channel.topic:
             return
         if not message.channel.type == discord.ChannelType.news:
             return

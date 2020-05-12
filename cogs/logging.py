@@ -1,7 +1,14 @@
+# ⚠️ Warning, part of the code in that file comes from https://github.com/nerrixDE/simple-modlogs
+# It's copied and licenced specifically for this project under the foillowing conditions:
+# "You're allowed to use my code in your AGPL-Bot as long as you fufill all GPLv3 terms - just except same license, you can stick with AGPL"
+# https://discordapp.com/channels/110373943822540800/468690756899438603/709861176506318959
+
 import collections
 import io
 import typing
+import datetime
 
+import asyncio
 import discord
 
 if typing.TYPE_CHECKING:
@@ -435,8 +442,20 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, old: discord.Member, new: discord.Member):
+        await asyncio.sleep(0.5)  # Wait for audit log to be created
+        found_entry = None
 
         if old.nick != new.nick:
+
+            async for entry in new.guild.audit_logs(limit=50, action=discord.AuditLogAction.member_update, after=datetime.datetime.utcnow() - datetime.timedelta(seconds=15),
+                                                    oldest_first=False):
+                if entry.created_at < datetime.datetime.utcnow() - datetime.timedelta(seconds=10):
+                    continue
+                if entry.target.id == new.id:
+                    found_entry = entry
+                    break
+            found_entry: discord.AuditLogEntry
+
             # Nickname update
             channel = await self.get_logging_channel(old.guild, 'logs_member_edits_channel_id')
 
@@ -454,6 +473,8 @@ class Logging(commands.Cog):
                                                   f"Old nickname: \t {old.nick}\n"
                                                   f"New nickname: \t {new.nick}"
                                       )
+                if found_entry and found_entry.user.id != new.id:
+                    embed.add_field(name="Responsible moderator", value=f"{found_entry.user.name}#{found_entry.user.discriminator} `[{found_entry.user.id}]`")
 
                 embed.set_thumbnail(url=str(new.avatar_url))
                 embed.set_author(name="Member changed nickname", url="https://getbeaned.me")  # , icon_url="ICON_URL_DELETE")

@@ -7,6 +7,7 @@ if typing.TYPE_CHECKING:
 
 BANNED_MEMBERS_IDS = [
     556456702753636400,  # See https://getbeaned.me/actions/17049
+    693482914318385212,  # See https://getbeaned.me/users/693482914318385212 (Gory stabbing videos)
 ]
 
 OWNERS_IDS = [

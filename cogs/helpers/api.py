@@ -223,7 +223,7 @@ class Api:
             if isinstance(role, discord.Role):
                 roles_list.append(str(role.id))
             else:
-                roles_list.append(str(role))
+                roles_list.append(str(int(role)))
 
         roles_list = ",".join(roles_list)
 
@@ -253,7 +253,7 @@ class Api:
         roles = []
 
         if len(res["roles"]) > 0:
-            for role_id in res["roles"].split(","):
+            for role_id in res["roles"].replace("\r\n", "").split(","):
                 if len(role_id) > 0:
                     role = discord.utils.get(guild.roles, id=int(role_id))
                     if role:

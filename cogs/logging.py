@@ -446,15 +446,17 @@ class Logging(commands.Cog):
         found_entry = None
 
         if old.nick != new.nick:
-
-            async for entry in new.guild.audit_logs(limit=50, action=discord.AuditLogAction.member_update, after=datetime.datetime.utcnow() - datetime.timedelta(seconds=15),
-                                                    oldest_first=False):
-                if entry.created_at < datetime.datetime.utcnow() - datetime.timedelta(seconds=10):
-                    continue
-                if entry.target.id == new.id:
-                    found_entry = entry
-                    break
-            found_entry: discord.AuditLogEntry
+            try:
+                async for entry in new.guild.audit_logs(limit=50, action=discord.AuditLogAction.member_update, after=datetime.datetime.utcnow() - datetime.timedelta(seconds=15),
+                                                        oldest_first=False):
+                    if entry.created_at < datetime.datetime.utcnow() - datetime.timedelta(seconds=10):
+                        continue
+                    if entry.target.id == new.id:
+                        found_entry = entry
+                        break
+                found_entry: discord.AuditLogEntry
+            except discord.Forbidden:
+                pass
 
             # Nickname update
             channel = await self.get_logging_channel(old.guild, 'logs_member_edits_channel_id')

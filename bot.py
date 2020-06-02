@@ -48,7 +48,7 @@ logger.debug("Importing the bot")
 from cogs.helpers.GetBeaned import GetBeaned, get_prefix
 logger.debug("Creating a bot instance of commands.AutoShardedBot")
 
-bot = GetBeaned(command_prefix=get_prefix, base_logger=base_logger, logger=logger, case_insensitive=True, max_messages=100000)
+bot = GetBeaned(command_prefix=get_prefix, base_logger=base_logger, logger=logger, fetch_offline_members=False, case_insensitive=True, max_messages=100000)
 # bot.remove_command("help")
 
 logger.debug("Loading cogs : ")

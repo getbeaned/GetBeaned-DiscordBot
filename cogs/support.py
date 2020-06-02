@@ -321,7 +321,12 @@ class Support(commands.Cog):
                        f"Any user that have a role equal or higher to <{top_role.name}> can't be kicked/banned")
         message.append("```")
 
-        messages["Bot Permissions"] = discord.Embed(description="\n".join(message), color=Color.green() if len(errored_in) == 0 else Color.red())
+        embed_desc = "\n".join(message)
+        if len(embed_desc) >= 1900:
+            url = await upload_text(embed_desc)
+            embed_desc = f"This was too long to show here (poor you), so here's a paste instead: {url}"
+
+        messages["Bot Permissions"] = discord.Embed(description=embed_desc, color=Color.green() if len(errored_in) == 0 else Color.red())
 
         # Settings
 
@@ -479,6 +484,9 @@ class Support(commands.Cog):
         except discord.HTTPException:
             widget = None
             ok = False
+        except KeyError:
+            widget = None
+            ok = True
 
         invite_code = await self.bot.settings.get(guild, 'invite_code')
 
@@ -502,7 +510,8 @@ class Support(commands.Cog):
         embed = discord.Embed(description="Checking discord server settings since 1990",
                               color=Color.green() if ok else Color.red())
 
-        embed.add_field(name="Widget enabled", value=f"Yes" if widget else "You should enable the server widget for it to show up properly on your server webpage.")
+        embed.add_field(name="Widget enabled", value=f"Yes" if widget else "You should enable the server widget for it to show up properly on your server webpage. "
+                                                                           "Sometimes, the bot can't detect your widget properly, in this case ignore this warning.")
         embed.add_field(name="Invite provided", value=f"Yes" if not invite_error else invite_error)
 
         messages["Server Settings"] = embed

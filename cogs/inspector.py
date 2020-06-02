@@ -198,7 +198,7 @@ async def inspect_message(ctx: 'CustomContext', inspected: discord.Message):
 
 async def inspect_invite(ctx: 'CustomContext', inspected: discord.Invite):
     e = discord.Embed(title="GetBeaned inspection")
-    e.description = f"Depending on the invite, some fields here may have a value of None. That's because the bot don't know about them."
+    e.description = f"Depending on the invite, some fields here may have a value of None. That's because the bot doesn't know about them."
     e.add_field(name="Guild", value=f"{inspected.guild.name} `[{inspected.guild.id}]`", inline=False)
 
     if inspected.channel:

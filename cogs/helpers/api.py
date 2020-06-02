@@ -80,7 +80,7 @@ class Api:
                 # Probably doesn't work
                 'discord_created_at': str(guild.created_at),
                 'discord_user_count': guild.member_count,
-                'owner': guild.owner.id}
+                'owner': guild.owner_id}
         # self.logger.debug(f"(add_guild) -> {data}")
 
         async with aiohttp.ClientSession() as cs:

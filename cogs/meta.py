@@ -75,7 +75,7 @@ class Meta(commands.Cog):
             await ctx.send_to("No permission to create webhooks :(")
             return
 
-        await webhook.send(message)
+        await webhook.send(discord.utils.escape_mentions(message))
         await webhook.delete()
 
 

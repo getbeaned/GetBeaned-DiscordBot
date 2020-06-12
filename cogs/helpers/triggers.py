@@ -87,11 +87,16 @@ class LibraCryptoDiscordBots(AutoTrigger):
         # Notice the weird i
         assert await message_contains_any(self.message,
                                           ["Fаcebook finally releаsed his own cryptocurrency",
+                                           "Facebooks Libra coin just got released 1 hour ago!",
+                                           "you should get some fast because they have a sale at the moment, but it could be over soon because everyone is buying in."
                                            "Lⅰbra",
                                            "buylⅰbra.tech",
                                            "buylibra.tech",
                                            "https://imgur.com/Tv6aRws",
-                                           "(be fast its almost sold out!)"])
+                                           "(be fast its almost sold out!)",
+                                           "imgpile.ⅽom/i/ISvKta",
+                                           "libraclaim..io",
+                                           "libraclaim.io"])
         # assert not await user_dont_have_a_profile_picture(self.message.author)  #Sometimes they actually have one, sometimes they don't
 
         assert await member_joined_x_days_ago(self.message.author, x=2)

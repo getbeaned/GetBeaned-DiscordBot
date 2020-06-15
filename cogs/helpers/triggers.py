@@ -110,7 +110,7 @@ class DMMeNudesDiscordBots(AutoTrigger):
         self.autotrigger_dbname = "sexdatingdiscordbots"
 
     async def check(self):
-        assert await message_contains_any(self.message, ["Dm me guys if you want to see my nudes for free"])
+        assert await message_contains_any(self.message, ["Dm me guys if you want to see my nudes for free", "Dm me guys if you want to see my nudes for  free"])
         assert await member_joined_x_hours_ago(self.message.author, x=1)
         return True
 
@@ -122,7 +122,7 @@ class SexDatingDiscordBots(AutoTrigger):
         self.autotrigger_dbname = "sexdatingdiscordbots"
 
     async def check(self):
-        assert await message_contains_any(self.message, ["discord.amazingsexdating.com", "Sex dating discord >", "Sex Dating >", "Best casino online >"])
+        assert await message_contains_any(self.message, ["discord.amazingsexdating.com", "Sex dating discord >", "Sex Dating >", "Best casino online >", "adultheroesofhentai.cf", "one of the best hentai games - free for adults now!"])
         assert await user_dont_have_a_profile_picture(self.message.author)
         assert await member_joined_x_days_ago(self.message.author, x=1)
         return True
@@ -158,7 +158,7 @@ class SexBots(AutoTrigger):
 
     async def check(self):
         assert await message_contains_x_of(self.message, 1, ["privatepage.vip", "nakedphotos.club", "viewc.site", "My naked photos", "My 18+ photos", "Awesome Gift of the Day",
-                                                             "https://bit.ly/KittyKiss",])
+                                                             "https://bit.ly/KittyKiss"])
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
 

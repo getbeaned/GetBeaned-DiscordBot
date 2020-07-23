@@ -22,6 +22,8 @@ DISCORD_BOTS_GG_TOKEN = credentials["discord_bots_gg_token"]
 DISCORD_BOTS_API = 'https://discord.bots.gg/api/v1'
 DISCORD_BOTS_ORG_API = 'https://discordbots.org/api'
 
+AGENT = "GetBeaned-7265/1.0.0 (discord.py; +https://getbeaned.me) DBots/<bot-id>"
+
 
 class Carbonitex(commands.Cog):
     """Cog for updating bots.discord.pw bot information."""

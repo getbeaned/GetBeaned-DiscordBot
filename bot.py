@@ -14,7 +14,7 @@ print("Loading...")
 
 print("Loading discord...")
 import discord
-
+print(f"Loaded discord {discord.version_info}")
 # Load some essentials modules
 print("Loading traceback...")
 

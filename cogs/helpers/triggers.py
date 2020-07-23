@@ -87,6 +87,15 @@ class LibraCryptoDiscordBots(AutoTrigger):
         # Notice the weird i
         assert await message_contains_any(self.message,
                                           ["Fаcebook finally releаsed his own cryptocurrency",
+                                           "Facebooks Libra coin just got released!",
+                                           "librasale.τech",
+                                           "imgpile.ⅽom/i/uRn63c",
+                                           "imgpile.com/i/uRn63c",
+                                           "Elon Musk started a crypto giveaway not long ago!",
+                                           "When you still want some you should be fast.",
+                                           "imgpile.ⅽom/i/u110M4",
+                                           "teslagain..io",
+                                           "teslagain.io",
                                            "Facebooks Libra coin just got released 1 hour ago!",
                                            "you should get some fast because they have a sale at the moment, but it could be over soon because everyone is buying in."
                                            "Lⅰbra",

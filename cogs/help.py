@@ -453,7 +453,7 @@ class HelpPaginator(Pages):
             self.embed.add_field(name='Support', value=value, inline=False)
 
         messages = [f'Use "+help command" for more info on a command.',
-                    "Remember that GetBeaned features include the automod, which dosen't have any commands, but that can be configured on the webinterface.",
+                    "Remember that GetBeaned features include the automod, which doesn't have any commands, but that can be configured on the webinterface.",
                     "Most of the commands shown here require the bot permissions to be correctly setup. "
                     "Please give the bot the following permissions if you encounter problems: "
                     "kick_members, ban_members, manage_messages, embed_links, attach_files, external_emojis, read_message_history and change_nickname"

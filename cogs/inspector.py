@@ -307,8 +307,10 @@ class Inspector(commands.Cog):
                 return await inspect_invite(ctx, await self.bot.fetch_invite(inspected, with_counts=True))
             except discord.NotFound:
                 pass
-
-        await ctx.send(f"Type: {type(inspected)}, Str:{str(inspected)}")
+        # there was a bug that allowed any role to be mentioned
+        # disable all mentions here that way you can't exploit this to ping everyone or a certain role
+        await ctx.send(f"Type: {type(inspected)}, Str:{str(inspected)}",
+                       allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
 
 
 def setup(bot: 'GetBeaned'):

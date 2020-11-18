@@ -48,7 +48,14 @@ logger.debug("Importing the bot")
 from cogs.helpers.GetBeaned import GetBeaned, get_prefix
 logger.debug("Creating a bot instance of commands.AutoShardedBot")
 
-bot = GetBeaned(command_prefix=get_prefix, base_logger=base_logger, logger=logger, fetch_offline_members=False, case_insensitive=True, max_messages=100000)
+intents = discord.Intents.none()
+intents.guilds = True
+intents.messages = True
+intents.reactions = True
+intents.presences = True
+intents.members = True
+
+bot = GetBeaned(command_prefix=get_prefix, base_logger=base_logger, logger=logger, fetch_offline_members=False, chunk_guilds_at_startup=False, intents=intents, case_insensitive=True, max_messages=100000)
 # bot.remove_command("help")
 
 logger.debug("Loading cogs : ")

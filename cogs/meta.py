@@ -64,7 +64,7 @@ class Meta(commands.Cog):
         await ctx.send_to(f"{ctx.channel.mention} ID is {ctx.channel.id}")
 
     @commands.command()
-    @checks.have_required_level(2)
+    @checks.have_required_level(4)
     async def fake_message(self, ctx: 'CustomContext', who: ForcedMember, *, message: str):
         """Refresh a user profile on the website."""
         avatar = await who.avatar_url.read()

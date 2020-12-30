@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from cogs.helpers.GetBeaned import GetBeaned
 
 from cogs.helpers.helpful_classes import LikeUser
-from cogs.helpers.actions import full_process, softban, ban
+from cogs.helpers.actions import full_process, softban, ban, kick
 from cogs.helpers.context import CustomContext
 
 
@@ -27,6 +27,8 @@ class AutoInspect(commands.Cog):
                        'autoinspect_bitcoin_bots': self.bitcoin_bots_check,
                        'autoinspect_suspicious': self.suspicious_check,}
         self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
+        self.joins_cache = bot.cache.get_cache("massjoins_cache", expire_after=180, strict=True)
+        self.protected_cache = bot.cache.get_cache("massjoins_protected", expire_after=300, strict=True)
 
     async def suspicious_check(self, member: discord.Member) -> bool:
         suspiciousness = 0
@@ -138,9 +140,34 @@ class AutoInspect(commands.Cog):
             'guild': member.guild,
         }
 
+        await self.massjoins(member)
+
         for check_name, check_callable in self.checks.items():
             if not await self.check_and_act(check_callable, check_name, context):
                 return True
+
+    async def massjoins(self, member: discord.Member):
+        guild = member.guild
+
+        if not await self.bot.settings.get(guild, 'autoinspect_enable') or not await self.bot.settings.get(guild, 'autoinspect_massjoins'):
+            return 'AutoInspect disabled on this guild.'
+
+        autoinspect_user = LikeUser(did=4, name="AutoInspector", guild=guild)
+
+        self.joins_cache[guild] = (self.joins_cache.get(guild, []) + [member])[:]
+        joins_count = len(self.joins_cache[guild])
+
+        if self.protected_cache.get(guild, False):
+            await full_process(self.bot, kick, member, autoinspect_user, reason=f"Automatic kick by AutoInspect because of too many joins",
+                               automod_logs=f"{joins_count} joins in the last 3 minutes")
+            return
+        else:
+            if joins_count >= 15:
+                self.protected_cache[guild] = True
+                tokick = self.joins_cache[guild]
+                for member in tokick:
+                    await full_process(self.bot, kick, member, autoinspect_user, reason=f"Automatic kick by AutoInspect because of too many joins",
+                                       automod_logs=f"{joins_count} joins in the last 3 minutes")
 
 
 def setup(bot: 'GetBeaned'):

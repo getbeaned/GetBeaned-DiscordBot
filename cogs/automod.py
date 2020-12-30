@@ -97,7 +97,7 @@ class AutoMod(commands.Cog):
                 \s?          # Sometimes people use spaces before dots to twhart the AutoMod. Let's stop that by allowing 1 space here
                 (?:app\s?\.\s?com\s?/invite|\.\s?gg)\s?/ # All the domains
                 \s?          # And here too
-                ((?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
+                ((?!.*[Ii10OolL]).[a-zA-Z0-9]{5,12}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
                 """, flags=re.VERBOSE)
 
         # self.message_history = collections.defaultdict(

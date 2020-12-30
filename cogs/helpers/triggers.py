@@ -10,6 +10,7 @@ import typing
 from typing import List
 
 import discord
+import unicodedata
 
 if typing.TYPE_CHECKING:
     from cogs.automod import CheckMessage
@@ -85,28 +86,14 @@ class LibraCryptoDiscordBots(AutoTrigger):
 
     async def check(self):
         # Notice the weird i
-        assert await message_contains_any(self.message,
-                                          ["Fаcebook finally releаsed his own cryptocurrency",
-                                           "Facebooks Libra coin just got released!",
-                                           "librasale.τech",
-                                           "imgpile.ⅽom/i/uRn63c",
-                                           "imgpile.com/i/uRn63c",
-                                           "Elon Musk started a crypto giveaway not long ago!",
-                                           "When you still want some you should be fast.",
-                                           "imgpile.ⅽom/i/u110M4",
-                                           "teslagain..io",
-                                           "teslagain.io",
-                                           "Facebooks Libra coin just got released 1 hour ago!",
-                                           "you should get some fast because they have a sale at the moment, but it could be over soon because everyone is buying in."
-                                           "Lⅰbra",
-                                           "buylⅰbra.tech",
-                                           "buylibra.tech",
-                                           "https://imgur.com/Tv6aRws",
-                                           "(be fast its almost sold out!)",
-                                           "imgpile.ⅽom/i/ISvKta",
-                                           "libraclaim..io",
-                                           "libraclaim.io"])
-        # assert not await user_dont_have_a_profile_picture(self.message.author)  #Sometimes they actually have one, sometimes they don't
+        assert await message_contains_x_of(self.message, 2,
+                                          ["christmas airdrop",
+                                           "heres the official tweet",
+                                           "dont miss the current 1INCH",
+                                           "okey that im sharing this but i claimed 1200$",
+                                           "i got 1400 dollars worth of 1inch tokens",
+                                           "1inch",
+                                           "1inch-airdrop.net"], normalize=True)
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
         return True
@@ -197,24 +184,21 @@ async def member_joined_x_hours_ago(member: discord.Member, x=1) -> bool:
 async def user_created_x_days_ago(member: discord.Member, x=1) -> bool:
     return member.created_at > datetime.datetime.now() - datetime.timedelta(hours=x)
 
+async def message_contains_any(message: discord.Message, texts: List[str], normalize=False) -> bool:
+    return await message_contains_x_of(message, 1, texts, normalize)
 
-async def message_contains(message: discord.Message, text: str) -> bool:
-    text = text.lower()
-    message_content = message.content.lower().strip()
-    return text in message_content
-
-
-async def message_contains_any(message: discord.Message, texts: List[str]) -> bool:
-    return await message_contains_x_of(message, 1, texts)
-
-
-async def message_contains_x_of(message: discord.Message, x: int, texts: List[str]) -> bool:
+async def message_contains_x_of(message: discord.Message, x: int, texts: List[str], normalize=False) -> bool:
     assert x <= len(texts)
     assert x > 0
 
+    if normalize:
+        content = unicodedata.normalize('NFKC', message.content).lower().strip()
+    else:
+        content = message.content.lower().strip()
+
     current_count = 0
     for text in texts:
-        if await message_contains(message, text):
+        if text.lower() in content:
             current_count += 1
             if current_count >= x:
                 return True

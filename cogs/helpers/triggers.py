@@ -88,6 +88,8 @@ class LibraCryptoDiscordBots(AutoTrigger):
         # Notice the weird i
         assert await message_contains_x_of(self.message, 2,
                                           ["christmas airdrop",
+                                           "airdrop",
+                                           "air drop",
                                            "heres the official tweet",
                                            "dont miss the current 1INCH",
                                            "okey that im sharing this but i claimed 1200$",

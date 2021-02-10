@@ -329,7 +329,7 @@ class AutoMod(commands.Cog):
         ) and act
 
         if spam_cond:
-            # Not a command or something
+            # Not a command or somethingmaster...tazz4843
             self.message_history[check_message.message.author].append(check_message.message)  # Add content for repeat-check later.
             self.message_history.reset_expiry(check_message.message.author)
 

@@ -102,7 +102,8 @@ class LibraCryptoDiscordBots(AutoTrigger):
                                            "i got 1400 dollars worth of 1inch tokens",
                                            "1inch",
                                            "1inch-airdrop.net",
-                                           "etherаirdrop.net"], normalize=True)
+                                           "etherаirdrop.net",
+                                           "ethereum аirdrop"], normalize=True)
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
         return True

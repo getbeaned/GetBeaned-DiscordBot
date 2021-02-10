@@ -10,7 +10,6 @@ import typing
 from typing import List
 
 import discord
-import unicodedata
 import ftfy
 
 if typing.TYPE_CHECKING:

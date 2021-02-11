@@ -102,7 +102,8 @@ class LibraCryptoDiscordBots(AutoTrigger):
                                            "1inch",
                                            "1inch-airdrop.net",
                                            "etherаirdrop.net",
-                                           "ethereum аirdrop"], normalize=True)
+                                           "ethereum аirdrop",
+                                           "ethereum-airdrop.io"], normalize=True)
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
         return True

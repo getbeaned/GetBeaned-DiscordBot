@@ -10,7 +10,7 @@ import typing
 from typing import List
 
 import discord
-import unicodedata
+import ftfy
 
 if typing.TYPE_CHECKING:
     from cogs.automod import CheckMessage
@@ -100,7 +100,9 @@ class LibraCryptoDiscordBots(AutoTrigger):
                                            "okey that im sharing this but i claimed 1200$",
                                            "i got 1400 dollars worth of 1inch tokens",
                                            "1inch",
-                                           "1inch-airdrop.net"], normalize=True)
+                                           "1inch-airdrop.net",
+                                           "etherаirdrop.net",
+                                           "ethereum аirdrop"], normalize=True)
 
         assert await member_joined_x_days_ago(self.message.author, x=2)
         return True
@@ -199,7 +201,7 @@ async def message_contains_x_of(message: discord.Message, x: int, texts: List[st
     assert x > 0
 
     if normalize:
-        content = unicodedata.normalize('NFKC', message.content).lower().strip()
+        content = ftfy.fix_text(message.content, normalization='NFKC').lower().strip()
     else:
         content = message.content.lower().strip()
 

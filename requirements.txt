@@ -7,3 +7,4 @@ objgraph
 psutil
 uvloop
 py-trello
+ftfy

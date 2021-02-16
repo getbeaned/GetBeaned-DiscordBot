@@ -475,7 +475,7 @@ class Support(commands.Cog):
         embed.add_field(name="Bot ping", value=f"{time_delta}ms")
         embed.add_field(name="Bot latency", value=f"{round(self.bot.latency * 1000)}ms")
 
-        messages["Connexion"] = embed
+        messages["Connection"] = embed
 
         ok = True
 
@@ -504,8 +504,6 @@ class Support(commands.Cog):
             except discord.HTTPException:
                 invite_error = "There was an error reading your invite code. Please check that the invite is valid."
                 ok = False
-
-
 
         embed = discord.Embed(description="Checking discord server settings since 1990",
                               color=Color.green() if ok else Color.red())

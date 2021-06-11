@@ -128,6 +128,9 @@ class AutoInspect(commands.Cog):
         if not await self.bot.settings.get(member.guild, 'autoinspect_enable'):
             return 'AutoInspect disabled on this guild.'
 
+        if member.bot:
+            return "Not acting on bots"
+
         logging_channel = await self.bot.get_cog('Logging').get_logging_channel(member.guild, "logs_autoinspect_channel_id")
 
         if not logging_channel:

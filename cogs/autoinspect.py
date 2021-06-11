@@ -70,8 +70,8 @@ class AutoInspect(commands.Cog):
         csmoney = member.name == "CS.Money Giveaway" and "558848bb9da07cf3a5564ab357393f7d" in avatar_url and cond
         ajar = "d425a7de8709f9492baa12544f2fa44d" in avatar_url and cond
         fixed_name = ftfy.fix_text(member.name, normalization='NFKC').lower()
-        honde = "h0nde" in fixed_name
-        honde = honde or "h0nda" in fixed_name
+        honde = "h0nde" in fixed_name and not member.bot
+        honde = honde or "h0nda" in fixed_name and not member.bot
 
         return bitcoin or csmoney or ajar or honde
 

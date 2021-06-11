@@ -69,7 +69,9 @@ class AutoInspect(commands.Cog):
         bitcoin = bool(re.match(r"^[A-Z][a-z]{2,10}($| [A-Z][a-z]{2,10}$)", member.name)) and "b97f153f3aadc5ae28cb1461d3f2be0c" in avatar_url and cond
         csmoney = member.name == "CS.Money Giveaway" and "558848bb9da07cf3a5564ab357393f7d" in avatar_url and cond
         ajar = "d425a7de8709f9492baa12544f2fa44d" in avatar_url and cond
-        honde = "twitter.com/h0nde" in ftfy.fix_text(member.name, normalization='NFKC').lower()
+        fixed_name = ftfy.fix_text(member.name, normalization='NFKC').lower()
+        honde = "h0nde" in fixed_name
+        honde = honde or "h0nda" in fixed_name
 
         return bitcoin or csmoney or ajar or honde
 

@@ -2,7 +2,7 @@ import random
 
 import aiohttp
 
-hastebins_servers = ["https://wastebin.travitia.xyz/", "https://hastebin.com/", "https://del.dog/", "http://bin.shortbin.eu:8080/", "https://mystb.in/"]
+hastebins_servers = ["https://hastebin.com/", "https://hastebin-plus.herokuapp.com/",  "https://mystb.in/"]
 
 
 async def upload_text(text: str) -> str:

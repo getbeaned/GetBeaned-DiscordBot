@@ -1,5 +1,5 @@
 # ⚠️ Warning, part of the code in that file comes from https://github.com/nerrixDE/simple-modlogs
-# It's copied and licenced specifically for this project under the foillowing conditions:
+# It's copied and licenced specifically for this project under the following conditions:
 # "You're allowed to use my code in your AGPL-Bot as long as you fufill all GPLv3 terms - just except same license, you can stick with AGPL"
 # https://discordapp.com/channels/110373943822540800/468690756899438603/709861176506318959
 
@@ -63,7 +63,9 @@ async def save_attachments(bot: 'GetBeaned', message: discord.Message):
 
 class Logging(commands.Cog):
     """
-    Logging events.
+    GetBeaned is able to log messages sent in your server in a logging channel on your server.
+    Please inform your members about it, for example in a #rules channel. You can check if
+    logging is enabled in the server profile (urls commmand)
 
     Here you'll find events that listen to message edition and deletion,
     and post the appropriate embeds in the appropriate channels if asked to by the guild settings

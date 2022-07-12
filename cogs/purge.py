@@ -126,9 +126,22 @@ class ModPurge(commands.Cog):
         to_send = '\n'.join(messages)
 
         if len(to_send) > 2000:
-            await ctx.send(f'Successfully removed {deleted} messages.')
+            m = await ctx.send(f'Successfully removed {deleted} messages.')
         else:
-            await ctx.send(to_send)
+            m = await ctx.send(to_send)
+
+        await m.add_reaction("🗑️")
+
+        def check(reaction: discord.Reaction, user: discord.User):
+            return user == ctx.author and str(reaction.emoji) == '🗑️' and reaction.message.id == m.id
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=1200.0, check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            await m.delete(delay=0)
+            await ctx.message.delete(delay=0)
 
     @remove.command()
     async def embeds(self, ctx: 'CustomContext', search: int = 100):

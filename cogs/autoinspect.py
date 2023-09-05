@@ -28,7 +28,7 @@ class AutoInspect(commands.Cog):
                        'autoinspect_bitcoin_bots': self.bitcoin_bots_check,
                        'autoinspect_suspicious': self.suspicious_check,}
         self.bypass_cache = bot.cache.get_cache("autoinspect_bypass_cache", expire_after=600, strict=True)
-        self.joins_cache = bot.cache.get_cache("massjoins_cache", expire_after=180, strict=True)
+        self.joins_cache = bot.cache.get_cache("massjoins_cache", expire_after=60, strict=True)
         self.protected_cache = bot.cache.get_cache("massjoins_protected", expire_after=300, strict=True)
 
     async def suspicious_check(self, member: discord.Member) -> bool:
@@ -166,7 +166,7 @@ class AutoInspect(commands.Cog):
 
         if self.protected_cache.get(guild, False):
             await full_process(self.bot, kick, member, autoinspect_user, reason=f"Automatic kick by AutoInspect because of too many joins",
-                               automod_logs=f"{joins_count} joins in the last 3 minutes")
+                               automod_logs=f"{joins_count} joins on the server in the last minutes... Please try joining later...")
             return
         else:
             if joins_count >= 15:
@@ -174,7 +174,7 @@ class AutoInspect(commands.Cog):
                 tokick = self.joins_cache[guild]
                 for member in tokick:
                     await full_process(self.bot, kick, member, autoinspect_user, reason=f"Automatic kick by AutoInspect because of too many joins",
-                                       automod_logs=f"{joins_count} joins in the last 3 minutes")
+                                       automod_logs=f"{joins_count} joins on the server in the last minutes... Please try joining later...")
 
 
 def setup(bot: 'GetBeaned'):

@@ -95,7 +95,7 @@ class AutoMod(commands.Cog):
             r"""
                 discord      # Literally just discord
                 \s?          # Sometimes people use spaces before dots to twhart the AutoMod. Let's stop that by allowing 1 space here
-                (?:app\s?)?(\.\s?com\s?/invite|\.\s?gg)\s?/ # All the domains
+                (?:app\s?)?(?:\.\s?com\s?/invite|\.\s?gg)\s?/ # All the domains
                 \s?          # And here too
                 ((?!.*[Ii10OolL]).[a-zA-Z0-9]{5,12}|[a-zA-Z0-9\-]{2,32}) # Rest of the fucking owl.
                 """, flags=re.VERBOSE)
@@ -139,9 +139,11 @@ class AutoMod(commands.Cog):
             total = 0
             for invite in invites:
                 check_message.debug(f"Checking invite code : {invite}")
+
                 invite_obj = self.invites_codes_cache.get(invite, None)
                 try:
                     if invite_obj is None:
+                        print(f"Checking invite code : {invite}")
                         invite_obj = await self.bot.fetch_invite(invite, with_counts=True)
                     self.invites_codes_cache[invite] = invite_obj
                     if invite_obj.guild.id not in [195260081036591104, 449663867841413120, 512328935304855555] + [check_message.message.guild.id]:
